@@ -1,5 +1,11 @@
 import type { DirectiveDefinition } from "../csp/directives";
 import { KEYWORD_OPTIONS } from "../csp/keywords";
+import { createNonceHelper } from "./NonceHelper";
+import { createStyleAttrHashHelper } from "./StyleAttrHashHelper";
+
+const SCRIPT_NONCE_DIRECTIVES = new Set(["script-src", "script-src-elem"]);
+const STYLE_NONCE_DIRECTIVES = new Set(["style-src", "style-src-elem"]);
+const STYLE_HASH_DIRECTIVES = new Set(["style-src-attr"]);
 
 export interface SourceListEditorOptions {
   directive: DirectiveDefinition;
@@ -43,6 +49,52 @@ export function createSourceListEditor(
   valuesList.className = "values-list";
   valuesList.setAttribute("role", "list");
   contentArea.appendChild(valuesList);
+
+  function addConfirmedValue(value: string): void {
+    if (!values.includes(value)) {
+      values.push(value);
+      renderValuesList();
+      onChange();
+    }
+  }
+
+  if (SCRIPT_NONCE_DIRECTIVES.has(directive.name)) {
+    contentArea.appendChild(
+      createNonceHelper({
+        idPrefix,
+        helpId,
+        variant: "script",
+        addValue: addConfirmedValue,
+        getValues: () => values,
+        onChange,
+      }),
+    );
+  }
+
+  if (STYLE_NONCE_DIRECTIVES.has(directive.name)) {
+    contentArea.appendChild(
+      createNonceHelper({
+        idPrefix,
+        helpId,
+        variant: "style",
+        addValue: addConfirmedValue,
+        getValues: () => values,
+        onChange,
+      }),
+    );
+  }
+
+  if (STYLE_HASH_DIRECTIVES.has(directive.name)) {
+    contentArea.appendChild(
+      createStyleAttrHashHelper({
+        idPrefix,
+        helpId,
+        addValue: addConfirmedValue,
+        getValues: () => values,
+        onChange,
+      }),
+    );
+  }
 
   container.appendChild(contentArea);
 

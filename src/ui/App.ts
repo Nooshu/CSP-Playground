@@ -9,6 +9,7 @@ import {
   type DirectiveSectionHandle,
 } from "./DirectiveSection";
 import { createPolicyOutput, type PolicyOutputPanel } from "./PolicyOutput";
+import { createSecurityScorePanel } from "./SecurityScore";
 import { createUrlImporter } from "./UrlImporter";
 
 const CATEGORY_ORDER: DirectiveCategory[] = [
@@ -22,6 +23,7 @@ const CATEGORY_ORDER: DirectiveCategory[] = [
 export function createApp(root: HTMLElement): void {
   const sections: DirectiveSectionHandle[] = [];
   let outputPanel: PolicyOutputPanel | null = null;
+  let securityScorePanel: ReturnType<typeof createSecurityScorePanel> | null = null;
 
   function collectState(): PolicyState {
     const state: PolicyState = {};
@@ -37,10 +39,22 @@ export function createApp(root: HTMLElement): void {
 
   function handleChange(): void {
     outputPanel?.update();
+    securityScorePanel?.update();
   }
 
   root.innerHTML = "";
   root.className = "app";
+
+  outputPanel = createPolicyOutput({
+    getState: collectState,
+    onModeChange: handleChange,
+  }) as PolicyOutputPanel;
+
+  securityScorePanel = createSecurityScorePanel({
+    getState: collectState,
+    getReportOnly: () => outputPanel?.getReportOnly() ?? false,
+  });
+  document.body.appendChild(securityScorePanel);
 
   const header = document.createElement("header");
   header.className = "app-header";
@@ -59,8 +73,6 @@ export function createApp(root: HTMLElement): void {
   const layout = document.createElement("div");
   layout.className = "app-layout";
   root.appendChild(layout);
-
-  outputPanel = createPolicyOutput({ getState: collectState }) as PolicyOutputPanel;
 
   const form = document.createElement("form");
   form.className = "directive-form";

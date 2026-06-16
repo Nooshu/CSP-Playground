@@ -27,6 +27,7 @@ export function createDirectiveSection(
 
   const article = document.createElement("article");
   article.className = "directive-section";
+  article.id = `directive-section-${directive.name}`;
   article.dataset.directive = directive.name;
 
   const header = document.createElement("div");
