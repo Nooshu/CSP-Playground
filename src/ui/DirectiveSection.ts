@@ -14,6 +14,8 @@ export interface DirectiveSectionOptions {
 export interface DirectiveSectionHandle {
   element: HTMLElement;
   getState: () => { enabled: boolean; values: string[] };
+  setState: (state: { enabled: boolean; values: string[] }) => void;
+  reset: () => void;
 }
 
 export function createDirectiveSection(
@@ -56,6 +58,7 @@ export function createDirectiveSection(
   let singleInput: HTMLInputElement | null = null;
   let trustedTypesInputs: HTMLInputElement[] = [];
   let trustedTypesForSelect: HTMLSelectElement | null = null;
+  let setTrustedTypePolicyNames: ((names: string[]) => void) | null = null;
 
   switch (directive.type) {
     case "source-list": {
@@ -187,6 +190,19 @@ export function createDirectiveSection(
 
       addPolicyInput();
       controls.append(inputsContainer, addBtn);
+
+      setTrustedTypePolicyNames = (names: string[]) => {
+        inputsContainer.innerHTML = "";
+        trustedTypesInputs = [];
+        if (names.length === 0) {
+          addPolicyInput();
+          return;
+        }
+        for (const name of names) {
+          addPolicyInput();
+          trustedTypesInputs.at(-1)!.value = name;
+        }
+      };
       break;
     }
     case "require-trusted-types-for": {
@@ -235,14 +251,77 @@ export function createDirectiveSection(
       });
   }
 
-  enableCheckbox.addEventListener("change", () => {
-    const enabled = enableCheckbox.checked;
+  function applyEnabled(enabled: boolean): void {
+    enableCheckbox.checked = enabled;
     controls.hidden = !enabled;
     setControlsEnabled(enabled);
+  }
+
+  enableCheckbox.addEventListener("change", () => {
+    applyEnabled(enableCheckbox.checked);
     onChange();
   });
 
   setControlsEnabled(false);
+
+  function setState(state: { enabled: boolean; values: string[] }): void {
+    applyEnabled(state.enabled);
+
+    if (!state.enabled) return;
+
+    switch (directive.type) {
+      case "source-list":
+        sourceEditor?.setValues(state.values);
+        break;
+      case "source-single":
+        if (singleInput) {
+          singleInput.value = state.values[0] ?? "";
+        }
+        break;
+      case "sandbox":
+        for (const checkbox of sandboxCheckboxes) {
+          checkbox.checked = state.values.includes(checkbox.value);
+        }
+        break;
+      case "trusted-types":
+        setTrustedTypePolicyNames?.(state.values);
+        break;
+      case "require-trusted-types-for":
+        if (trustedTypesForSelect && state.values[0]) {
+          trustedTypesForSelect.value = state.values[0];
+        }
+        break;
+      case "boolean":
+        break;
+    }
+  }
+
+  function reset(): void {
+    setState({ enabled: false, values: [] });
+    switch (directive.type) {
+      case "source-list":
+        sourceEditor?.setValues([]);
+        break;
+      case "source-single":
+        if (singleInput) singleInput.value = "";
+        break;
+      case "sandbox":
+        for (const checkbox of sandboxCheckboxes) {
+          checkbox.checked = false;
+        }
+        break;
+      case "trusted-types":
+        setTrustedTypePolicyNames?.([]);
+        break;
+      case "require-trusted-types-for":
+        if (trustedTypesForSelect) {
+          trustedTypesForSelect.selectedIndex = 0;
+        }
+        break;
+      default:
+        break;
+    }
+  }
 
   function getState(): { enabled: boolean; values: string[] } {
     const enabled = enableCheckbox.checked;
@@ -283,5 +362,5 @@ export function createDirectiveSection(
     }
   }
 
-  return { element: article, getState };
+  return { element: article, getState, setState, reset };
 }
