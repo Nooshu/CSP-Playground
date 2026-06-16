@@ -2,5 +2,9 @@ node_modules
 dist
 coverage
 package-lock.json
+.wrangler
+.env
+.env.*
+!.env.example
 .DS_Store
 *.local

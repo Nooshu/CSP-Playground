@@ -8,7 +8,8 @@ Guidance for AI coding agents working in the CSP Builder repository.
 
 - **Stack:** Vite, TypeScript, vanilla DOM (no React), Yarn
 - **Purpose:** Browser-based Content Security Policy header builder with URL import, security scoring, and server export snippets
-- **Package manager:** **Yarn v1** — use `yarn.lock` as the single source of truth. Do not use `npm install` for dependency changes.
+- **Package manager:** **Yarn v1 (classic)** — use `yarn.lock` as the single source of truth. Do not use `npm install` for dependency changes.
+- **Production builds:** [Cloudflare Pages v3 build image](https://developers.cloudflare.com/pages/configuration/build-image/) — Node **22.16.0**, Yarn **1.22.22** (via env var; see below).
 
 ## Key paths
 
@@ -21,6 +22,7 @@ Guidance for AI coding agents working in the CSP Builder repository.
 | Cloudflare Pages API | `functions/api/` |
 | Tests | `tests/` (Vitest + jsdom) |
 | Cursor rules | `.cursor/rules/*.mdc` |
+| Pages config | `wrangler.toml` |
 
 ## Commands
 
@@ -54,6 +56,49 @@ Summary:
    Do **not** run `yarn verify:deps` after each individual package change; batch updates, then verify once.
 
 4. **Transitive dependencies** — every resolved tarball in `yarn.lock` must have an `integrity` hash. The verify script fails if any are missing.
+
+All dependency work must also follow `.cursor/rules/cloudflare-pages-v3.mdc` for Pages v3 compatibility.
+
+## Cloudflare Pages v3 compatibility (required)
+
+Deploys use the **Pages v3 build image** (Ubuntu 22.04, x86_64). Toolchain and package choices must work on that environment.
+
+### Toolchain pins
+
+| Tool | v3 default | This project | How to pin |
+|------|------------|--------------|------------|
+| Node.js | 22.16.0 | 22.16.0 | `.nvmrc` — **exact semver only** |
+| Yarn | 4.9.1 | 1.22.22 (classic) | `YARN_VERSION=1.22.22` in Pages build env vars |
+
+**Critical:** v3 does **not** detect Yarn 1 from `yarn.lock`. Without `YARN_VERSION=1.22.22` in the Cloudflare Pages dashboard (production **and** preview), the build uses Yarn 4 and fails against this lockfile.
+
+v3 also does **not** read `package.json` → `engines` for Node or package managers. Use `.nvmrc` for the Pages build Node version; `engines.node` (`>=22.16.0`) is for local tooling only. Do not use Node codenames in `.nvmrc` (e.g. `lts/hydrogen`).
+
+### Package compatibility rules
+
+- Stay on **Yarn v1** unless the user explicitly requests a migration.
+- New dependencies must install on **Linux x86_64 + Node 22** (the v3 build container).
+- Keep test-only packages (`vitest`, `jsdom`, coverage, `wrangler`) in `devDependencies`. Pages runs `yarn build` only.
+- **Pages Functions** (`functions/`) use the Workers runtime — shared `server/` code must use Web APIs, not Node built-ins, unless `nodejs_compat` is enabled and verified.
+
+### Verify deploy-related changes
+
+Use the Node version from `.nvmrc`, then:
+
+```bash
+yarn install
+yarn verify:deps   # once, after all dependency edits
+yarn build
+yarn test
+```
+
+Use `yarn pages:dev` when changing Functions or shared server lookup code.
+
+### Pages dashboard settings
+
+- **Build command:** `yarn build`
+- **Build output directory:** `dist`
+- **Build environment variables:** `YARN_VERSION=1.22.22` (required); `NODE_VERSION=22.16.0` (optional if `.nvmrc` is committed)
 
 ## Testing expectations
 

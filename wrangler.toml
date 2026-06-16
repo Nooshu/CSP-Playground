@@ -1,3 +1,6 @@
 name = "csp-builder"
 compatibility_date = "2024-09-23"
 pages_build_output_dir = "dist"
+
+# Pages v3 build image: Node 22.16.0 (see .nvmrc), Yarn 1.22.22 via dashboard
+# YARN_VERSION=1.22.22 — required; v3 defaults to Yarn 4 and will not read yarn.lock v1.

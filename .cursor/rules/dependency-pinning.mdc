@@ -6,7 +6,9 @@ alwaysApply: false
 
 # Dependency pinning and integrity verification
 
-This project uses **Yarn v1** with a committed `yarn.lock`. Treat `package-lock.json` as non-canonical; prefer Yarn for all dependency work.
+This project uses **Yarn v1 (classic)** with a committed `yarn.lock`. Treat `package-lock.json` as non-canonical; prefer Yarn for all dependency work.
+
+**Cloudflare Pages v3:** the build image defaults to Yarn 4 and Node 22.16.0. This repo requires `YARN_VERSION=1.22.22` in Pages build env vars and an exact Node version in `.nvmrc`. v3 does not read `engines` or infer Yarn from the lockfile. See `.cursor/rules/cloudflare-pages-v3.mdc`.
 
 ## Pinning rules
 
@@ -37,6 +39,7 @@ When adding, removing, or bumping dependencies:
 
 4. Fix any reported unpinned versions or missing integrity hashes before committing.
 5. Commit both `package.json` and `yarn.lock`.
+6. Confirm compatibility with Pages v3: `yarn build` and `yarn test` on Node **22.16.0** (see `.nvmrc`).
 
 ## Do not
 
