@@ -4,6 +4,7 @@ import {
   TRUSTED_TYPES_FOR_OPTIONS,
 } from "../csp/directives";
 import { createSourceListEditor } from "./SourceListEditor";
+import { createFlagInfoIcon } from "./FlagInfoIcon";
 import { createMdnInfoLink } from "./mdnLink";
 
 export interface DirectiveSectionOptions {
@@ -123,7 +124,19 @@ export function createDirectiveSection(
         checkbox.value = flag;
         checkbox.addEventListener("change", onChange);
 
-        flagLabel.append(checkbox, flag);
+        const flagName = document.createElement("span");
+        flagName.className = "sandbox-flag-name";
+        flagName.textContent = flag;
+
+        flagLabel.append(
+          checkbox,
+          flagName,
+          createFlagInfoIcon({
+            group: "sandbox",
+            flagKey: flag,
+            idPrefix,
+          }),
+        );
         grid.appendChild(flagLabel);
         sandboxCheckboxes.push(checkbox);
       }

@@ -493,11 +493,64 @@ select {
 .sandbox-flag-label {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
+  gap: var(--space-xs);
   font-family: var(--font-mono);
   font-size: 0.8125rem;
   min-height: 2.75rem;
   cursor: pointer;
+}
+
+.sandbox-flag-name {
+  flex: 1;
+  min-width: 0;
+}
+
+.flag-info-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.flag-info-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0;
+  color: var(--color-text-muted);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  cursor: help;
+}
+
+.flag-info-btn:hover,
+.flag-info-btn:focus-visible {
+  color: var(--color-primary);
+  background: var(--color-chip-bg);
+  border-color: var(--color-border-subtle);
+}
+
+.flag-info-tooltip {
+  position: absolute;
+  z-index: 300;
+  top: calc(100% + 0.25rem);
+  right: 0;
+  width: max-content;
+  max-width: 16rem;
+  padding: var(--space-sm);
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.flag-info-tooltip[hidden] {
+  display: none;
 }
 
 .btn {
@@ -592,6 +645,38 @@ select {
 .policy-output h2 {
   margin: 0 0 var(--space-md);
   font-size: 1.125rem;
+}
+
+.policy-warning {
+  margin: 0 0 var(--space-md);
+  padding: var(--space-md);
+  border: 1px solid var(--color-deprecated-bg);
+  border-left: 4px solid var(--color-deprecated);
+  border-radius: var(--radius);
+  background: var(--color-deprecated-bg);
+}
+
+.policy-warning p {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--color-deprecated);
+}
+
+.policy-warning a {
+  color: #78350f;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.policy-warning a:hover {
+  color: #92400e;
+}
+
+.policy-warning a:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
 }
 
 .output-group {

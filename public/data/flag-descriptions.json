@@ -1,0 +1,18 @@
+{
+  "sandbox": {
+    "allow-downloads": "Lets the sandboxed document start downloads of files.",
+    "allow-forms": "Allows the sandboxed document to submit forms.",
+    "allow-modals": "Lets the sandboxed document open modal dialogs such as alert, confirm, and print.",
+    "allow-orientation-lock": "Allows the sandboxed document to lock screen orientation.",
+    "allow-pointer-lock": "Enables the Pointer Lock API inside the sandboxed document.",
+    "allow-popups": "Allows popups such as window.open() to be created from the sandboxed document.",
+    "allow-popups-to-escape-sandbox": "Allows popups opened from the sandbox to run without the sandbox restrictions.",
+    "allow-presentation": "Grants access to the Presentation API from the sandboxed document.",
+    "allow-same-origin": "Treats the sandboxed content as same-origin with its iframe, reducing isolation.",
+    "allow-scripts": "Allows JavaScript to run inside the sandboxed document.",
+    "allow-storage-access-by-user-activation": "Permits storage access requests after an explicit user gesture.",
+    "allow-top-navigation": "Allows the sandboxed document to navigate the top-level browsing context.",
+    "allow-top-navigation-by-user-activation": "Allows top-level navigation only after a user gesture.",
+    "allow-top-navigation-to-custom-protocols": "Allows top-level navigation to custom URL schemes after a user gesture."
+  }
+}
