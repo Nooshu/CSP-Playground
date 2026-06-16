@@ -23,6 +23,30 @@ export function createPolicyOutput(options: PolicyOutputOptions): HTMLElement {
   heading.textContent = "Generated policy";
   panel.appendChild(heading);
 
+  const warning = document.createElement("div");
+  warning.className = "policy-warning";
+  warning.setAttribute("role", "note");
+  warning.setAttribute("aria-label", "Content Security Policy disclaimer");
+
+  const warningText = document.createElement("p");
+  warningText.textContent =
+    "A CSP deployed without careful testing can break your site. Use at your own risk—the authors accept no liability for outages or regressions. ";
+
+  const guideLink = document.createElement("a");
+  guideLink.href = "https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CSP";
+  guideLink.target = "_blank";
+  guideLink.rel = "noopener noreferrer";
+  guideLink.referrerPolicy = "no-referrer";
+  guideLink.textContent = "MDN: implementing CSP safely";
+  guideLink.setAttribute(
+    "aria-label",
+    "MDN: implementing CSP safely (opens in new tab)",
+  );
+
+  warningText.append(guideLink);
+  warning.appendChild(warningText);
+  panel.appendChild(warning);
+
   const modeFieldset = document.createElement("fieldset");
   modeFieldset.className = "mode-fieldset";
   modeFieldset.id = "policy-header-mode";
