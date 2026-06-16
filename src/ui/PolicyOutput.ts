@@ -7,10 +7,11 @@ import {
 
 export interface PolicyOutputOptions {
   getState: () => PolicyState;
+  onModeChange?: () => void;
 }
 
 export function createPolicyOutput(options: PolicyOutputOptions): HTMLElement {
-  const { getState } = options;
+  const { getState, onModeChange } = options;
   let reportOnly = false;
   let selectedServer: WebServerId = "apache";
 
@@ -24,6 +25,7 @@ export function createPolicyOutput(options: PolicyOutputOptions): HTMLElement {
 
   const modeFieldset = document.createElement("fieldset");
   modeFieldset.className = "mode-fieldset";
+  modeFieldset.id = "policy-header-mode";
 
   const modeLegend = document.createElement("legend");
   modeLegend.textContent = "Header mode";
@@ -193,11 +195,13 @@ export function createPolicyOutput(options: PolicyOutputOptions): HTMLElement {
   enforceRadio.addEventListener("change", () => {
     reportOnly = false;
     update();
+    onModeChange?.();
   });
 
   reportOnlyRadio.addEventListener("change", () => {
     reportOnly = true;
     update();
+    onModeChange?.();
   });
 
   serverSelect.addEventListener("change", () => {
@@ -230,16 +234,19 @@ export function createPolicyOutput(options: PolicyOutputOptions): HTMLElement {
 
   return Object.assign(panel, {
     update,
+    getReportOnly: () => reportOnly,
     setReportOnly: (value: boolean) => {
       reportOnly = value;
       enforceRadio.checked = !value;
       reportOnlyRadio.checked = value;
       update();
+      onModeChange?.();
     },
   });
 }
 
 export type PolicyOutputPanel = HTMLElement & {
   update: () => void;
+  getReportOnly: () => boolean;
   setReportOnly: (value: boolean) => void;
 };
