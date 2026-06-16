@@ -1,3 +1,15 @@
+/**
+ * CSP directive metadata driving the builder form structure.
+ *
+ * @remarks
+ * Each {@link DirectiveDefinition} describes one directive’s UI category, control
+ * type, and help text. {@link DIRECTIVES} is the canonical list rendered in the
+ * form; {@link DIRECTIVES_BY_CATEGORY} groups them for fieldset legends.
+ *
+ * @see {@link getMdnDirectiveUrl} for documentation links shown beside each directive.
+ */
+
+/** High-level CSP directive grouping used for form fieldsets. */
 export type DirectiveCategory =
   | "fetch"
   | "document"
@@ -5,6 +17,7 @@ export type DirectiveCategory =
   | "reporting"
   | "other";
 
+/** Determines which editor control set is rendered for a directive. */
 export type DirectiveType =
   | "source-list"
   | "source-single"
@@ -13,6 +26,7 @@ export type DirectiveType =
   | "require-trusted-types-for"
   | "boolean";
 
+/** Static metadata for one CSP directive in the builder. */
 export interface DirectiveDefinition {
   name: string;
   category: DirectiveCategory;
@@ -21,6 +35,7 @@ export interface DirectiveDefinition {
   deprecated?: boolean;
 }
 
+/** Human-readable legend text for each {@link DirectiveCategory}. */
 export const CATEGORY_LABELS: Record<DirectiveCategory, string> = {
   fetch: "Fetch directives",
   document: "Document directives",
@@ -29,6 +44,11 @@ export const CATEGORY_LABELS: Record<DirectiveCategory, string> = {
   other: "Other directives",
 };
 
+/**
+ * Sandbox flag tokens selectable when the `sandbox` directive is enabled.
+ *
+ * @see {@link https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Security-Policy/sandbox | sandbox on MDN}
+ */
 export const SANDBOX_FLAGS = [
   "allow-downloads",
   "allow-forms",
@@ -46,15 +66,28 @@ export const SANDBOX_FLAGS = [
   "allow-top-navigation-to-custom-protocols",
 ] as const;
 
+/** Allowed values for `require-trusted-types-for` (currently only `'script'`). */
 export const TRUSTED_TYPES_FOR_OPTIONS = ["'script'"] as const;
 
+/** Base MDN URL for per-directive documentation links. */
 export const MDN_CSP_DIRECTIVE_BASE =
   "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Security-Policy";
 
+/**
+ * Builds the MDN documentation URL for a CSP directive name.
+ *
+ * @param directiveName - Directive token (for example, `script-src`).
+ */
 export function getMdnDirectiveUrl(directiveName: string): string {
   return `${MDN_CSP_DIRECTIVE_BASE}/${directiveName}`;
 }
 
+/**
+ * Complete list of directives shown in the builder, in definition order.
+ *
+ * @remarks
+ * Category section comments (`// Fetch directives`, etc.) mirror MDN groupings.
+ */
 export const DIRECTIVES: DirectiveDefinition[] = [
   // Fetch directives
   {
@@ -237,6 +270,9 @@ export const DIRECTIVES: DirectiveDefinition[] = [
   },
 ];
 
+/**
+ * Directives grouped by {@link DirectiveCategory} for rendering categorized fieldsets.
+ */
 export const DIRECTIVES_BY_CATEGORY = DIRECTIVES.reduce(
   (acc, directive) => {
     if (!acc[directive.category]) {

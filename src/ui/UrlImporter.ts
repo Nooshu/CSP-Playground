@@ -1,15 +1,42 @@
+/**
+ * Form for importing an existing CSP from a live site URL.
+ *
+ * @remarks
+ * Fetches policy text via {@link lookupCspFromUrl}, parses it with
+ * {@link parsePolicyString}, and applies values through {@link applyParsedPolicy}.
+ * Also syncs report-only mode on the output panel when the source used
+ * `Content-Security-Policy-Report-Only`.
+ *
+ * @see {@link lookupCspFromUrl}
+ * @see {@link applyParsedPolicy}
+ */
+
 import { lookupCspFromUrl, type CspLookupFailure } from "../api/lookupCsp";
 import { parsePolicyString } from "../csp/parsePolicy";
 import { applyParsedPolicy } from "./applyPolicy";
 import type { DirectiveSectionHandle } from "./DirectiveSection";
 import type { PolicyOutputPanel } from "./PolicyOutput";
 
+/** Options for the URL policy importer section. */
 export interface UrlImporterOptions {
+  /** All directive sections to reset and pre-fill from the imported policy. */
   sections: DirectiveSectionHandle[];
+  /** Output panel whose report-only mode reflects the imported header. */
   outputPanel: PolicyOutputPanel;
+  /** Called after a successful import so previews and score refresh. */
   onApplied: () => void;
 }
 
+/**
+ * Creates the "Import existing policy" section with URL lookup form.
+ *
+ * @param options - Directive handles, output panel, and post-import callback.
+ * @returns The mounted `<section>` element.
+ *
+ * @remarks
+ * Lookup runs asynchronously on submit; controls are disabled while fetching.
+ * A missing CSP shows an inline link to `/why-csp.html` rather than an error tone.
+ */
 export function createUrlImporter(options: UrlImporterOptions): HTMLElement {
   const { sections, outputPanel, onApplied } = options;
 

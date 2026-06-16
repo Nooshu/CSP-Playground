@@ -1,3 +1,15 @@
+/**
+ * Collapsible helper for SHA-256 hashes of inline `style=""` attribute values.
+ *
+ * @remarks
+ * Inline style attributes cannot use nonces; this helper hashes the exact attribute
+ * value and adds both the `'sha256-…'` source and `'unsafe-hashes'` when needed.
+ * Used for the `style-src-attr` directive inside {@link createSourceListEditor}.
+ *
+ * @see {@link sha256Base64FromText}
+ * @see {@link formatSha256HashForCsp}
+ */
+
 import {
   buildInlineStyleAttributeSnippet,
   formatSha256HashForCsp,
@@ -5,14 +17,30 @@ import {
   STYLE_ATTR_UNSAFE_HASHES,
 } from "../csp/hash";
 
+/** Options for the style-attribute hash helper in a source list editor. */
 export interface StyleAttrHashHelperOptions {
+  /** Prefix for element IDs scoped to the parent directive section. */
   idPrefix: string;
+  /** ID of the directive help text referenced by `aria-describedby`. */
   helpId: string;
+  /** Adds a confirmed CSP source value to the parent source list. */
   addValue: (value: string) => void;
+  /** Returns current confirmed values so duplicates are skipped. */
   getValues: () => string[];
+  /** Called when a new hash or keyword is added to the list. */
   onChange: () => void;
 }
 
+/**
+ * Creates a `<details>` panel for hashing inline style attribute values.
+ *
+ * @param options - IDs and callbacks wired to the parent source list.
+ * @returns The mounted helper element.
+ *
+ * @remarks
+ * Hashing is async (Web Crypto). The input must match the exact characters inside
+ * `style="…"` on the page, including spacing and casing.
+ */
 export function createStyleAttrHashHelper(
   options: StyleAttrHashHelperOptions,
 ): HTMLElement {

@@ -1,3 +1,17 @@
+/**
+ * Root application shell for the CSP builder UI.
+ *
+ * @remarks
+ * Wires together directive sections (grouped by category), the policy output panel,
+ * security score sidebar, and URL importer. State is collected from all directive
+ * sections on each change and passed to the output and score panels.
+ *
+ * @see {@link createDirectiveSection}
+ * @see {@link createPolicyOutput}
+ * @see {@link createSecurityScorePanel}
+ * @see {@link createUrlImporter}
+ */
+
 import type { PolicyState } from "../csp/buildPolicy";
 import {
   CATEGORY_LABELS,
@@ -20,6 +34,15 @@ const CATEGORY_ORDER: DirectiveCategory[] = [
   "other",
 ];
 
+/**
+ * Mounts the CSP builder into the given DOM root.
+ *
+ * @param root - Container element (typically `#app` from the page shell).
+ *
+ * @remarks
+ * Clears and repopulates `root`, appends the security score panel to
+ * `document.body`, and triggers an initial output refresh.
+ */
 export function createApp(root: HTMLElement): void {
   const sections: DirectiveSectionHandle[] = [];
   let outputPanel: PolicyOutputPanel | null = null;

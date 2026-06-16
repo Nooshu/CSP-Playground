@@ -1,3 +1,14 @@
+/**
+ * Editable CSP source list for fetch directives (`script-src`, `style-src`, etc.).
+ *
+ * @remarks
+ * Manages confirmed keyword/source chips, custom URL inputs, and optional helper
+ * panels (nonce generation, style-attribute hashing) depending on directive name.
+ *
+ * @see {@link createNonceHelper}
+ * @see {@link createStyleAttrHashHelper}
+ */
+
 import type { DirectiveDefinition } from "../csp/directives";
 import { KEYWORD_OPTIONS } from "../csp/keywords";
 import { createNonceHelper } from "./NonceHelper";
@@ -7,11 +18,25 @@ const SCRIPT_NONCE_DIRECTIVES = new Set(["script-src", "script-src-elem"]);
 const STYLE_NONCE_DIRECTIVES = new Set(["style-src", "style-src-elem"]);
 const STYLE_HASH_DIRECTIVES = new Set(["style-src-attr"]);
 
+/** Options for mounting a source list editor inside a directive section. */
 export interface SourceListEditorOptions {
+  /** Directive whose sources are being edited; drives helpers and labels. */
   directive: DirectiveDefinition;
+  /** Called when the confirmed source list changes. */
   onChange: () => void;
 }
 
+/**
+ * Builds a source list editor inside an existing container element.
+ *
+ * @param container - Parent element whose contents are replaced with the editor UI.
+ * @param options - Directive metadata and change callback.
+ * @returns Accessors to read, replace, and enable/disable the source list.
+ *
+ * @remarks
+ * Duplicate values are ignored on add. Pending custom inputs are cleared when
+ * {@link setValues} runs (for example during policy import).
+ */
 export function createSourceListEditor(
   container: HTMLElement,
   options: SourceListEditorOptions,
@@ -236,6 +261,7 @@ export function createSourceListEditor(
     input.addEventListener("keydown", (event) => {
       if (event.key === "Enter") {
         event.preventDefault();
+        // Confirm on Enter without submitting the outer directive form.
         confirmCustomInput(input, row);
       }
     });

@@ -1,3 +1,16 @@
+/**
+ * Collapsible helpers for generating script and style nonces in source lists.
+ *
+ * @remarks
+ * Produces cryptographically random nonces via {@link generateNonce}, formats them
+ * for CSP source lists, and optionally adds host sources for external resources.
+ * Used inside {@link createSourceListEditor} for `script-src*` and `style-src*`
+ * directives.
+ *
+ * @see {@link generateNonce}
+ * @see {@link formatNonceForCsp}
+ */
+
 import {
   buildExternalScriptSnippet,
   buildExternalStylesheetSnippet,
@@ -10,6 +23,7 @@ import {
   parseStylesheetUrl,
 } from "../csp/nonce";
 
+/** Whether the helper targets script or stylesheet/style inline nonces. */
 export type NonceHelperVariant = "script" | "style";
 
 interface NonceVariantConfig {
@@ -63,15 +77,32 @@ const NONCE_VARIANTS: Record<NonceHelperVariant, NonceVariantConfig> = {
   },
 };
 
+/** Options for mounting a nonce helper inside a source list editor. */
 export interface NonceHelperOptions {
+  /** Prefix for element IDs scoped to the parent directive section. */
   idPrefix: string;
+  /** ID of the directive help text referenced by `aria-describedby`. */
   helpId: string;
+  /** Script vs style variant; controls labels and snippet builders. */
   variant: NonceHelperVariant;
+  /** Adds a confirmed CSP source value to the parent source list. */
   addValue: (value: string) => void;
+  /** Returns current confirmed values so duplicates are skipped. */
   getValues: () => string[];
+  /** Called when a new nonce (or host source) is added to the list. */
   onChange: () => void;
 }
 
+/**
+ * Creates a `<details>` panel for generating nonces and HTML snippets.
+ *
+ * @param options - IDs, variant, and callbacks wired to the parent source list.
+ * @returns The mounted helper element.
+ *
+ * @remarks
+ * External mode adds both `'nonce-…'` and a host source derived from the URL.
+ * Inline mode requires non-empty pasted content before generation.
+ */
 export function createNonceHelper(options: NonceHelperOptions): HTMLElement {
   const { idPrefix, helpId, variant, addValue, getValues, onChange } = options;
   const config = NONCE_VARIANTS[variant];

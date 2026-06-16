@@ -1,3 +1,12 @@
+/**
+ * Server-specific configuration snippets for deploying CSP response headers.
+ *
+ * @remarks
+ * Each exporter escapes quotes and backslashes appropriately for its target
+ * format. Only servers that support setting response headers are included.
+ */
+
+/** Identifier for a supported web server or proxy export format. */
 export type WebServerId =
   | "apache"
   | "nginx"
@@ -7,21 +16,34 @@ export type WebServerId =
   | "traefik"
   | "envoy";
 
+/** Metadata and formatter for one web server export target. */
 export interface WebServerExport {
   id: WebServerId;
+  /** Display name in the server export dropdown. */
   name: string;
+  /** Short help text describing where to paste the snippet. */
   description: string;
+  /** Produces a config fragment for the given header name and policy value. */
   format: (headerName: string, policy: string) => string;
 }
 
+/** Escapes values embedded in Apache `Header` directives (double-quoted). */
 function escapeApacheValue(value: string): string {
   return value.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
 }
 
+/** Escapes values embedded in Nginx/Caddy-style double-quoted config strings. */
 function escapeNginxValue(value: string): string {
   return value.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
 }
 
+/**
+ * All supported web server export formats, in dropdown order.
+ *
+ * @remarks
+ * `format` receives the full header name (for example,
+ * `Content-Security-Policy-Report-Only`) and the raw policy value.
+ */
 export const WEB_SERVER_EXPORTS: WebServerExport[] = [
   {
     id: "apache",
@@ -74,6 +96,12 @@ export const WEB_SERVER_EXPORTS: WebServerExport[] = [
   },
 ];
 
+/**
+ * Looks up export metadata by server id.
+ *
+ * @param id - Server identifier from the policy output dropdown.
+ * @returns Matching export definition, or `undefined` if not found.
+ */
 export function getWebServerExport(id: WebServerId): WebServerExport | undefined {
   return WEB_SERVER_EXPORTS.find((server) => server.id === id);
 }

@@ -1,9 +1,22 @@
+/**
+ * Server-side CSP discovery: fetches remote pages and extracts policies safely.
+ *
+ * @remarks
+ * Used by the URL importer API. Requests are restricted to public HTTP(S) URLs
+ * to mitigate SSRF—private IPs, localhost, and `.local` hosts are blocked.
+ * Lookup order: `HEAD` headers → `GET` headers → HTML `<meta>` tags.
+ */
+
 import { extractMetaCsp } from "../src/csp/parsePolicy";
 
+/** Maximum redirect hops before aborting as a loop. */
 const MAX_REDIRECTS = 5;
+/** Network timeout per fetch attempt (milliseconds). */
 const FETCH_TIMEOUT_MS = 12_000;
+/** Cap HTML body size when falling back to meta-tag parsing. */
 const MAX_HTML_BYTES = 512_000;
 
+/** Hostnames always rejected regardless of IP resolution. */
 const BLOCKED_HOSTNAMES = new Set([
   "localhost",
   "127.0.0.1",
@@ -13,6 +26,7 @@ const BLOCKED_HOSTNAMES = new Set([
   "metadata.google.internal",
 ]);
 
+/** Successful CSP lookup payload returned to API clients. */
 export interface CspLookupResult {
   url: string;
   policy: string;
@@ -20,12 +34,16 @@ export interface CspLookupResult {
   source: "header-enforce" | "header-report-only" | "meta-enforce" | "meta-report-only";
 }
 
+/** Machine-readable lookup failure codes mapped to HTTP status by the handler. */
 export type CspLookupErrorCode =
   | "invalid_url"
   | "blocked_url"
   | "fetch_failed"
   | "no_csp";
 
+/**
+ * Typed error thrown when a URL cannot be fetched or has no discoverable CSP.
+ */
 export class CspLookupError extends Error {
   code: CspLookupErrorCode;
 
@@ -36,11 +54,17 @@ export class CspLookupError extends Error {
   }
 }
 
+/**
+ * Detects RFC1918, loopback, link-local, and malformed IPv4 literals.
+ *
+ * @param hostname - Host portion of the lookup URL (not bracketed IPv6).
+ */
 function isPrivateIpv4(hostname: string): boolean {
   const match = hostname.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
   if (!match) return false;
 
   const octets = match.slice(1, 5).map(Number);
+  // Reject impossible octets (treated as unsafe).
   if (octets.some((octet) => octet > 255)) return true;
 
   const [a, b] = octets;
@@ -54,6 +78,13 @@ function isPrivateIpv4(hostname: string): boolean {
   return false;
 }
 
+/**
+ * Validates and normalizes a user-supplied lookup URL.
+ *
+ * @param input - Raw URL string from the API request body.
+ * @returns Parsed public HTTP(S) URL without credentials.
+ * @throws {@link CspLookupError} When the URL is missing, invalid, or blocked.
+ */
 export function normalizeLookupUrl(input: string): URL {
   const trimmed = input.trim();
   if (!trimmed) {
@@ -88,6 +119,7 @@ export function normalizeLookupUrl(input: string): URL {
   return parsed;
 }
 
+/** Reads enforce or report-only CSP headers, preferring enforce. */
 function readCspFromHeaders(headers: Headers): {
   policy: string | null;
   reportOnly: boolean;
@@ -110,6 +142,12 @@ function readCspFromHeaders(headers: Headers): {
   return { policy: null, reportOnly: false, source: null };
 }
 
+/**
+ * Fetches a URL following redirects manually with SSRF checks on each hop.
+ *
+ * @remarks
+ * Uses `redirect: "manual"` so every redirect target is re-validated.
+ */
 async function fetchWithRedirects(
   startUrl: URL,
   method: "HEAD" | "GET",
@@ -160,6 +198,13 @@ async function fetchWithRedirects(
   throw new CspLookupError("fetch_failed", "Too many redirects while fetching the URL.");
 }
 
+/**
+ * Looks up the CSP policy published by a remote origin.
+ *
+ * @param input - User-provided URL string.
+ * @returns Policy text, report-only flag, and discovery source.
+ * @throws {@link CspLookupError} On validation, network, or missing-policy errors.
+ */
 export async function lookupCspForUrl(input: string): Promise<CspLookupResult> {
   const normalizedUrl = normalizeLookupUrl(input);
 

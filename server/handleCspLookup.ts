@@ -1,7 +1,17 @@
+/**
+ * HTTP handler for `POST /api/csp-lookup` shared by Vite dev and Cloudflare Pages.
+ *
+ * @remarks
+ * Parses JSON bodies, delegates fetching to {@link ./fetchCsp.lookupCspForUrl},
+ * and maps {@link CspLookupError} codes to HTTP status codes.
+ */
+
 import { CspLookupError, lookupCspForUrl } from "./fetchCsp";
 
+/** Maximum accepted JSON body size for lookup requests (bytes). */
 const MAX_BODY_BYTES = 4_096;
 
+/** JSON shape returned by the lookup API (success or error). */
 export interface CspLookupResponseBody {
   error?: string;
   message?: string;
@@ -11,6 +21,12 @@ export interface CspLookupResponseBody {
   source?: string;
 }
 
+/**
+ * Handles a raw POST body for the CSP lookup endpoint.
+ *
+ * @param rawBody - Unparsed request body text.
+ * @returns HTTP status code and JSON-serializable response body.
+ */
 export async function handleCspLookupRequest(
   rawBody: string,
 ): Promise<{ status: number; body: CspLookupResponseBody }> {
@@ -52,6 +68,12 @@ export async function handleCspLookupRequest(
   }
 }
 
+/**
+ * Builds a `Response` with JSON body and no-cache headers.
+ *
+ * @param status - HTTP status code.
+ * @param body - Payload to JSON-stringify.
+ */
 export function cspLookupJsonResponse(
   status: number,
   body: CspLookupResponseBody,
