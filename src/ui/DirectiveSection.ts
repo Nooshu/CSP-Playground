@@ -4,6 +4,7 @@ import {
   TRUSTED_TYPES_FOR_OPTIONS,
 } from "../csp/directives";
 import { createSourceListEditor } from "./SourceListEditor";
+import { createMdnInfoLink } from "./mdnLink";
 
 export interface DirectiveSectionOptions {
   directive: DirectiveDefinition;
@@ -42,7 +43,7 @@ export function createDirectiveSection(
   title.textContent = directive.name;
 
   enableLabel.append(enableCheckbox, title);
-  header.appendChild(enableLabel);
+  header.append(enableLabel, createMdnInfoLink(directive.name));
   article.appendChild(header);
 
   const controls = document.createElement("div");
