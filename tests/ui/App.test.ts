@@ -13,6 +13,7 @@ describe("createApp", () => {
     expect(root.querySelectorAll(".directive-section").length).toBeGreaterThan(0);
     expect(document.body.querySelector(".security-score-panel")).not.toBeNull();
     expect(root.querySelector(".policy-output")).not.toBeNull();
+    expect(root.querySelector("#generated-policy")).not.toBeNull();
     expect(root.querySelector(".url-importer")).not.toBeNull();
   });
 });

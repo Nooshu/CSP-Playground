@@ -10,7 +10,7 @@
  * @see {@link scrollToRecommendationTarget}
  */
 
-import { scrollToRecommendationTarget } from "./scrollToTarget";
+import { scrollToRecommendationTarget, scrollToGeneratedPolicy } from "./scrollToTarget";
 import { scorePolicy } from "../csp/scorePolicy";
 import type { PolicyState } from "../csp/buildPolicy";
 
@@ -85,7 +85,43 @@ export function createSecurityScorePanel(
     recommendationIntro,
     recommendationList,
   );
-  panel.append(value, grade, summary, breakdownDetails, recommendationDetails);
+
+  const nav = document.createElement("nav");
+  nav.className = "security-score-nav";
+  nav.setAttribute("aria-label", "Page navigation");
+
+  const viewPolicyBtn = document.createElement("button");
+  viewPolicyBtn.type = "button";
+  viewPolicyBtn.className = "security-score-nav-btn";
+  viewPolicyBtn.textContent = "View generated policy";
+  viewPolicyBtn.addEventListener("click", () => {
+    scrollToGeneratedPolicy();
+  });
+
+  const backToTopBtn = document.createElement("button");
+  backToTopBtn.type = "button";
+  backToTopBtn.className = "security-score-nav-btn security-score-back-to-top";
+  backToTopBtn.textContent = "Back to top";
+  backToTopBtn.setAttribute("aria-hidden", "true");
+  backToTopBtn.tabIndex = -1;
+  backToTopBtn.addEventListener("click", () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+
+  const scrollThreshold = 240;
+
+  function updateBackToTopVisibility(): void {
+    const visible = window.scrollY > scrollThreshold;
+    backToTopBtn.classList.toggle("is-visible", visible);
+    backToTopBtn.setAttribute("aria-hidden", visible ? "false" : "true");
+    backToTopBtn.tabIndex = visible ? 0 : -1;
+  }
+
+  window.addEventListener("scroll", updateBackToTopVisibility, { passive: true });
+  updateBackToTopVisibility();
+
+  nav.append(viewPolicyBtn, backToTopBtn);
+  panel.append(value, grade, summary, breakdownDetails, recommendationDetails, nav);
 
   function update(): void {
     const result = scorePolicy(getState(), { reportOnly: getReportOnly() });

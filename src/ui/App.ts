@@ -41,7 +41,8 @@ const CATEGORY_ORDER: DirectiveCategory[] = [
  *
  * @remarks
  * Clears and repopulates `root`, appends the security score panel to
- * `document.body`, and triggers an initial output refresh.
+ * `document.body`, places the policy output after all directive fieldsets,
+ * and triggers an initial output refresh.
  */
 export function createApp(root: HTMLElement): void {
   const sections: DirectiveSectionHandle[] = [];
@@ -129,13 +130,15 @@ export function createApp(root: HTMLElement): void {
     form.appendChild(fieldset);
   }
 
+  form.appendChild(outputPanel);
+
   const urlImporter = createUrlImporter({
     sections,
     outputPanel,
     onApplied: handleChange,
   });
 
-  layout.append(urlImporter, form, outputPanel);
+  layout.append(urlImporter, form);
 
   handleChange();
 }

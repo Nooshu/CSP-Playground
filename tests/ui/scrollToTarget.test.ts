@@ -1,5 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
-import { scrollToRecommendationTarget } from "../../src/ui/scrollToTarget";
+import {
+  scrollToGeneratedPolicy,
+  scrollToRecommendationTarget,
+} from "../../src/ui/scrollToTarget";
 
 describe("scrollToRecommendationTarget", () => {
   it("enables hidden directive sections and highlights them", () => {
@@ -44,5 +47,31 @@ describe("scrollToRecommendationTarget", () => {
 
     scrollToRecommendationTarget("script-src");
     expect(Element.prototype.scrollIntoView).toHaveBeenCalled();
+  });
+
+  it("scrolls to the generated policy section and highlights it", () => {
+    vi.useFakeTimers();
+
+    const panel = document.createElement("aside");
+    panel.id = "generated-policy";
+    panel.className = "policy-output";
+    const heading = document.createElement("h2");
+    heading.tabIndex = -1;
+    panel.appendChild(heading);
+    document.body.appendChild(panel);
+
+    scrollToGeneratedPolicy();
+
+    expect(Element.prototype.scrollIntoView).toHaveBeenCalled();
+    expect(panel.classList.contains("recommendation-highlight")).toBe(true);
+
+    vi.advanceTimersByTime(1600);
+    expect(panel.classList.contains("recommendation-highlight")).toBe(false);
+    vi.useRealTimers();
+  });
+
+  it("returns early when generated policy is missing", () => {
+    scrollToGeneratedPolicy();
+    expect(Element.prototype.scrollIntoView).not.toHaveBeenCalled();
   });
 });
