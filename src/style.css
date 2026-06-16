@@ -9,6 +9,8 @@
   --color-primary-hover: #1d4ed8;
   --color-focus: #2563eb;
   --color-danger: #b91c1c;
+  --color-success: #15803d;
+  --color-success-hover: #166534;
   --color-chip-bg: #eff6ff;
   --color-chip-text: #1e40af;
   --color-deprecated: #92400e;
@@ -264,9 +266,20 @@ select {
 
 .custom-source-row {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   gap: var(--space-sm);
+}
+
+.custom-source-row .source-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.custom-source-actions {
+  display: flex;
+  flex-shrink: 0;
+  gap: var(--space-xs);
 }
 
 .sandbox-fieldset {
@@ -348,6 +361,28 @@ select {
 
 .btn-icon:hover:not(:disabled) {
   color: var(--color-danger);
+  border-color: var(--color-danger);
+}
+
+.btn-confirm {
+  color: #fff;
+  background: var(--color-success);
+  border-color: var(--color-success);
+}
+
+.btn-confirm:hover:not(:disabled) {
+  background: var(--color-success-hover);
+  border-color: var(--color-success-hover);
+}
+
+.remove-source-btn {
+  color: var(--color-danger);
+  border-color: var(--color-danger);
+}
+
+.remove-source-btn:hover:not(:disabled) {
+  color: #fff;
+  background: var(--color-danger);
   border-color: var(--color-danger);
 }
 
