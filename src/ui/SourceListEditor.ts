@@ -119,6 +119,24 @@ export function createSourceListEditor(
     });
   }
 
+  function confirmCustomInput(
+    input: HTMLInputElement,
+    row: HTMLElement,
+  ): void {
+    const value = input.value.trim();
+    if (!value) return;
+
+    if (!values.includes(value)) {
+      values.push(value);
+      renderValuesList();
+    }
+
+    const idx = customInputs.indexOf(input);
+    if (idx >= 0) customInputs.splice(idx, 1);
+    row.remove();
+    onChange();
+  }
+
   function addCustomInput(initialValue = ""): void {
     const row = document.createElement("div");
     row.className = "custom-source-row";
@@ -136,6 +154,18 @@ export function createSourceListEditor(
     input.value = initialValue;
     input.setAttribute("aria-describedby", helpId);
 
+    const actions = document.createElement("div");
+    actions.className = "custom-source-actions";
+
+    const confirmBtn = document.createElement("button");
+    confirmBtn.type = "button";
+    confirmBtn.className = "btn btn-icon btn-confirm confirm-source-btn";
+    confirmBtn.setAttribute(
+      "aria-label",
+      `Confirm custom source for ${directive.name}`,
+    );
+    confirmBtn.textContent = "+";
+
     const removeBtn = document.createElement("button");
     removeBtn.type = "button";
     removeBtn.className = "btn btn-icon remove-source-btn";
@@ -145,9 +175,14 @@ export function createSourceListEditor(
     );
     removeBtn.textContent = "×";
 
-    const handleInput = () => onChange();
+    confirmBtn.addEventListener("click", () => confirmCustomInput(input, row));
 
-    input.addEventListener("input", handleInput);
+    input.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        confirmCustomInput(input, row);
+      }
+    });
 
     removeBtn.addEventListener("click", () => {
       const idx = customInputs.indexOf(input);
@@ -157,10 +192,10 @@ export function createSourceListEditor(
     });
 
     customInputs.push(input);
-    row.append(label, input, removeBtn);
+    actions.append(confirmBtn, removeBtn);
+    row.append(label, input, actions);
     contentArea.appendChild(row);
     input.focus();
-    onChange();
   }
 
   addKeywordBtn.addEventListener("click", () => {
@@ -177,10 +212,7 @@ export function createSourceListEditor(
   addSourceBtn.addEventListener("click", () => addCustomInput());
 
   function getValues(): string[] {
-    const custom = customInputs
-      .map((input) => input.value.trim())
-      .filter((v) => v.length > 0);
-    return [...values, ...custom];
+    return [...values];
   }
 
   function setEnabled(enabled: boolean): void {
