@@ -1,3 +1,17 @@
+/**
+ * UI for a single CSP directive in the builder form.
+ *
+ * @remarks
+ * Renders an enable checkbox and type-specific controls (source lists, sandbox
+ * flags, Trusted Types inputs, and so on) based on {@link DirectiveDefinition.type}.
+ * Exposes {@link DirectiveSectionHandle} for reading, writing, and resetting state
+ * when importing policies or applying recommendations.
+ *
+ * @see {@link createSourceListEditor}
+ * @see {@link createMdnInfoLink}
+ * @see {@link createFlagInfoIcon}
+ */
+
 import type { DirectiveDefinition } from "../csp/directives";
 import {
   SANDBOX_FLAGS,
@@ -7,18 +21,42 @@ import { createSourceListEditor } from "./SourceListEditor";
 import { createFlagInfoIcon } from "./FlagInfoIcon";
 import { createMdnInfoLink } from "./mdnLink";
 
+/** Configuration for constructing one directive section in the builder form. */
 export interface DirectiveSectionOptions {
+  /** Metadata and control type for the directive being rendered. */
   directive: DirectiveDefinition;
+  /** Called when the user toggles or edits any value in this section. */
   onChange: () => void;
 }
 
+/**
+ * Live DOM handle for one directive section.
+ *
+ * @remarks
+ * State shape matches {@link ../csp/buildPolicy.DirectiveState | DirectiveState}:
+ * an `enabled` flag plus a `values` array whose meaning depends on directive type.
+ */
 export interface DirectiveSectionHandle {
+  /** Root `<article>` element; carries `data-directive` for lookup. */
   element: HTMLElement;
+  /** Returns current `{ enabled, values }` for policy serialization. */
   getState: () => { enabled: boolean; values: string[] };
+  /** Applies imported or programmatic state without firing spurious side effects beyond UI sync. */
   setState: (state: { enabled: boolean; values: string[] }) => void;
+  /** Clears the section to disabled with empty values. */
   reset: () => void;
 }
 
+/**
+ * Creates a directive section with enable toggle and type-specific controls.
+ *
+ * @param options - Directive metadata and change callback.
+ * @returns A handle with the mounted element and state accessors.
+ *
+ * @remarks
+ * Control visibility is tied to the enable checkbox; disabled sections report
+ * `{ enabled: false, values: [] }` regardless of stale control values.
+ */
 export function createDirectiveSection(
   options: DirectiveSectionOptions,
 ): DirectiveSectionHandle {

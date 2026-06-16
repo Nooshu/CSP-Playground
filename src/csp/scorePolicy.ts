@@ -1,36 +1,58 @@
+/**
+ * Heuristic CSP security scoring and improvement recommendations.
+ *
+ * @remarks
+ * The score is educational—not a substitute for deployment testing. Points are
+ * awarded for restrictive defaults (nonces, `object-src 'none'`, frame ancestors)
+ * and deducted for common weakeners (`'unsafe-inline'`, wildcards, Report-Only).
+ * {@link buildRecommendations} suggests UI targets the user can jump to.
+ */
+
 import { buildPolicyString, type PolicyState } from "./buildPolicy";
 
+/** Letter grade derived from the numeric score. */
 export type SecurityGrade = "Poor" | "Fair" | "Good" | "Strong" | "Excellent";
 
+/** One line item in the score breakdown panel. */
 export interface ScoreFactor {
   label: string;
+  /** Positive points reward good practices; negative points flag risk. */
   points: number;
 }
 
+/** Actionable suggestion linked to a scroll target in the builder UI. */
 export interface ScoreRecommendation {
   id: string;
   label: string;
+  /** Estimated score increase if the suggestion is fully applied. */
   pointsGain: number;
+  /** DOM id or `data-directive` value for {@link scrollToRecommendationTarget}. */
   targetId: string;
 }
 
+/** Full scoring result shown in the security score panel. */
 export interface SecurityScore {
   score: number;
   grade: SecurityGrade;
   summary: string;
   factors: ScoreFactor[];
   recommendations: ScoreRecommendation[];
+  /** Upper bound if all recommendations were applied (capped at 100). */
   potentialScore: number;
 }
 
+/** Options that affect scoring but are not part of {@link PolicyState}. */
 export interface ScorePolicyOptions {
+  /** When true, applies a penalty because violations are not blocked. */
   reportOnly?: boolean;
 }
 
+/** Maps a directive name to the `id` of its section in the DOM. */
 function directiveTarget(name: string): string {
   return `directive-section-${name}`;
 }
 
+/** Returns enabled directive values, or `null` when the directive is off. */
 function getDirectiveValues(
   state: PolicyState,
   name: string,
@@ -41,6 +63,9 @@ function getDirectiveValues(
   return directive.values;
 }
 
+/**
+ * Resolves effective script sources from `script-src` or `default-src` fallback.
+ */
 function getScriptSources(state: PolicyState): string[] {
   const scriptSrc = getDirectiveValues(state, "script-src");
   if (scriptSrc?.length) return scriptSrc;
@@ -55,6 +80,7 @@ function containsAny(values: string[], ...needles: string[]): boolean {
   return needles.some((needle) => values.includes(needle));
 }
 
+/** True when any source list contains a nonce or hash expression. */
 function hasNonceOrHash(values: string[]): boolean {
   return values.some(
     (value) =>
@@ -65,6 +91,7 @@ function hasNonceOrHash(values: string[]): boolean {
   );
 }
 
+/** True for `*`, `*.`, scheme-only, or host wildcard patterns. */
 function hasWildcardSource(values: string[]): boolean {
   return values.some(
     (value) =>
@@ -110,6 +137,12 @@ function summaryForScore(score: number): string {
   return "No policy configured yet.";
 }
 
+/**
+ * Builds prioritized recommendations based on gaps in the current policy.
+ *
+ * @remarks
+ * Sorted by `pointsGain` descending so the highest-impact fixes appear first.
+ */
 function buildRecommendations(
   state: PolicyState,
   options: ScorePolicyOptions,
@@ -319,6 +352,13 @@ function buildRecommendations(
   return recommendations.sort((a, b) => b.pointsGain - a.pointsGain);
 }
 
+/**
+ * Computes a security score, grade, and recommendations for a policy state.
+ *
+ * @param state - Current builder policy state.
+ * @param options - Scoring modifiers (for example, Report-Only header mode).
+ * @returns Score breakdown suitable for the live security score panel.
+ */
 export function scorePolicy(
   state: PolicyState,
   options: ScorePolicyOptions = {},

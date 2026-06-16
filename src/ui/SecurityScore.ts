@@ -1,12 +1,28 @@
+/**
+ * Live CSP security score sidebar with breakdown and recommendations.
+ *
+ * @remarks
+ * Scores policy via {@link scorePolicy} whenever builder state or report-only mode
+ * changes. Recommendation buttons delegate navigation to
+ * {@link scrollToRecommendationTarget}.
+ *
+ * @see {@link scorePolicy}
+ * @see {@link scrollToRecommendationTarget}
+ */
+
 import { scrollToRecommendationTarget } from "./scrollToTarget";
 import { scorePolicy } from "../csp/scorePolicy";
 import type { PolicyState } from "../csp/buildPolicy";
 
+/** Options for the floating security score panel. */
 export interface SecurityScorePanelOptions {
+  /** Returns current builder state for scoring. */
   getState: () => PolicyState;
+  /** Whether the output panel is in report-only mode (affects scoring). */
   getReportOnly: () => boolean;
 }
 
+/** CSS class suffix keyed by letter grade from {@link scorePolicy}. */
 const GRADE_CLASS: Record<string, string> = {
   Poor: "score-poor",
   Fair: "score-fair",
@@ -15,6 +31,12 @@ const GRADE_CLASS: Record<string, string> = {
   Excellent: "score-excellent",
 };
 
+/**
+ * Creates the security score panel appended to the document body.
+ *
+ * @param options - State and report-only accessors shared with the output panel.
+ * @returns An `<aside>` element with an `update` method to refresh score UI.
+ */
 export function createSecurityScorePanel(
   options: SecurityScorePanelOptions,
 ): HTMLElement & { update: () => void } {
@@ -129,4 +151,5 @@ export function createSecurityScorePanel(
   return Object.assign(panel, { update });
 }
 
+/** Security score panel element with imperative refresh. */
 export type SecurityScorePanel = HTMLElement & { update: () => void };

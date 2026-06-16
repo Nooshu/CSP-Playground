@@ -1,3 +1,15 @@
+/**
+ * Generated policy preview, copy actions, and web-server export snippets.
+ *
+ * @remarks
+ * Subscribes to builder state via a getter and re-serializes through
+ * {@link buildPolicyString} and {@link buildHeaderLine}. Supports enforce vs
+ * report-only header mode and formats output for common server configs.
+ *
+ * @see {@link buildPolicyString}
+ * @see {@link buildHeaderLine}
+ */
+
 import { buildHeaderLine, buildPolicyString } from "../csp/buildPolicy";
 import type { PolicyState } from "../csp/buildPolicy";
 import {
@@ -5,11 +17,25 @@ import {
   type WebServerId,
 } from "../csp/serverExports";
 
+/** Options for the live policy output sidebar. */
 export interface PolicyOutputOptions {
+  /** Returns current builder state whenever the preview should refresh. */
   getState: () => PolicyState;
+  /** Optional callback when enforce vs report-only mode changes. */
   onModeChange?: () => void;
 }
 
+/**
+ * Creates the policy output panel with previews and clipboard actions.
+ *
+ * @param options - State getter and optional mode-change hook.
+ * @returns An `<aside>` element augmented with `update`, `getReportOnly`, and `setReportOnly`.
+ *
+ * @remarks
+ * Clipboard copy uses {@link navigator.clipboard}; failures are announced via an
+ * `aria-live` region. The returned element is cast to {@link PolicyOutputPanel}
+ * at the call site for typed access to extension methods.
+ */
 export function createPolicyOutput(options: PolicyOutputOptions): HTMLElement {
   const { getState, onModeChange } = options;
   let reportOnly = false;
@@ -175,6 +201,7 @@ export function createPolicyOutput(options: PolicyOutputOptions): HTMLElement {
 
   function announce(message: string): void {
     liveRegion.textContent = "";
+    // Clear then set on the next frame so screen readers re-announce the message.
     requestAnimationFrame(() => {
       liveRegion.textContent = message;
     });
@@ -269,8 +296,12 @@ export function createPolicyOutput(options: PolicyOutputOptions): HTMLElement {
   });
 }
 
+/** Policy output panel element with imperative update and mode accessors. */
 export type PolicyOutputPanel = HTMLElement & {
+  /** Refreshes policy, header, and server export previews from current state. */
   update: () => void;
+  /** Whether report-only header mode is selected. */
   getReportOnly: () => boolean;
+  /** Sets enforce vs report-only mode and refreshes previews. */
   setReportOnly: (value: boolean) => void;
 };
