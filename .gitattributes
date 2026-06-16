@@ -1,0 +1,13 @@
+# Normalize line endings across platforms
+* text=auto eol=lf
+
+# Shell scripts must remain executable with LF
+*.sh text eol=lf
+
+# Binary assets
+*.png binary
+*.ico binary
+*.sqlite binary
+
+# Generated coverage HTML is not source
+coverage/** linguist-generated=true

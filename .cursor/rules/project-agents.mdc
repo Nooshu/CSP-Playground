@@ -13,6 +13,7 @@ Read [AGENTS.md](../../AGENTS.md) for full project guidance.
 - **TSDoc** for TypeScript documentation in `src/`, `server/`, `functions/`.
 - **Tests:** `yarn test` · **Build:** `yarn build`
 - **Dependency updates:** pin exact versions, then run `yarn verify:deps` **once** after all updates — see `.cursor/rules/dependency-pinning.mdc`.
+- **Cloudflare Pages v3:** Node `22.16.0` via `.nvmrc`; Yarn `1.22.22` via `YARN_VERSION` build env var (v3 defaults to Yarn 4) — see `.cursor/rules/cloudflare-pages-v3.mdc`.
 
 ## Scope discipline
 

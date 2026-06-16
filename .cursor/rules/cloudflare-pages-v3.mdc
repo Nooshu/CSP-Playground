@@ -1,0 +1,65 @@
+---
+description: Cloudflare Pages v3 build image compatibility for Node, Yarn, and dependencies
+globs: package.json,yarn.lock,wrangler.toml,.nvmrc,.node-version,functions/**/*
+alwaysApply: false
+---
+
+# Cloudflare Pages v3 build compatibility
+
+Production deploys use the [Cloudflare Pages v3 build image](https://developers.cloudflare.com/pages/configuration/build-image/) (Ubuntu 22.04, x86_64, gVisor). All dependency, Node, and package-manager changes must remain compatible with that environment.
+
+## v3 defaults vs this project
+
+| Tool | v3 default | This project | Pin method |
+|------|------------|--------------|------------|
+| Node.js | 22.16.0 | 22.16.0 | `.nvmrc` with **exact semver** |
+| Yarn | 4.9.1 | 1.22.22 (classic) | `YARN_VERSION=1.22.22` Pages build env var |
+| npm | 10.9.2 | (not used for installs) | — |
+
+## v3 limitations agents must respect
+
+The v3 build system does **not**:
+
+- Read Node or package-manager versions from `package.json` → `engines`
+- Infer Yarn version from `yarn.lock` format (v3 defaults to Yarn 4)
+- Infer pnpm version from `pnpm-lock.yaml`
+- Accept Node codenames in `.nvmrc` / `.node-version` (e.g. `lts/hydrogen`, `hydrogen`)
+
+**Never rely on `engines` or lockfile auto-detection for Pages builds.** Pin explicitly.
+
+## Required pins
+
+1. **`.nvmrc`** — exact Node semver matching v3 (currently `22.16.0`). No major-only (`20`) or codename aliases.
+2. **`YARN_VERSION`** — must be set to `1.22.22` in Cloudflare Pages **production and preview** build environment variables. Without this, v3 uses Yarn 4 and `yarn install` fails against the Yarn v1 lockfile.
+3. **`packageManager`** in `package.json` — keep `"yarn@1.22.22"` as documentation; it does not replace the dashboard `YARN_VERSION` on Pages.
+
+## Dependency and package rules
+
+- **Yarn v1 only** — `yarn.lock` is canonical. Do not run `npm install` or add `package-lock.json`.
+- **Exact versions** in `package.json` — follow `.cursor/rules/dependency-pinning.mdc`.
+- **Linux x86_64 + Node 22** — new packages must install and build on the v3 image (no macOS-only native binaries in the build path).
+- **Dev vs prod** — `vitest`, `jsdom`, coverage tools, and `wrangler` stay in `devDependencies`. The Pages build command is `yarn build` (`tsc && vite build`); only static output in `dist/` is deployed.
+- **Pages Functions** (`functions/`) run on the **Workers runtime** — prefer Web APIs (`fetch`, `Request`, `Response`). Avoid Node.js built-ins in shared `server/` code used by Functions unless `nodejs_compat` is enabled and tested.
+
+## After dependency or toolchain changes
+
+Run **once** when all updates are complete:
+
+```bash
+# Match .nvmrc (22.16.0)
+yarn install
+yarn verify:deps
+yarn build
+yarn test
+```
+
+For function changes, also run `yarn pages:dev` when possible.
+
+## Pages project settings (reference)
+
+| Setting | Value |
+|---------|-------|
+| Build command | `yarn build` |
+| Build output directory | `dist` |
+| `YARN_VERSION` | `1.22.22` |
+| `NODE_VERSION` | `22.16.0` (optional if `.nvmrc` is committed) |
