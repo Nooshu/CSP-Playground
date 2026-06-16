@@ -1,0 +1,20 @@
+---
+description: Project context and agent conventions (see AGENTS.md)
+alwaysApply: true
+---
+
+# CSP Builder agent context
+
+Read [AGENTS.md](../../AGENTS.md) for full project guidance.
+
+## Quick reference
+
+- **Yarn only** for dependencies; `yarn.lock` is canonical.
+- **TSDoc** for TypeScript documentation in `src/`, `server/`, `functions/`.
+- **Tests:** `yarn test` · **Build:** `yarn build`
+- **Dependency updates:** pin exact versions, then run `yarn verify:deps` **once** after all updates — see `.cursor/rules/dependency-pinning.mdc`.
+
+## Scope discipline
+
+- Minimize diffs; match existing patterns in surrounding code.
+- Do not commit unless the user explicitly requests it.

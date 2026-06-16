@@ -1,0 +1,57 @@
+---
+description: Pin dependencies and verify lockfile SHA integrity after updates
+globs: package.json,yarn.lock,package-lock.json
+alwaysApply: false
+---
+
+# Dependency pinning and integrity verification
+
+This project uses **Yarn v1** with a committed `yarn.lock`. Treat `package-lock.json` as non-canonical; prefer Yarn for all dependency work.
+
+## Pinning rules
+
+1. **Direct dependencies** in `package.json` must use **exact versions**:
+   - ✅ `"vite": "6.3.5"`
+   - ❌ `"vite": "^6.3.5"` or `"~6.3.5"`
+
+2. **Transitive dependencies** are pinned by `yarn.lock`. Never hand-edit `yarn.lock`; regenerate with `yarn install` after `package.json` changes.
+
+3. **Integrity** — every lockfile entry with a `resolved` tarball URL must include an `integrity` field (SHA-512). The verify script enforces this.
+
+## Update workflow
+
+When adding, removing, or bumping dependencies:
+
+1. Apply **all** planned `package.json` edits first (batch the work).
+2. Run **one** install to refresh the lockfile:
+
+   ```bash
+   yarn install
+   ```
+
+3. After **all** dependency updates are complete — not after each individual package — run **once**:
+
+   ```bash
+   yarn verify:deps
+   ```
+
+4. Fix any reported unpinned versions or missing integrity hashes before committing.
+5. Commit both `package.json` and `yarn.lock`.
+
+## Do not
+
+- Run `yarn verify:deps` repeatedly between single-package edits in the same update session.
+- Use `npm install` or commit `package-lock.json` changes instead of `yarn.lock`.
+- Leave caret/tilde ranges in `package.json` after a dependency bump.
+
+## If integrity is missing
+
+Re-resolve the lockfile:
+
+```bash
+rm -rf node_modules
+yarn install
+yarn verify:deps
+```
+
+If entries still lack `integrity`, check registry/network issues or replace the problematic dependency.
