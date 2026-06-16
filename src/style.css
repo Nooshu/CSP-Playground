@@ -109,6 +109,7 @@ body {
 .directive-header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: var(--space-sm);
 }
 
@@ -118,6 +119,35 @@ body {
   gap: var(--space-sm);
   cursor: pointer;
   min-height: 2.75rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.directive-info-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 2.75rem;
+  height: 2.75rem;
+  color: var(--color-text-muted);
+  border-radius: var(--radius);
+  text-decoration: none;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.directive-info-link:hover {
+  color: var(--color-primary);
+  background: var(--color-chip-bg);
+}
+
+.directive-info-link:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.directive-info-link svg {
+  display: block;
 }
 
 .enable-checkbox {

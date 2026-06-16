@@ -48,6 +48,13 @@ export const SANDBOX_FLAGS = [
 
 export const TRUSTED_TYPES_FOR_OPTIONS = ["'script'"] as const;
 
+export const MDN_CSP_DIRECTIVE_BASE =
+  "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Security-Policy";
+
+export function getMdnDirectiveUrl(directiveName: string): string {
+  return `${MDN_CSP_DIRECTIVE_BASE}/${directiveName}`;
+}
+
 export const DIRECTIVES: DirectiveDefinition[] = [
   // Fetch directives
   {
