@@ -8,12 +8,19 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "pages:dev": "yarn build && wrangler pages dev dist",
-    "pages:deploy": "yarn build && wrangler pages deploy dist"
+    "pages:deploy": "yarn build && wrangler pages deploy dist",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250614.0",
+    "@types/node": "^25.9.3",
+    "@vitest/coverage-v8": "^3.2.4",
+    "jsdom": "^29.1.1",
     "typescript": "^5.8.3",
     "vite": "^6.3.5",
+    "vitest": "^3.2.4",
     "wrangler": "^4.20.0"
   }
 }
