@@ -9,6 +9,34 @@
 /** CSS class applied briefly to draw attention after scrolling. */
 const HIGHLIGHT_CLASS = "recommendation-highlight";
 
+/** Element id for the generated policy panel in the document flow. */
+export const GENERATED_POLICY_ID = "generated-policy";
+
+/**
+ * Scrolls to the generated policy section and highlights it briefly.
+ */
+export function scrollToGeneratedPolicy(): void {
+  const target = document.getElementById(GENERATED_POLICY_ID);
+  if (!target) return;
+
+  target.scrollIntoView({
+    behavior: "smooth",
+    block: "start",
+    inline: "nearest",
+  });
+
+  target.classList.remove(HIGHLIGHT_CLASS);
+  void target.offsetWidth;
+  target.classList.add(HIGHLIGHT_CLASS);
+
+  window.setTimeout(() => {
+    target.classList.remove(HIGHLIGHT_CLASS);
+  }, 1600);
+
+  const heading = target.querySelector<HTMLElement>("h2");
+  heading?.focus({ preventScroll: true });
+}
+
 /**
  * Scrolls to a builder control referenced by a score recommendation.
  *

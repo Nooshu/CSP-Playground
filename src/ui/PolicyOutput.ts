@@ -43,10 +43,12 @@ export function createPolicyOutput(options: PolicyOutputOptions): HTMLElement {
 
   const panel = document.createElement("aside");
   panel.className = "policy-output";
+  panel.id = "generated-policy";
   panel.setAttribute("aria-label", "Generated policy");
 
   const heading = document.createElement("h2");
   heading.textContent = "Generated policy";
+  heading.tabIndex = -1;
   panel.appendChild(heading);
 
   const warning = document.createElement("div");
