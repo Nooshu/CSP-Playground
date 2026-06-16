@@ -228,7 +228,18 @@ export function createPolicyOutput(options: PolicyOutputOptions): HTMLElement {
     }
   });
 
-  return Object.assign(panel, { update });
+  return Object.assign(panel, {
+    update,
+    setReportOnly: (value: boolean) => {
+      reportOnly = value;
+      enforceRadio.checked = !value;
+      reportOnlyRadio.checked = value;
+      update();
+    },
+  });
 }
 
-export type PolicyOutputPanel = HTMLElement & { update: () => void };
+export type PolicyOutputPanel = HTMLElement & {
+  update: () => void;
+  setReportOnly: (value: boolean) => void;
+};

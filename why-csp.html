@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Why your website should use a Content Security Policy (CSP) and the security benefits it provides."
+    />
+    <title>Why use a Content Security Policy? | CSP Builder</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <main class="info-page">
+      <header class="info-header">
+        <p class="info-eyebrow"><a href="/">CSP Builder</a></p>
+        <h1>Why your site should use a Content Security Policy</h1>
+        <p class="info-lead">
+          A Content Security Policy (CSP) is an HTTP response header that tells browsers
+          which resources are allowed to load and execute on your pages. It is one of the
+          most effective defenses against cross-site scripting (XSS) and related injection
+          attacks.
+        </p>
+      </header>
+
+      <section class="info-section">
+        <h2>What went wrong without a CSP?</h2>
+        <p>
+          When we looked up the URL you provided, no <code>Content-Security-Policy</code>
+          header or equivalent HTML <code>&lt;meta&gt;</code> tag was found. That means
+          browsers are not receiving explicit instructions about which scripts, styles,
+          images, or connections are permitted on that site.
+        </p>
+        <p>
+          Without a policy, a single injected script tag or event handler can often run
+          with the same privileges as your own code, potentially stealing session data,
+          modifying page content, or redirecting users.
+        </p>
+      </section>
+
+      <section class="info-section">
+        <h2>Security advantages of a CSP</h2>
+        <ul class="info-list">
+          <li>
+            <strong>Reduces XSS impact.</strong> CSP limits where scripts and styles may
+            load from, blocking many inline and attacker-hosted payloads by default.
+          </li>
+          <li>
+            <strong>Controls third-party resources.</strong> You define trusted domains for
+            scripts, fonts, images, frames, and network connections.
+          </li>
+          <li>
+            <strong>Restricts dangerous APIs.</strong> Policies can limit <code>eval()</code>,
+            inline event handlers, and other high-risk execution paths.
+          </li>
+          <li>
+            <strong>Helps prevent clickjacking.</strong> The <code>frame-ancestors</code>
+            directive specifies which sites may embed your pages in frames.
+          </li>
+          <li>
+            <strong>Supports monitoring.</strong> Report-only policies and reporting
+            directives let you test changes and detect violations before enforcing them.
+          </li>
+          <li>
+            <strong>Encourages safer patterns.</strong> Teams adopt nonces, hashes, and
+            external scripts instead of widespread inline code.
+          </li>
+        </ul>
+      </section>
+
+      <section class="info-section">
+        <h2>How to get started</h2>
+        <ol class="info-list">
+          <li>Return to the <a href="/">CSP Builder</a> and create a policy for your site.</li>
+          <li>Start with <code>Content-Security-Policy-Report-Only</code> to collect violations without blocking users.</li>
+          <li>Review reports, tighten sources gradually, and switch to enforcing mode.</li>
+        </ol>
+      </section>
+
+      <section class="info-section">
+        <h2>Learn more</h2>
+        <ul class="info-list">
+          <li>
+            <a
+              href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CSP"
+              target="_blank"
+              rel="noopener noreferrer"
+            >Content Security Policy guide on MDN</a>
+          </li>
+          <li>
+            <a
+              href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Security-Policy"
+              target="_blank"
+              rel="noopener noreferrer"
+            >CSP header reference on MDN</a>
+          </li>
+        </ul>
+      </section>
+
+      <p class="info-actions">
+        <a class="btn btn-primary" href="/">Build a CSP now</a>
+      </p>
+    </main>
+  </body>
+</html>

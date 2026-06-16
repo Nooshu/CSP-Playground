@@ -9,6 +9,7 @@ import {
   type DirectiveSectionHandle,
 } from "./DirectiveSection";
 import { createPolicyOutput, type PolicyOutputPanel } from "./PolicyOutput";
+import { createUrlImporter } from "./UrlImporter";
 
 const CATEGORY_ORDER: DirectiveCategory[] = [
   "fetch",
@@ -59,11 +60,12 @@ export function createApp(root: HTMLElement): void {
   layout.className = "app-layout";
   root.appendChild(layout);
 
+  outputPanel = createPolicyOutput({ getState: collectState }) as PolicyOutputPanel;
+
   const form = document.createElement("form");
   form.className = "directive-form";
   form.setAttribute("novalidate", "");
   form.addEventListener("submit", (e) => e.preventDefault());
-  layout.appendChild(form);
 
   for (const category of CATEGORY_ORDER) {
     const directives = DIRECTIVES_BY_CATEGORY[category];
@@ -92,8 +94,13 @@ export function createApp(root: HTMLElement): void {
     form.appendChild(fieldset);
   }
 
-  outputPanel = createPolicyOutput({ getState: collectState }) as PolicyOutputPanel;
-  layout.appendChild(outputPanel);
+  const urlImporter = createUrlImporter({
+    sections,
+    outputPanel,
+    onApplied: handleChange,
+  });
+
+  layout.append(urlImporter, form, outputPanel);
 
   handleChange();
 }

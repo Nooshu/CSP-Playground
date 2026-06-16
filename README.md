@@ -5,6 +5,7 @@ A browser-based tool for building [Content Security Policy](https://developer.mo
 ## Features
 
 - Form-based editor for all standard CSP directives (fetch, document, navigation, reporting, and other)
+- **Import from URL** — fetch an existing policy from HTTP headers or HTML meta tags and pre-fill the form
 - Keyword dropdown for common values (`'self'`, `'none'`, `'unsafe-inline'`, schemes, and more)
 - Multiple source inputs per directive with add/remove controls
 - Live preview of the policy value and full HTTP header
@@ -46,12 +47,17 @@ yarn preview
 
 ## Usage
 
-1. Enable a directive (e.g. `default-src`) using its checkbox.
-2. Add keywords from the dropdown or enter custom sources (e.g. `https://cdn.example.com`).
-3. Review the generated policy in the preview panel at the bottom.
-4. Copy the policy, full header, or web server configuration snippet.
+1. Optionally enter a site URL at the top and click **Import CSP** to load an existing policy.
+2. Enable a directive (e.g. `default-src`) using its checkbox.
+3. Add keywords from the dropdown or enter custom sources (e.g. `https://cdn.example.com`).
+4. Review the generated policy in the preview panel at the bottom.
+5. Copy the policy, full header, or web server configuration snippet.
+
+If no CSP is found for a URL, you will be linked to [why-csp.html](/why-csp.html) with guidance on why and how to adopt a policy.
 
 Toggle **Content-Security-Policy-Report-Only** to generate a report-only header for testing.
+
+**Note:** URL import uses a local API endpoint (`/api/csp-lookup`) provided by the Vite dev and preview servers. It is not available from a static file host without a compatible backend.
 
 ## License
 

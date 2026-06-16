@@ -9,7 +9,11 @@ export interface SourceListEditorOptions {
 export function createSourceListEditor(
   container: HTMLElement,
   options: SourceListEditorOptions,
-): { getValues: () => string[]; setEnabled: (enabled: boolean) => void } {
+): {
+  getValues: () => string[];
+  setValues: (nextValues: string[]) => void;
+  setEnabled: (enabled: boolean) => void;
+} {
   const { directive, onChange } = options;
   const idPrefix = `directive-${directive.name.replace(/[^a-z0-9-]/gi, "-")}`;
   const helpId = `${idPrefix}-help`;
@@ -211,6 +215,20 @@ export function createSourceListEditor(
 
   addSourceBtn.addEventListener("click", () => addCustomInput());
 
+  function clearPendingInputs(): void {
+    for (const input of [...customInputs]) {
+      input.closest(".custom-source-row")?.remove();
+    }
+    customInputs.length = 0;
+  }
+
+  function setValues(nextValues: string[]): void {
+    clearPendingInputs();
+    values.length = 0;
+    values.push(...nextValues);
+    renderValuesList();
+  }
+
   function getValues(): string[] {
     return [...values];
   }
@@ -224,5 +242,5 @@ export function createSourceListEditor(
     });
   }
 
-  return { getValues, setEnabled };
+  return { getValues, setValues, setEnabled };
 }
