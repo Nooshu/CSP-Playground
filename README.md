@@ -57,7 +57,38 @@ If no CSP is found for a URL, you will be linked to [why-csp.html](/why-csp.html
 
 Toggle **Content-Security-Policy-Report-Only** to generate a report-only header for testing.
 
-**Note:** URL import uses a local API endpoint (`/api/csp-lookup`) provided by the Vite dev and preview servers. It is not available from a static file host without a compatible backend.
+## Deploy to Cloudflare Pages
+
+URL import is supported in production via [Cloudflare Pages Functions](https://developers.cloudflare.com/pages/functions/). The function at [`functions/api/csp-lookup.ts`](functions/api/csp-lookup.ts) runs on Cloudflare’s edge and exposes the same `POST /api/csp-lookup` endpoint used during local development.
+
+### Dashboard setup
+
+1. Connect this repository to Cloudflare Pages.
+2. **Build command:** `yarn build`
+3. **Build output directory:** `dist`
+4. Deploy. Cloudflare automatically detects the `functions/` directory and deploys the API route alongside your static assets.
+
+No separate Worker or backend is required.
+
+### Local Pages preview
+
+To test the production setup locally (static assets + Pages Function):
+
+```bash
+yarn pages:dev
+```
+
+### CLI deploy
+
+```bash
+yarn pages:deploy
+```
+
+Requires [Wrangler](https://developers.cloudflare.com/workers/wrangler/) authentication (`wrangler login`).
+
+### Local development
+
+`yarn dev` uses a Vite middleware shim with the same lookup logic, so you do not need Wrangler for day-to-day UI work.
 
 ## License
 

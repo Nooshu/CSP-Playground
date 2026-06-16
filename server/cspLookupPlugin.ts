@@ -1,5 +1,5 @@
 import type { Connect, Plugin } from "vite";
-import { CspLookupError, lookupCspForUrl } from "./fetchCsp";
+import { cspLookupJsonResponse, handleCspLookupRequest } from "./handleCspLookup";
 
 function createLookupHandler(): Connect.NextHandleFunction {
   return (req, res, next) => {
@@ -21,29 +21,13 @@ function createLookupHandler(): Connect.NextHandleFunction {
 
     req.on("end", () => {
       void (async () => {
-        try {
-          const payload = JSON.parse(body) as { url?: string };
-          const result = await lookupCspForUrl(payload.url ?? "");
-          res.statusCode = 200;
-          res.setHeader("Content-Type", "application/json");
-          res.end(JSON.stringify(result));
-        } catch (error) {
-          if (error instanceof CspLookupError) {
-            res.statusCode = error.code === "no_csp" ? 404 : 400;
-            res.setHeader("Content-Type", "application/json");
-            res.end(JSON.stringify({ error: error.code, message: error.message }));
-            return;
-          }
-
-          res.statusCode = 500;
-          res.setHeader("Content-Type", "application/json");
-          res.end(
-            JSON.stringify({
-              error: "fetch_failed",
-              message: "An unexpected error occurred while looking up the URL.",
-            }),
-          );
-        }
+        const { status, body: responseBody } = await handleCspLookupRequest(body);
+        const response = cspLookupJsonResponse(status, responseBody);
+        res.statusCode = response.status;
+        response.headers.forEach((value, key) => {
+          res.setHeader(key, value);
+        });
+        res.end(await response.text());
       })();
     });
   };

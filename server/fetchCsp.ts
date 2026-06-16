@@ -27,11 +27,11 @@ export type CspLookupErrorCode =
   | "no_csp";
 
 export class CspLookupError extends Error {
-  constructor(
-    public readonly code: CspLookupErrorCode,
-    message: string,
-  ) {
+  code: CspLookupErrorCode;
+
+  constructor(code: CspLookupErrorCode, message: string) {
     super(message);
+    this.code = code;
     this.name = "CspLookupError";
   }
 }
