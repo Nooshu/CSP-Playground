@@ -1,6 +1,14 @@
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createPolicyOutput } from "../../src/ui/PolicyOutput";
 import type { PolicyState } from "../../src/csp/buildPolicy";
+
+const { showToast } = vi.hoisted(() => ({
+  showToast: vi.fn(),
+}));
+
+vi.mock("../../src/ui/toast", () => ({
+  showToast,
+}));
 
 function createState(): PolicyState {
   return {
@@ -9,6 +17,10 @@ function createState(): PolicyState {
 }
 
 describe("createPolicyOutput", () => {
+  beforeEach(() => {
+    showToast.mockClear();
+  });
+
   it("updates previews and server export formats", async () => {
     const onModeChange = vi.fn();
     const panel = createPolicyOutput({
@@ -85,6 +97,24 @@ describe("createPolicyOutput", () => {
       panel.querySelectorAll(".output-actions .btn.btn-secondary")[1] as HTMLButtonElement
     ).click();
     await vi.waitFor(() => expect(writeText).toHaveBeenCalled());
+    expect(showToast).toHaveBeenCalledWith(
+      "Server config copied to clipboard",
+      "success",
+    );
+  });
+
+  it("shows a toast when server config copy has no output", async () => {
+    const panel = createPolicyOutput({ getState: () => ({}) });
+    document.body.appendChild(panel);
+    panel.update();
+
+    (
+      panel.querySelectorAll(".output-actions .btn.btn-secondary")[1] as HTMLButtonElement
+    ).click();
+
+    await vi.waitFor(() =>
+      expect(showToast).toHaveBeenCalledWith("Nothing to copy", "error"),
+    );
   });
 
   it("can progressively enhance an existing container element", () => {

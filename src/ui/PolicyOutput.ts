@@ -12,9 +12,10 @@
 
 import { buildHeaderLine, buildPolicyString } from "../csp/buildPolicy";
 import type { PolicyState } from "../csp/buildPolicy";
-import type { WebServerExport, WebServerId } from "../csp/serverExports";
+import { WEB_SERVER_EXPORTS, type WebServerId } from "../csp/serverExports";
 import { createFlagInfoIcon } from "./FlagInfoIcon";
 import type { PolicyUpdateSnapshot } from "./policyUpdate";
+import { showToast } from "./toast";
 
 /** Options for the live policy output sidebar. */
 export interface PolicyOutputOptions {
@@ -39,8 +40,9 @@ export interface PolicyOutputOptions {
  * @returns An `<aside>` element augmented with `update`, `getReportOnly`, and `setReportOnly`.
  *
  * @remarks
- * Clipboard copy uses {@link navigator.clipboard}; failures are announced via an
- * `aria-live` region. The returned element is cast to {@link PolicyOutputPanel}
+ * Clipboard copy uses {@link navigator.clipboard}; success and failure are shown
+ * via a top-of-screen toast and announced in an `aria-live` region. The returned
+ * element is cast to {@link PolicyOutputPanel}
  * at the call site for typed access to extension methods.
  */
 export function createPolicyOutput(options: PolicyOutputOptions): HTMLElement {
@@ -48,15 +50,6 @@ export function createPolicyOutput(options: PolicyOutputOptions): HTMLElement {
   let reportOnly = false;
   let selectedServer: WebServerId = "apache";
   let htmlOnly = false;
-  let serverExports: WebServerExport[] | null = null;
-
-  const serverExportsReady = import("../csp/serverExports").then((module) => {
-    serverExports = module.WEB_SERVER_EXPORTS;
-    populateServerSelect(serverExports);
-    serverHelp.textContent = serverExports[0]?.description ?? "";
-    update();
-    return serverExports;
-  });
 
   const panel = container ?? document.createElement("aside");
   panel.innerHTML = "";
@@ -252,10 +245,10 @@ export function createPolicyOutput(options: PolicyOutputOptions): HTMLElement {
   liveRegion.setAttribute("aria-atomic", "true");
   panel.appendChild(liveRegion);
 
-  function populateServerSelect(exports: WebServerExport[]): void {
+  function populateServerSelect(): void {
     if (serverSelect.options.length > 0) return;
 
-    for (const server of exports) {
+    for (const server of WEB_SERVER_EXPORTS) {
       const opt = document.createElement("option");
       opt.value = server.id;
       opt.textContent = server.name;
@@ -264,6 +257,9 @@ export function createPolicyOutput(options: PolicyOutputOptions): HTMLElement {
 
     serverSelect.value = selectedServer;
   }
+
+  populateServerSelect();
+  serverHelp.textContent = WEB_SERVER_EXPORTS[0]?.description ?? "";
 
   function announce(message: string): void {
     liveRegion.textContent = "";
@@ -275,14 +271,19 @@ export function createPolicyOutput(options: PolicyOutputOptions): HTMLElement {
 
   async function copyText(text: string, successMessage: string): Promise<void> {
     if (!text) {
-      announce("Nothing to copy");
+      const message = "Nothing to copy";
+      announce(message);
+      showToast(message, "error");
       return;
     }
     try {
       await navigator.clipboard.writeText(text);
       announce(successMessage);
+      showToast(successMessage, "success");
     } catch {
-      announce("Copy failed");
+      const message = "Copy failed";
+      announce(message);
+      showToast(message, "error");
     }
   }
 
@@ -292,8 +293,20 @@ export function createPolicyOutput(options: PolicyOutputOptions): HTMLElement {
       : "Content-Security-Policy";
   }
 
+  function getServerExportText(): string {
+    const policy = buildPolicyString(getState());
+    if (!policy) return "";
+
+    const server = WEB_SERVER_EXPORTS.find(
+      (item) => item.id === (serverSelect.value as WebServerId),
+    );
+    if (!server) return "";
+
+    return server.format(getHeaderName(), policy, { htmlOnly });
+  }
+
   function updateServerPreview(policy: string, headerName: string): void {
-    const server = serverExports?.find((item) => item.id === selectedServer);
+    const server = WEB_SERVER_EXPORTS.find((item) => item.id === selectedServer);
     if (server && policy) {
       serverHelp.textContent = server.description;
       htmlOnlyCheckbox.disabled = !server.supportsHtmlOnly;
@@ -302,8 +315,6 @@ export function createPolicyOutput(options: PolicyOutputOptions): HTMLElement {
         htmlOnlyCheckbox.checked = false;
       }
       serverPreview.textContent = server.format(headerName, policy, { htmlOnly });
-    } else if (!serverExports) {
-      serverPreview.textContent = "(loading server export formats…)";
     } else {
       serverPreview.textContent = "(no server config to display)";
     }
@@ -355,19 +366,11 @@ export function createPolicyOutput(options: PolicyOutputOptions): HTMLElement {
   });
 
   copyServerBtn.addEventListener("click", () => {
-    void serverExportsReady.then(() => {
-      const policy = buildPolicyString(getState());
-      const server = serverExports?.find((item) => item.id === selectedServer);
-      if (server && policy) {
-        void copyText(
-          server.format(getHeaderName(), policy, { htmlOnly }),
-          "Server config copied to clipboard",
-        );
-      }
-    });
+    void copyText(
+      getServerExportText(),
+      "Server config copied to clipboard",
+    );
   });
-
-  void serverExportsReady;
 
   return Object.assign(panel, {
     update,

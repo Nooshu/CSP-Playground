@@ -591,6 +591,73 @@ select {
   border-color: var(--color-danger);
 }
 
+.toast-container {
+  position: fixed;
+  top: var(--page-top-inset);
+  left: 50%;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: min(24rem, calc(100vw - 2 * var(--grid-gutter)));
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.toast {
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius);
+  font-size: var(--step--1);
+  font-weight: 500;
+  line-height: 1.4;
+  text-align: center;
+  color: #fff;
+  box-shadow: var(--shadow), 0 4px 12px rgb(0 0 0 / 12%);
+  opacity: 0;
+  transform: translateY(-1rem);
+}
+
+.toast.is-visible {
+  animation: toast-enter 0.3s ease forwards;
+}
+
+.toast.is-hiding {
+  animation: toast-exit 0.3s ease forwards;
+}
+
+.toast--success {
+  background: var(--color-success);
+}
+
+.toast--error {
+  background: var(--color-danger);
+}
+
+@keyframes toast-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-1rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes toast-exit {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(-0.75rem);
+  }
+}
+
 .policy-output {
   margin: var(--space-xl) 0;
   padding: var(--space-lg);
