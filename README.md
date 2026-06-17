@@ -166,9 +166,10 @@ URL import in production uses [Cloudflare Pages Functions](https://developers.cl
 1. Connect this repository to Cloudflare Pages.
 2. **Build command:** `yarn build`
 3. **Build output directory:** `dist`
-4. Deploy. Cloudflare automatically detects the `functions/` directory and deploys the API route alongside static assets.
+4. **Deploy command:** `npx wrangler deploy` (required on Workers Builds; do not use `wrangler pages deploy` — the CI token lacks Pages API access)
+5. **Root directory / path:** `/` (repo root, not `dist`)
 
-No separate Worker or backend is required.
+`yarn build` compiles Pages Functions into `dist/_worker/` and configures static assets in `wrangler.toml`. No separate Worker or backend is required beyond `functions/`.
 
 ### Local Pages preview
 

@@ -48,4 +48,5 @@ if (!statSync(distDir, { throwIfNoEntry: false })) {
 }
 
 writeFileSync(join(distDir, "_headers"), HEADERS, "utf8");
-console.log("generate-dist-headers: wrote dist/_headers");
+writeFileSync(join(distDir, ".assetsignore"), "_worker\n", "utf8");
+console.log("generate-dist-headers: wrote dist/_headers and dist/.assetsignore");

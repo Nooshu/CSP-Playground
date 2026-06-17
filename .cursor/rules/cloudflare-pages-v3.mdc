@@ -61,5 +61,6 @@ For function changes, also run `yarn pages:dev` when possible.
 |---------|-------|
 | Build command | `yarn build` |
 | Build output directory | `dist` |
+| Deploy command | `npx wrangler deploy` |
 | `YARN_VERSION` | `1.22.22` |
 | `NODE_VERSION` | `22.16.0` (optional if `.nvmrc` is committed) |
