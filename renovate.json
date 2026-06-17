@@ -17,6 +17,12 @@
       "rangeStrategy": "pin"
     },
     {
+      "description": "Cloudflare Pages v3 pins Node; ignore Node version updates",
+      "matchManagers": ["npm", "nvm"],
+      "matchPackageNames": ["node"],
+      "enabled": false
+    },
+    {
       "description": "Group patch/minor devDependency updates into one daily PR",
       "matchManagers": ["npm"],
       "matchDepTypes": ["devDependencies"],
