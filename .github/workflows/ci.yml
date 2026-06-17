@@ -1,0 +1,48 @@
+# Validates pushes and PRs (including Renovate / Dependabot dependency updates).
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify-build-test:
+    name: Verify, build, and test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: yarn
+
+      - name: Enable Yarn 1.22.22
+        run: |
+          corepack enable
+          corepack prepare yarn@1.22.22 --activate
+          yarn --version
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Verify pinned dependencies and lockfile integrity
+        run: yarn verify:deps
+
+      - name: Build
+        run: yarn build
+
+      - name: Test with coverage
+        run: yarn test:coverage
