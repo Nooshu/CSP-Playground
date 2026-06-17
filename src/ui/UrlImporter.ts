@@ -20,6 +20,7 @@ import {
 import { applyParsedPolicy } from "./applyPolicy";
 import type { DirectiveSectionHandle } from "./DirectiveSection";
 import type { PolicyOutputPanel } from "./PolicyOutput";
+import { showToast } from "./toast";
 
 /** Options for the URL policy importer section. */
 export interface UrlImporterOptions {
@@ -358,14 +359,24 @@ export function createUrlImporter(options: UrlImporterOptions): HTMLElement {
   copyCorrectedBtn.addEventListener("click", () => {
     const text = correctedPreview.textContent ?? "";
     if (!text) {
-      announceValidation("Nothing to copy");
+      const message = "Nothing to copy";
+      announceValidation(message);
+      showToast(message, "error");
       return;
     }
 
     void navigator.clipboard
       .writeText(text)
-      .then(() => announceValidation("Corrected policy copied"))
-      .catch(() => announceValidation("Copy failed"));
+      .then(() => {
+        const message = "Corrected policy copied to clipboard";
+        announceValidation(message);
+        showToast(message, "success");
+      })
+      .catch(() => {
+        const message = "Copy failed";
+        announceValidation(message);
+        showToast(message, "error");
+      });
   });
 
   return section;

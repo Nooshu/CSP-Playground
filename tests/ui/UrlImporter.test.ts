@@ -1,11 +1,22 @@
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { DIRECTIVES } from "../../src/csp/directives";
 import { createDirectiveSection } from "../../src/ui/DirectiveSection";
 import { createPolicyOutput } from "../../src/ui/PolicyOutput";
 import { createUrlImporter } from "../../src/ui/UrlImporter";
 import * as lookupApi from "../../src/api/lookupCsp";
 
+const { showToast } = vi.hoisted(() => ({
+  showToast: vi.fn(),
+}));
+
+vi.mock("../../src/ui/toast", () => ({
+  showToast,
+}));
+
 describe("createUrlImporter", () => {
+  beforeEach(() => {
+    showToast.mockClear();
+  });
   it("imports policies from successful lookups", async () => {
     const sections = DIRECTIVES.slice(0, 3).map((directive) =>
       createDirectiveSection({ directive, onChange: vi.fn() }),
@@ -202,6 +213,51 @@ describe("createUrlImporter", () => {
         (importer.querySelector(".url-importer-validate") as HTMLButtonElement)
           .disabled,
       ).toBe(false),
+    );
+  });
+
+  it("shows a toast when copying the corrected policy", async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.assign(navigator, { clipboard: { writeText } });
+
+    const sections = DIRECTIVES.slice(0, 3).map((directive) =>
+      createDirectiveSection({ directive, onChange: vi.fn() }),
+    );
+    const outputPanel = createPolicyOutput({ getState: () => ({}) });
+    const importer = createUrlImporter({
+      sections,
+      outputPanel,
+      onApplied: vi.fn(),
+    });
+    document.body.appendChild(importer);
+
+    vi.spyOn(lookupApi, "lookupCspFromUrl").mockResolvedValue({
+      url: "https://example.com",
+      policy: "default-src self",
+      reportOnly: false,
+      source: "header-enforce",
+    });
+
+    const input = importer.querySelector("#site-url") as HTMLInputElement;
+    input.value = "https://example.com";
+    importer
+      .querySelector(".url-importer-validate")
+      ?.dispatchEvent(new Event("click", { bubbles: true }));
+
+    await vi.waitFor(() =>
+      expect(
+        importer.querySelector(".url-importer-corrected")?.textContent,
+      ).toContain("'self'"),
+    );
+
+    (
+      importer.querySelector(".url-importer-copy-corrected") as HTMLButtonElement
+    ).click();
+
+    await vi.waitFor(() => expect(writeText).toHaveBeenCalled());
+    expect(showToast).toHaveBeenCalledWith(
+      "Corrected policy copied to clipboard",
+      "success",
     );
   });
 });
