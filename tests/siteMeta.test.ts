@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   OG_IMAGE_PATH,
+  OG_IMAGE_TYPE,
   renderSiteMetaHtml,
   SITE_ORIGIN,
   SITE_PAGE_META,
@@ -8,10 +9,13 @@ import {
 } from "../src/siteMeta";
 
 describe("siteMeta", () => {
-  it("renders Open Graph and Twitter tags for the home page", () => {
+  it("renders SEO, Open Graph, and Twitter tags for the home page", () => {
     const html = renderSiteMetaHtml("home");
     const { title, description } = SITE_PAGE_META.home;
 
+    expect(html).toContain(`<title>${title}</title>`);
+    expect(html).toContain(`name="description" content="${description}"`);
+    expect(html).toContain(`rel="canonical" href="${SITE_ORIGIN}/"`);
     expect(html).toContain('property="og:type" content="website"');
     expect(html).toContain(`property="og:title" content="${title}"`);
     expect(html).toContain(`property="og:description" content="${description}"`);
@@ -19,6 +23,10 @@ describe("siteMeta", () => {
     expect(html).toContain(
       `property="og:image" content="${SITE_ORIGIN}${OG_IMAGE_PATH}"`,
     );
+    expect(html).toContain(
+      `property="og:image:secure_url" content="${SITE_ORIGIN}${OG_IMAGE_PATH}"`,
+    );
+    expect(html).toContain(`property="og:image:type" content="${OG_IMAGE_TYPE}"`);
     expect(html).toContain('property="og:image:width" content="1200"');
     expect(html).toContain('property="og:image:height" content="464"');
     expect(html).toContain('name="twitter:card" content="summary_large_image"');
@@ -26,21 +34,28 @@ describe("siteMeta", () => {
     expect(html).toContain(
       `name="twitter:image" content="${SITE_ORIGIN}${OG_IMAGE_PATH}"`,
     );
+    expect(html).toContain('"@type":"WebApplication"');
   });
 
   it("renders page-specific metadata for the why-CSP guide", () => {
     const html = renderSiteMetaHtml("whyCsp");
     const { title, description } = SITE_PAGE_META.whyCsp;
 
+    expect(html).toContain(`<title>${title}</title>`);
+    expect(html).toContain(`name="description" content="${description}"`);
+    expect(html).toContain(`rel="canonical" href="${SITE_ORIGIN}/why-csp.html"`);
     expect(html).toContain(`property="og:title" content="${title}"`);
     expect(html).toContain(`property="og:description" content="${description}"`);
     expect(html).toContain(`property="og:url" content="${SITE_ORIGIN}/why-csp.html"`);
+    expect(html).toContain('"@type":"Article"');
   });
 
-  it("includes image alt text for accessibility", () => {
+  it("includes concise image alt text for accessibility", () => {
     const html = renderSiteMetaHtml("home");
-    expect(html).toContain('property="og:image:alt" content="CSP Builder —');
-    expect(html).toContain('name="twitter:image:alt" content="CSP Builder —');
+    const { imageAlt } = SITE_PAGE_META.home;
+
+    expect(html).toContain(`property="og:image:alt" content="${imageAlt}"`);
+    expect(html).toContain(`name="twitter:image:alt" content="${imageAlt}"`);
   });
 
   it("maps HTML entry filenames to site meta pages", () => {

@@ -1,8 +1,8 @@
 /**
- * Shared Open Graph and Twitter Card metadata for public pages.
+ * Shared SEO, Open Graph, and Twitter Card metadata for public pages.
  */
 
-/** Canonical site origin for absolute social preview URLs. */
+/** Canonical site origin for absolute URLs and social previews. */
 export const SITE_ORIGIN = "https://csp-playground.dev";
 
 /** Path to the social preview image in `public/` (1200 × 464 px). */
@@ -14,28 +14,43 @@ export const OG_IMAGE_WIDTH = 1200;
 /** Social preview image height in pixels. */
 export const OG_IMAGE_HEIGHT = 464;
 
+/** MIME type of the social preview image. */
+export const OG_IMAGE_TYPE = "image/jpeg";
+
 /** Site name shown in Open Graph metadata. */
 export const SITE_NAME = "CSP Builder";
 
 /** Page keys supported by {@link renderSiteMetaHtml}. */
 export type SiteMetaPage = "home" | "whyCsp";
 
-/** Per-page title, description, and canonical path. */
+/** Per-page SEO fields and canonical path. */
 export const SITE_PAGE_META: Record<
   SiteMetaPage,
-  { title: string; description: string; path: string }
+  {
+    title: string;
+    description: string;
+    path: string;
+    imageAlt: string;
+    schemaType: "WebApplication" | "Article";
+  }
 > = {
   home: {
-    title: "CSP Builder",
+    title: "CSP Builder — Free Content Security Policy Header Generator",
     description:
-      "Build a Content Security Policy (CSP) header with an accessible form-based tool.",
+      "Build and validate Content Security Policy headers in your browser. Import policies from any URL, score your CSP, and copy server snippets for Apache, Nginx, Caddy, and more.",
     path: "/",
+    imageAlt:
+      "CSP Builder — free browser-based Content Security Policy header generator",
+    schemaType: "WebApplication",
   },
   whyCsp: {
     title: "Why use a Content Security Policy? | CSP Builder",
     description:
-      "Why your website should use a Content Security Policy (CSP) and the security benefits it provides.",
+      "Learn why Content Security Policy matters for XSS protection, what risks you face without a CSP, and how to adopt a policy safely with report-only mode.",
     path: "/why-csp.html",
+    imageAlt:
+      "Why use a Content Security Policy — security guide from CSP Builder",
+    schemaType: "Article",
   },
 };
 
@@ -51,16 +66,57 @@ function escapeHtmlAttribute(value: string): string {
     .replaceAll(">", "&gt;");
 }
 
+function renderJsonLd(page: SiteMetaPage, pageUrl: string): string {
+  const { title, description, schemaType } = SITE_PAGE_META[page];
+  const imageUrl = absoluteUrl(OG_IMAGE_PATH);
+
+  const schema =
+    schemaType === "WebApplication"
+      ? {
+          "@context": "https://schema.org",
+          "@type": "WebApplication",
+          name: SITE_NAME,
+          url: pageUrl,
+          description,
+          applicationCategory: "DeveloperApplication",
+          operatingSystem: "Any",
+          image: imageUrl,
+          offers: {
+            "@type": "Offer",
+            price: "0",
+            priceCurrency: "USD",
+          },
+        }
+      : {
+          "@context": "https://schema.org",
+          "@type": "Article",
+          headline: title,
+          description,
+          url: pageUrl,
+          image: imageUrl,
+          author: {
+            "@type": "Organization",
+            name: SITE_NAME,
+          },
+          publisher: {
+            "@type": "Organization",
+            name: SITE_NAME,
+          },
+        };
+
+  return `<script type="application/ld+json">${JSON.stringify(schema)}</script>`;
+}
+
 /**
- * Returns `<head>` meta tags for Open Graph and Twitter Card previews.
+ * Returns `<head>` SEO tags: description, canonical, Open Graph, Twitter Card,
+ * and JSON-LD structured data.
  *
  * @param page - Which public page is being rendered.
  */
 export function renderSiteMetaHtml(page: SiteMetaPage): string {
-  const { title, description, path } = SITE_PAGE_META[page];
+  const { title, description, path, imageAlt } = SITE_PAGE_META[page];
   const pageUrl = absoluteUrl(path);
   const imageUrl = absoluteUrl(OG_IMAGE_PATH);
-  const imageAlt = `${SITE_NAME} — ${description}`;
 
   const attrs = {
     title: escapeHtmlAttribute(title),
@@ -71,13 +127,18 @@ export function renderSiteMetaHtml(page: SiteMetaPage): string {
     siteName: escapeHtmlAttribute(SITE_NAME),
   };
 
-  return `<meta property="og:type" content="website" />
+  return `<title>${attrs.title}</title>
+    <meta name="description" content="${attrs.description}" />
+    <link rel="canonical" href="${attrs.pageUrl}" />
+    <meta property="og:type" content="website" />
     <meta property="og:site_name" content="${attrs.siteName}" />
     <meta property="og:title" content="${attrs.title}" />
     <meta property="og:description" content="${attrs.description}" />
     <meta property="og:url" content="${attrs.pageUrl}" />
     <meta property="og:locale" content="en_GB" />
     <meta property="og:image" content="${attrs.imageUrl}" />
+    <meta property="og:image:secure_url" content="${attrs.imageUrl}" />
+    <meta property="og:image:type" content="${OG_IMAGE_TYPE}" />
     <meta property="og:image:width" content="${OG_IMAGE_WIDTH}" />
     <meta property="og:image:height" content="${OG_IMAGE_HEIGHT}" />
     <meta property="og:image:alt" content="${attrs.imageAlt}" />
@@ -85,7 +146,8 @@ export function renderSiteMetaHtml(page: SiteMetaPage): string {
     <meta name="twitter:title" content="${attrs.title}" />
     <meta name="twitter:description" content="${attrs.description}" />
     <meta name="twitter:image" content="${attrs.imageUrl}" />
-    <meta name="twitter:image:alt" content="${attrs.imageAlt}" />`;
+    <meta name="twitter:image:alt" content="${attrs.imageAlt}" />
+    ${renderJsonLd(page, pageUrl)}`;
 }
 
 /**
