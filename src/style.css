@@ -420,6 +420,10 @@ select {
   gap: var(--space-sm);
 }
 
+.custom-source-row + .custom-source-row {
+  margin-top: var(--space-sm);
+}
+
 .custom-source-row .source-input {
   flex: 1;
   min-width: 0;
