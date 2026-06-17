@@ -24,10 +24,16 @@ export default defineConfig({
     },
   ],
   build: {
+    assetsDir: "assets",
     rollupOptions: {
       input: {
         main: "index.html",
         whyCsp: "why-csp.html",
+      },
+      output: {
+        entryFileNames: "assets/[name]-[hash].js",
+        chunkFileNames: "assets/[name]-[hash].js",
+        assetFileNames: "assets/[name]-[hash][extname]",
       },
     },
   },

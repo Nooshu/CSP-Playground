@@ -9,8 +9,10 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "tsc && vite build && node scripts/generate-dist-headers.mjs && node scripts/compress-dist-brotli.mjs",
     "preview": "vite preview",
+    "preview:dist": "node scripts/preview-dist.mjs",
+    "preview:brotli": "yarn build && node scripts/preview-dist.mjs",
     "pages:dev": "yarn build && wrangler pages dev dist",
     "pages:deploy": "yarn build && wrangler pages deploy dist",
     "test": "vitest run",
