@@ -5,7 +5,7 @@
     ":pinAllExceptPeerDependencies"
   ],
   "timezone": "Europe/London",
-  "schedule": ["at 6:00am"],
+  "schedule": ["* 6 * * *"],
   "labels": ["dependencies"],
   "rangeStrategy": "pin",
   "packageRules": [
