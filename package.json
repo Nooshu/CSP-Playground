@@ -21,12 +21,12 @@
   "devDependencies": {
     "@cloudflare/workers-types": "4.20260617.1",
     "@types/node": "25.9.3",
-    "@vitest/coverage-istanbul": "4.1.8",
-    "@vitest/coverage-v8": "4.1.8",
+    "@vitest/coverage-istanbul": "4.1.9",
+    "@vitest/coverage-v8": "4.1.9",
     "jsdom": "29.1.1",
     "typescript": "6.0.3",
     "vite": "8.0.16",
-    "vitest": "4.1.8",
+    "vitest": "4.1.9",
     "wrangler": "4.101.0"
   }
 }
