@@ -1,12 +1,21 @@
 import { defineConfig } from "vite";
 import { cspLookupPlugin } from "./server/cspLookupPlugin";
 import { renderIndexAppHtml } from "./src/ssg/renderIndexApp";
+import { renderSiteMetaHtml, siteMetaPageFromFilename } from "./src/siteMeta";
 import { renderSiteFooterHtml } from "./src/ui/siteFooter";
 
 export default defineConfig({
   root: ".",
   plugins: [
     cspLookupPlugin(),
+    {
+      name: "csp-builder-site-meta",
+      transformIndexHtml(html, ctx) {
+        if (!html.includes("<!--SITE_META-->")) return html;
+        const page = siteMetaPageFromFilename(ctx.filename);
+        return html.replace("<!--SITE_META-->", renderSiteMetaHtml(page));
+      },
+    },
     {
       name: "csp-builder-footer",
       transformIndexHtml(html) {
