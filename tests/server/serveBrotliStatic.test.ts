@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import {
   getStaticAssetCacheControl,
   getStaticAssetContentType,
+  isBrotliCompressibleAsset,
   resolveStaticAssetPath,
   tryServeBrotliAsset,
 } from "../../server/serveBrotliStatic";
@@ -20,6 +21,12 @@ describe("serveBrotliStatic", () => {
     expect(getStaticAssetContentType("/assets/main-abc12345.js")).toBe(
       "text/javascript; charset=UTF-8",
     );
+    expect(getStaticAssetContentType("/favicon-32x32.png")).toBe("image/png");
+    expect(getStaticAssetContentType("/favicon.ico")).toBe(
+      "image/vnd.microsoft.icon",
+    );
+    expect(isBrotliCompressibleAsset("/index.html")).toBe(true);
+    expect(isBrotliCompressibleAsset("/favicon-32x32.png")).toBe(false);
     expect(getStaticAssetCacheControl("/assets/main-abc12345.js")).toBe(
       "public, max-age=31536000, immutable, no-transform",
     );
@@ -70,6 +77,22 @@ describe("serveBrotliStatic", () => {
       ),
     ).resolves.toBeNull();
 
+    expect(assets.fetch).not.toHaveBeenCalled();
+  });
+
+  it("falls through for assets without brotli sidecars", async () => {
+    const assets = {
+      fetch: vi.fn(async () => new Response("br-body", { status: 200 })),
+    } as unknown as Fetcher;
+
+    const response = await tryServeBrotliAsset(
+      new Request("https://example.com/favicon-32x32.png", {
+        headers: { "Accept-Encoding": "gzip, br" },
+      }),
+      assets,
+    );
+
+    expect(response).toBeNull();
     expect(assets.fetch).not.toHaveBeenCalled();
   });
 });

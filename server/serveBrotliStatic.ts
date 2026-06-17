@@ -17,7 +17,28 @@ export const FINGERPRINTED_ASSET_CACHE_CONTROL =
 const FINGERPRINTED_ASSET_PATTERN =
   /\/assets\/[^/]+-[A-Za-z0-9_-]{8,}\.[A-Za-z0-9]+$/;
 
-/** MIME types for compressible static assets served from `dist/`. */
+/**
+ * Extensions pre-compressed during `yarn build`.
+ *
+ * @remarks
+ * Keep in sync with `scripts/compress-dist-brotli.mjs` and
+ * `scripts/lib/brotli-static.mjs`. Do not request `.br` sidecars for other
+ * types — Pages may return an unrelated asset (for example `index.html.br`).
+ */
+const BROTLI_COMPRESSIBLE_EXTENSIONS = new Set([
+  ".css",
+  ".html",
+  ".js",
+  ".json",
+  ".map",
+  ".mjs",
+  ".svg",
+  ".txt",
+  ".webmanifest",
+  ".xml",
+]);
+
+/** MIME types for static assets served from `dist/`. */
 const CONTENT_TYPES: Record<string, string> = {
   ".html": "text/html; charset=UTF-8",
   ".js": "text/javascript; charset=UTF-8",
@@ -25,6 +46,8 @@ const CONTENT_TYPES: Record<string, string> = {
   ".css": "text/css; charset=UTF-8",
   ".json": "application/json; charset=UTF-8",
   ".svg": "image/svg+xml",
+  ".png": "image/png",
+  ".ico": "image/vnd.microsoft.icon",
   ".webmanifest": "application/manifest+json; charset=UTF-8",
   ".txt": "text/plain; charset=UTF-8",
 };
@@ -49,6 +72,16 @@ export function resolveStaticAssetPath(pathname: string): string {
 export function getStaticAssetContentType(assetPath: string): string {
   const extension = assetPath.slice(assetPath.lastIndexOf(".")).toLowerCase();
   return CONTENT_TYPES[extension] ?? "application/octet-stream";
+}
+
+/**
+ * Whether a build step writes a `.br` sidecar for this asset path.
+ *
+ * @param assetPath - Normalized asset path.
+ */
+export function isBrotliCompressibleAsset(assetPath: string): boolean {
+  const extension = assetPath.slice(assetPath.lastIndexOf(".")).toLowerCase();
+  return BROTLI_COMPRESSIBLE_EXTENSIONS.has(extension);
 }
 
 /**
@@ -103,6 +136,10 @@ export async function tryServeBrotliAsset(
   }
 
   const assetPath = resolveStaticAssetPath(url.pathname);
+  if (!isBrotliCompressibleAsset(assetPath)) {
+    return null;
+  }
+
   const brResponse = await assets.fetch(
     new URL(`${assetPath}.br`, url.origin).toString(),
     { method: "GET" },

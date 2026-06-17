@@ -13,6 +13,26 @@ export const FINGERPRINTED_ASSET_CACHE_CONTROL =
 const FINGERPRINTED_ASSET_PATTERN =
   /\/assets\/[^/]+-[A-Za-z0-9_-]{8,}\.[A-Za-z0-9]+$/;
 
+/**
+ * Extensions pre-compressed during `yarn build`.
+ *
+ * @remarks
+ * Keep in sync with `scripts/compress-dist-brotli.mjs` and
+ * `server/serveBrotliStatic.ts`.
+ */
+export const BROTLI_COMPRESSIBLE_EXTENSIONS = new Set([
+  ".css",
+  ".html",
+  ".js",
+  ".json",
+  ".map",
+  ".mjs",
+  ".svg",
+  ".txt",
+  ".webmanifest",
+  ".xml",
+]);
+
 /** @type {Record<string, string>} */
 export const CONTENT_TYPES = {
   ".html": "text/html; charset=UTF-8",
@@ -21,6 +41,8 @@ export const CONTENT_TYPES = {
   ".css": "text/css; charset=UTF-8",
   ".json": "application/json; charset=UTF-8",
   ".svg": "image/svg+xml",
+  ".png": "image/png",
+  ".ico": "image/vnd.microsoft.icon",
   ".webmanifest": "application/manifest+json; charset=UTF-8",
   ".txt": "text/plain; charset=UTF-8",
 };
@@ -40,6 +62,14 @@ export function resolveStaticAssetPath(pathname) {
 export function getStaticAssetContentType(assetPath) {
   const extension = assetPath.slice(assetPath.lastIndexOf(".")).toLowerCase();
   return CONTENT_TYPES[extension] ?? "application/octet-stream";
+}
+
+/**
+ * @param {string} assetPath
+ */
+export function isBrotliCompressibleAsset(assetPath) {
+  const extension = assetPath.slice(assetPath.lastIndexOf(".")).toLowerCase();
+  return BROTLI_COMPRESSIBLE_EXTENSIONS.has(extension);
 }
 
 /**

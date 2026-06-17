@@ -20,6 +20,7 @@ import { fileURLToPath } from "node:url";
 import {
   getStaticAssetCacheControl,
   getStaticAssetContentType,
+  isBrotliCompressibleAsset,
   requestAcceptsBrotli,
   resolveStaticAssetPath,
 } from "./lib/brotli-static.mjs";
@@ -53,9 +54,13 @@ function resolveDistFile(pathname) {
  * @param {string} filePath
  * @param {boolean} acceptsBrotli
  */
-function readResponseBody(filePath, acceptsBrotli) {
+function readResponseBody(filePath, assetPath, acceptsBrotli) {
   const brotliPath = `${filePath}.br`;
-  if (acceptsBrotli && existsSync(brotliPath)) {
+  if (
+    acceptsBrotli &&
+    isBrotliCompressibleAsset(assetPath) &&
+    existsSync(brotliPath)
+  ) {
     return {
       body: readFileSync(brotliPath),
       encoding: "br",
@@ -103,6 +108,7 @@ const server = createServer((request, response) => {
 
   const payload = readResponseBody(
     resolved.filePath,
+    resolved.assetPath,
     requestAcceptsBrotli(request),
   );
 

@@ -3,6 +3,7 @@ import {
   FINGERPRINTED_ASSET_CACHE_CONTROL,
   getStaticAssetCacheControl,
   getStaticAssetContentType,
+  isBrotliCompressibleAsset,
   isFingerprintedAsset,
   requestAcceptsBrotli,
   resolveStaticAssetPath,
@@ -15,6 +16,9 @@ describe("scripts/lib/brotli-static", () => {
     expect(getStaticAssetContentType("/assets/main-abc12345.js")).toBe(
       "text/javascript; charset=UTF-8",
     );
+    expect(getStaticAssetContentType("/favicon-32x32.png")).toBe("image/png");
+    expect(isBrotliCompressibleAsset("/index.html")).toBe(true);
+    expect(isBrotliCompressibleAsset("/favicon-32x32.png")).toBe(false);
     expect(isFingerprintedAsset("/assets/main-abc12345.js")).toBe(true);
     expect(isFingerprintedAsset("/assets/main-abc12345.css")).toBe(true);
     expect(isFingerprintedAsset("/site-footer-year.mjs")).toBe(false);
