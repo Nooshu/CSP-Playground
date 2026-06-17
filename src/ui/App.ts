@@ -66,8 +66,66 @@ export function createApp(root: HTMLElement): void {
     securityScorePanel?.update();
   }
 
+  root.classList.add("app");
+
+  const hasSsgShell =
+    root.querySelector(".app-layout") &&
+    root.querySelector(".directive-form") &&
+    root.querySelector("#generated-policy");
+
+  if (hasSsgShell) {
+    const outputContainer = root.querySelector<HTMLElement>("#generated-policy");
+    outputPanel = createPolicyOutput({
+      getState: collectState,
+      onModeChange: handleChange,
+      container: outputContainer ?? undefined,
+    }) as PolicyOutputPanel;
+
+    securityScorePanel = createSecurityScorePanel({
+      getState: collectState,
+      getReportOnly: () => outputPanel?.getReportOnly() ?? false,
+    });
+    document.body.appendChild(securityScorePanel);
+
+    const form = root.querySelector<HTMLFormElement>(".directive-form");
+    if (form) {
+      form.addEventListener("submit", (e) => e.preventDefault());
+    }
+
+    for (const category of CATEGORY_ORDER) {
+      const directives = DIRECTIVES_BY_CATEGORY[category];
+      if (!directives?.length) continue;
+
+      for (const directive of directives) {
+        const existing = root.querySelector<HTMLElement>(
+          `[data-directive="${directive.name}"]`,
+        );
+        const section = createDirectiveSection({
+          directive,
+          onChange: handleChange,
+          container: existing ?? undefined,
+        });
+        sections.push(section);
+      }
+    }
+
+    const urlImporterContainer =
+      root.querySelector<HTMLElement>("#url-importer-root") ??
+      root.querySelector<HTMLElement>(".url-importer");
+
+    createUrlImporter({
+      sections,
+      outputPanel,
+      onApplied: handleChange,
+      container: urlImporterContainer ?? undefined,
+    });
+
+    handleChange();
+    return;
+  }
+
+  // Fallback: fully client-rendered (used for tests or non-SSG pages).
   root.innerHTML = "";
-  root.className = "app";
 
   outputPanel = createPolicyOutput({
     getState: collectState,

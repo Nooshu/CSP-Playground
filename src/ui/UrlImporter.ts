@@ -25,6 +25,14 @@ export interface UrlImporterOptions {
   outputPanel: PolicyOutputPanel;
   /** Called after a successful import so previews and score refresh. */
   onApplied: () => void;
+  /**
+   * Optional existing container to progressively enhance.
+   *
+   * @remarks
+   * When provided, the container is cleared and reused rather than creating a
+   * new `<section>`. This enables build-time rendered HTML with client-side wiring.
+   */
+  container?: HTMLElement;
 }
 
 /**
@@ -38,9 +46,10 @@ export interface UrlImporterOptions {
  * A missing CSP shows an inline link to `/why-csp.html` rather than an error tone.
  */
 export function createUrlImporter(options: UrlImporterOptions): HTMLElement {
-  const { sections, outputPanel, onApplied } = options;
+  const { sections, outputPanel, onApplied, container } = options;
 
-  const section = document.createElement("section");
+  const section = container ?? document.createElement("section");
+  section.innerHTML = "";
   section.className = "url-importer";
   section.setAttribute("aria-labelledby", "url-importer-heading");
 

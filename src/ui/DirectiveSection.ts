@@ -27,6 +27,15 @@ export interface DirectiveSectionOptions {
   directive: DirectiveDefinition;
   /** Called when the user toggles or edits any value in this section. */
   onChange: () => void;
+  /**
+   * Optional existing container to progressively enhance.
+   *
+   * @remarks
+   * When provided, the container is cleared and reused instead of creating a new
+   * `<article>`. This supports build-time pre-rendered HTML (SSG) with client-side
+   * enhancement.
+   */
+  container?: HTMLElement;
 }
 
 /**
@@ -60,11 +69,12 @@ export interface DirectiveSectionHandle {
 export function createDirectiveSection(
   options: DirectiveSectionOptions,
 ): DirectiveSectionHandle {
-  const { directive, onChange } = options;
+  const { directive, onChange, container } = options;
   const idPrefix = `directive-${directive.name.replace(/[^a-z0-9-]/gi, "-")}`;
   const helpId = `${idPrefix}-help`;
 
-  const article = document.createElement("article");
+  const article = container ?? document.createElement("article");
+  article.innerHTML = "";
   article.className = "directive-section";
   article.id = `directive-section-${directive.name}`;
   article.dataset.directive = directive.name;
