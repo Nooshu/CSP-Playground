@@ -710,7 +710,9 @@ select {
   margin-bottom: var(--space-md);
 }
 
-.output-group label {
+.output-group label,
+.output-group .field-caption,
+.nonce-result .field-caption {
   display: block;
   margin-bottom: var(--space-xs);
   font-size: 0.875rem;

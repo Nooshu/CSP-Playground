@@ -142,13 +142,15 @@ export function createPolicyOutput(options: PolicyOutputOptions): HTMLElement {
   const policyGroup = document.createElement("div");
   policyGroup.className = "output-group";
 
-  const policyLabel = document.createElement("label");
-  policyLabel.htmlFor = "policy-preview";
+  const policyLabel = document.createElement("span");
+  policyLabel.id = "policy-preview-label";
+  policyLabel.className = "field-caption";
   policyLabel.textContent = "Policy value";
 
   const policyPreview = document.createElement("pre");
   policyPreview.id = "policy-preview";
   policyPreview.className = "policy-preview";
+  policyPreview.setAttribute("aria-labelledby", "policy-preview-label");
   policyPreview.tabIndex = 0;
   policyPreview.setAttribute("role", "status");
   policyPreview.textContent = "";
@@ -159,13 +161,15 @@ export function createPolicyOutput(options: PolicyOutputOptions): HTMLElement {
   const headerGroup = document.createElement("div");
   headerGroup.className = "output-group";
 
-  const headerLabel = document.createElement("label");
-  headerLabel.htmlFor = "header-preview";
+  const headerLabel = document.createElement("span");
+  headerLabel.id = "header-preview-label";
+  headerLabel.className = "field-caption";
   headerLabel.textContent = "HTTP header";
 
   const headerPreview = document.createElement("pre");
   headerPreview.id = "header-preview";
   headerPreview.className = "policy-preview";
+  headerPreview.setAttribute("aria-labelledby", "header-preview-label");
   headerPreview.tabIndex = 0;
   headerPreview.textContent = "";
 

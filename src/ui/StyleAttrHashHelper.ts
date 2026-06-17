@@ -88,21 +88,27 @@ export function createStyleAttrHashHelper(
   result.className = "nonce-result";
   result.hidden = true;
 
-  const snippetLabel = document.createElement("label");
-  snippetLabel.htmlFor = `${idPrefix}-style-attr-snippet`;
+  const snippetLabelId = `${idPrefix}-style-attr-snippet-label`;
+  const snippetLabel = document.createElement("span");
+  snippetLabel.id = snippetLabelId;
+  snippetLabel.className = "field-caption";
   snippetLabel.textContent = "Example HTML";
 
   const snippet = document.createElement("pre");
   snippet.id = `${idPrefix}-style-attr-snippet`;
   snippet.className = "nonce-snippet policy-preview";
+  snippet.setAttribute("aria-labelledby", snippetLabelId);
 
-  const hashLabel = document.createElement("label");
-  hashLabel.htmlFor = `${idPrefix}-style-attr-hash`;
+  const hashLabelId = `${idPrefix}-style-attr-hash-label`;
+  const hashLabel = document.createElement("span");
+  hashLabel.id = hashLabelId;
+  hashLabel.className = "field-caption";
   hashLabel.textContent = "CSP hash value";
 
   const hashPreview = document.createElement("pre");
   hashPreview.id = `${idPrefix}-style-attr-hash`;
   hashPreview.className = "nonce-snippet policy-preview";
+  hashPreview.setAttribute("aria-labelledby", hashLabelId);
 
   const resultActions = document.createElement("div");
   resultActions.className = "nonce-result-actions";

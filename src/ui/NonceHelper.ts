@@ -191,13 +191,16 @@ export function createNonceHelper(options: NonceHelperOptions): HTMLElement {
   result.className = "nonce-result";
   result.hidden = true;
 
-  const snippetLabel = document.createElement("label");
-  snippetLabel.htmlFor = `${idPrefix}-nonce-snippet`;
+  const snippetLabelId = `${idPrefix}-nonce-snippet-label`;
+  const snippetLabel = document.createElement("span");
+  snippetLabel.id = snippetLabelId;
+  snippetLabel.className = "field-caption";
   snippetLabel.textContent = "HTML snippet";
 
   const snippet = document.createElement("pre");
   snippet.id = `${idPrefix}-nonce-snippet`;
   snippet.className = "nonce-snippet policy-preview";
+  snippet.setAttribute("aria-labelledby", snippetLabelId);
 
   const resultActions = document.createElement("div");
   resultActions.className = "nonce-result-actions";
