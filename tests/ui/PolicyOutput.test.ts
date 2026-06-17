@@ -54,16 +54,20 @@ describe("createPolicyOutput", () => {
     document.body.appendChild(panel);
     panel.update();
 
-    const buttons = panel.querySelectorAll("button");
-    (buttons[0] as HTMLButtonElement).click();
+    const copyPolicyBtn = panel.querySelector(
+      ".output-actions .btn.btn-secondary",
+    ) as HTMLButtonElement;
+    copyPolicyBtn.click();
     await vi.waitFor(() => expect(writeText).toHaveBeenCalled());
 
     writeText.mockClear();
-    (buttons[1] as HTMLButtonElement).click();
+    (panel.querySelector(".output-actions .btn.btn-primary") as HTMLButtonElement).click();
     await vi.waitFor(() => expect(writeText).toHaveBeenCalled());
 
     writeText.mockClear();
-    (buttons[2] as HTMLButtonElement).click();
+    (
+      panel.querySelectorAll(".output-actions .btn.btn-secondary")[1] as HTMLButtonElement
+    ).click();
     await vi.waitFor(() => expect(writeText).toHaveBeenCalled());
   });
 

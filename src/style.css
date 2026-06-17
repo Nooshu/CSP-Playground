@@ -780,6 +780,18 @@ select {
   cursor: pointer;
 }
 
+.server-export-html-only-label .flag-info-wrap {
+  align-self: center;
+}
+
+.server-export-html-only-label .flag-info-tooltip {
+  top: 50%;
+  right: auto;
+  left: calc(100% + var(--space-xs));
+  transform: translateY(-50%);
+  max-width: 18rem;
+}
+
 .output-actions {
   display: flex;
   flex-wrap: wrap;

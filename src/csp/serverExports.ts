@@ -23,8 +23,20 @@ export interface WebServerExport {
   name: string;
   /** Short help text describing where to paste the snippet. */
   description: string;
+  /**
+   * Whether this exporter can scope the header to HTML responses only.
+   *
+   * @remarks
+   * Some platforms (e.g. proxies or middleware-only configs) apply headers
+   * globally and cannot trivially restrict by file extension.
+   */
+  supportsHtmlOnly?: boolean;
   /** Produces a config fragment for the given header name and policy value. */
-  format: (headerName: string, policy: string) => string;
+  format: (
+    headerName: string,
+    policy: string,
+    options?: { htmlOnly?: boolean },
+  ) => string;
 }
 
 /** Escapes values embedded in Apache `Header` directives (double-quoted). */
@@ -49,36 +61,66 @@ export const WEB_SERVER_EXPORTS: WebServerExport[] = [
     id: "apache",
     name: "Apache",
     description: "Header directive in .htaccess or VirtualHost config",
-    format: (headerName, policy) =>
-      `Header always set ${headerName} "${escapeApacheValue(policy)}"`,
+    supportsHtmlOnly: true,
+    format: (headerName, policy, options) => {
+      const directive = `Header always set ${headerName} "${escapeApacheValue(policy)}"`;
+      if (options?.htmlOnly) {
+        return `<FilesMatch "\\\\.html$">\n  ${directive}\n</FilesMatch>`;
+      }
+      return directive;
+    },
   },
   {
     id: "nginx",
     name: "Nginx",
     description: "add_header in server or location block",
-    format: (headerName, policy) =>
-      `add_header ${headerName} "${escapeNginxValue(policy)}" always;`,
+    supportsHtmlOnly: true,
+    format: (headerName, policy, options) => {
+      const directive = `add_header ${headerName} "${escapeNginxValue(policy)}" always;`;
+      if (options?.htmlOnly) {
+        return `location ~* \\\\.html$ {\n  ${directive}\n}`;
+      }
+      return directive;
+    },
   },
   {
     id: "caddy",
     name: "Caddy",
     description: "header directive in Caddyfile",
-    format: (headerName, policy) =>
-      `header ${headerName} "${escapeNginxValue(policy)}"`,
+    supportsHtmlOnly: true,
+    format: (headerName, policy, options) => {
+      const directive = `header ${headerName} "${escapeNginxValue(policy)}"`;
+      if (options?.htmlOnly) {
+        return `@html path *.html\n${directive} @html`;
+      }
+      return directive;
+    },
   },
   {
     id: "litespeed",
     name: "LiteSpeed",
     description: "Header directive (Apache-compatible syntax)",
-    format: (headerName, policy) =>
-      `Header always set ${headerName} "${escapeApacheValue(policy)}"`,
+    supportsHtmlOnly: true,
+    format: (headerName, policy, options) => {
+      const directive = `Header always set ${headerName} "${escapeApacheValue(policy)}"`;
+      if (options?.htmlOnly) {
+        return `<FilesMatch "\\\\.html$">\n  ${directive}\n</FilesMatch>`;
+      }
+      return directive;
+    },
   },
   {
     id: "iis",
     name: "Microsoft IIS",
     description: "customHeaders in web.config",
-    format: (headerName, policy) =>
-      `<add name="${headerName}" value="${escapeApacheValue(policy)}" />`,
+    supportsHtmlOnly: true,
+    format: (headerName, policy, options) => {
+      const headerLine = `<add name="${headerName}" value="${escapeApacheValue(policy)}" />`;
+      if (options?.htmlOnly) {
+        return `<location path=\"*.html\">\n  <system.webServer>\n    <httpProtocol>\n      <customHeaders>\n        ${headerLine}\n      </customHeaders>\n    </httpProtocol>\n  </system.webServer>\n</location>`;
+      }
+      return headerLine;
+    },
   },
   {
     id: "traefik",

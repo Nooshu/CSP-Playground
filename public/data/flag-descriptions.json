@@ -14,5 +14,8 @@
     "allow-top-navigation": "Allows the sandboxed document to navigate the top-level browsing context.",
     "allow-top-navigation-by-user-activation": "Allows top-level navigation only after a user gesture.",
     "allow-top-navigation-to-custom-protocols": "Allows top-level navigation to custom URL schemes after a user gesture."
+  },
+  "serverExport": {
+    "only-html-files": "Scopes the Content-Security-Policy header to HTML responses (for example .html files) instead of every file your server sends. CSP protects how documents load and run scripts, so it is most useful on HTML pages. Limiting the header to HTML is recommended because it avoids applying CSP to assets that do not need it—such as images, fonts, stylesheets, JSON, and other non-HTML responses—which can otherwise cause unexpected breakage or make debugging harder."
   }
 }

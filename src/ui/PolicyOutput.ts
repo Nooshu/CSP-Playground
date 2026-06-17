@@ -16,6 +16,7 @@ import {
   WEB_SERVER_EXPORTS,
   type WebServerId,
 } from "../csp/serverExports";
+import { createFlagInfoIcon } from "./FlagInfoIcon";
 
 /** Options for the live policy output sidebar. */
 export interface PolicyOutputOptions {
@@ -48,6 +49,7 @@ export function createPolicyOutput(options: PolicyOutputOptions): HTMLElement {
   const { getState, onModeChange, container } = options;
   let reportOnly = false;
   let selectedServer: WebServerId = "apache";
+  let htmlOnly = false;
 
   const panel = container ?? document.createElement("aside");
   panel.innerHTML = "";
@@ -174,6 +176,27 @@ export function createPolicyOutput(options: PolicyOutputOptions): HTMLElement {
   serverHelp.className = "server-help";
   serverHelp.textContent = WEB_SERVER_EXPORTS[0].description;
 
+  const htmlOnlyLabel = document.createElement("label");
+  htmlOnlyLabel.className = "mode-label server-export-html-only-label";
+
+  const htmlOnlyCheckbox = document.createElement("input");
+  htmlOnlyCheckbox.type = "checkbox";
+  htmlOnlyCheckbox.checked = false;
+  htmlOnlyCheckbox.setAttribute("aria-describedby", "server-export-help");
+
+  const htmlOnlyText = document.createElement("span");
+  htmlOnlyText.textContent = "Only apply to HTML files";
+
+  htmlOnlyLabel.append(
+    htmlOnlyCheckbox,
+    htmlOnlyText,
+    createFlagInfoIcon({
+      group: "serverExport",
+      flagKey: "only-html-files",
+      idPrefix: "server-export-html-only",
+    }),
+  );
+
   const serverPreview = document.createElement("pre");
   serverPreview.id = "server-export-preview";
   serverPreview.className = "policy-preview server-preview";
@@ -181,7 +204,7 @@ export function createPolicyOutput(options: PolicyOutputOptions): HTMLElement {
   serverPreview.setAttribute("aria-describedby", "server-export-help");
   serverPreview.textContent = "";
 
-  serverGroup.append(serverLabel, serverSelect, serverHelp, serverPreview);
+  serverGroup.append(serverLabel, serverSelect, serverHelp, htmlOnlyLabel, serverPreview);
   panel.appendChild(serverGroup);
 
   const actions = document.createElement("div");
@@ -249,7 +272,12 @@ export function createPolicyOutput(options: PolicyOutputOptions): HTMLElement {
     const server = WEB_SERVER_EXPORTS.find((s) => s.id === selectedServer);
     if (server && policy) {
       serverHelp.textContent = server.description;
-      serverPreview.textContent = server.format(headerName, policy);
+      htmlOnlyCheckbox.disabled = !server.supportsHtmlOnly;
+      if (!server.supportsHtmlOnly) {
+        htmlOnly = false;
+        htmlOnlyCheckbox.checked = false;
+      }
+      serverPreview.textContent = server.format(headerName, policy, { htmlOnly });
     } else {
       serverPreview.textContent = "(no server config to display)";
     }
@@ -272,6 +300,11 @@ export function createPolicyOutput(options: PolicyOutputOptions): HTMLElement {
     update();
   });
 
+  htmlOnlyCheckbox.addEventListener("change", () => {
+    htmlOnly = htmlOnlyCheckbox.checked;
+    update();
+  });
+
   copyPolicyBtn.addEventListener("click", () => {
     void copyText(buildPolicyString(getState()), "Policy copied to clipboard");
   });
@@ -289,7 +322,7 @@ export function createPolicyOutput(options: PolicyOutputOptions): HTMLElement {
     const server = WEB_SERVER_EXPORTS.find((s) => s.id === selectedServer);
     if (server && policy) {
       void copyText(
-        server.format(getHeaderName(), policy),
+        server.format(getHeaderName(), policy, { htmlOnly }),
         "Server config copied to clipboard",
       );
     }
