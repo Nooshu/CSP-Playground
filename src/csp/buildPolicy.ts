@@ -49,8 +49,11 @@ export function buildPolicyString(state: PolicyState): string {
   for (const [name, directive] of Object.entries(state)) {
     if (!directive.enabled) continue;
 
-    // Boolean directive: no value list in the serialized output.
-    if (name === "upgrade-insecure-requests") {
+    // Boolean directives: no value list in the serialized output.
+    if (
+      name === "upgrade-insecure-requests" ||
+      name === "block-all-mixed-content"
+    ) {
       parts.push(name);
       continue;
     }

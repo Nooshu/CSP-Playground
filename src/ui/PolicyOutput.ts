@@ -76,7 +76,7 @@ export function createPolicyOutput(options: PolicyOutputOptions): HTMLElement {
 
   const warningText = document.createElement("p");
   warningText.textContent =
-    "A CSP deployed without careful testing can break your site. Use at your own risk—the authors accept no liability for outages or regressions. ";
+    "A CSP deployed without careful testing can break your site. Use at your own risk: the author accepts no liability for outages or regressions. For more information see: ";
 
   const guideLink = document.createElement("a");
   guideLink.href = "https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CSP";
@@ -119,10 +119,29 @@ export function createPolicyOutput(options: PolicyOutputOptions): HTMLElement {
   reportOnlyRadio.name = "header-mode";
   reportOnlyRadio.value = "report-only";
 
-  enforceLabel.append(enforceRadio, " Content-Security-Policy");
+  const enforceText = document.createElement("span");
+  enforceText.textContent = "Content-Security-Policy";
+
+  const reportOnlyText = document.createElement("span");
+  reportOnlyText.textContent = "Content-Security-Policy-Report-Only";
+
+  enforceLabel.append(
+    enforceRadio,
+    enforceText,
+    createFlagInfoIcon({
+      group: "headerMode",
+      flagKey: "content-security-policy",
+      idPrefix: "policy-header-mode-enforce",
+    }),
+  );
   reportOnlyLabel.append(
     reportOnlyRadio,
-    " Content-Security-Policy-Report-Only",
+    reportOnlyText,
+    createFlagInfoIcon({
+      group: "headerMode",
+      flagKey: "content-security-policy-report-only",
+      idPrefix: "policy-header-mode-report-only",
+    }),
   );
   modeFieldset.append(enforceLabel, reportOnlyLabel);
   panel.appendChild(modeFieldset);
@@ -176,7 +195,7 @@ export function createPolicyOutput(options: PolicyOutputOptions): HTMLElement {
   serverHelp.className = "server-help";
 
   const htmlOnlyLabel = document.createElement("label");
-  htmlOnlyLabel.className = "mode-label server-export-html-only-label";
+  htmlOnlyLabel.className = "mode-label";
 
   const htmlOnlyCheckbox = document.createElement("input");
   htmlOnlyCheckbox.type = "checkbox";
@@ -184,7 +203,7 @@ export function createPolicyOutput(options: PolicyOutputOptions): HTMLElement {
   htmlOnlyCheckbox.setAttribute("aria-describedby", "server-export-help");
 
   const htmlOnlyText = document.createElement("span");
-  htmlOnlyText.textContent = "Only apply to HTML files";
+  htmlOnlyText.textContent = "Only apply CSP response header to HTML files";
 
   htmlOnlyLabel.append(
     htmlOnlyCheckbox,

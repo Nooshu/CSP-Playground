@@ -17,5 +17,9 @@
   },
   "serverExport": {
     "only-html-files": "Scopes the Content-Security-Policy header to HTML responses (for example .html files) instead of every file your server sends. CSP protects how documents load and run scripts, so it is most useful on HTML pages. Limiting the header to HTML is recommended because it avoids applying CSP to assets that do not need it—such as images, fonts, stylesheets, JSON, and other non-HTML responses—which can otherwise cause unexpected breakage or make debugging harder."
+  },
+  "headerMode": {
+    "content-security-policy": "Sends the Content-Security-Policy header so the browser enforces your policy—blocking disallowed scripts, styles, and other resources. Deploy only after testing; violations break page functionality.",
+    "content-security-policy-report-only": "Sends the Content-Security-Policy-Report-Only header so the browser reports policy violations without blocking them. Useful for rolling out or tuning a policy before switching to enforcing mode."
   }
 }

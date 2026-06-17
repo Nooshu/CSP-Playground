@@ -24,7 +24,7 @@ export interface ParsedPolicy {
  * @remarks
  * Handles single- and double-quoted tokens so values like `'nonce-abc'` survive intact.
  */
-function parseSourceValues(valuePart: string): string[] {
+export function parseSourceValues(valuePart: string): string[] {
   const values: string[] = [];
   let index = 0;
 

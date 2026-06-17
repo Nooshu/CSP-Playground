@@ -18,6 +18,9 @@ describe("createPolicyOutput", () => {
     document.body.appendChild(panel);
 
     panel.update();
+    expect(
+      panel.querySelectorAll("#policy-header-mode .flag-info-btn").length,
+    ).toBe(2);
     expect(panel.querySelector("#policy-preview")?.textContent).toContain(
       "default-src 'self'",
     );

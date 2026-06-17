@@ -210,7 +210,7 @@ export function createDirectiveSection(
       const inputsContainer = document.createElement("div");
       inputsContainer.className = "trusted-types-inputs";
 
-      function addPolicyInput(): void {
+      function addPolicyInput(focus = false): void {
         const row = document.createElement("div");
         row.className = "custom-source-row";
 
@@ -244,11 +244,13 @@ export function createDirectiveSection(
         trustedTypesInputs.push(input);
         row.append(label, input, removeBtn);
         inputsContainer.appendChild(row);
-        input.focus();
+        if (focus) {
+          input.focus({ preventScroll: true });
+        }
       }
 
       addBtn.addEventListener("click", () => {
-        addPolicyInput();
+        addPolicyInput(true);
         onChange();
       });
 

@@ -127,6 +127,23 @@ describe("createDirectiveSection", () => {
     expect(requireSection.getState().values).toEqual(["'script'"]);
   });
 
+  it("does not focus trusted-types inputs when setState is called programmatically", () => {
+    const trustedTypes = DIRECTIVES.find(
+      (directive) => directive.name === "trusted-types",
+    )!;
+    const section = createDirectiveSection({
+      directive: trustedTypes,
+      onChange: vi.fn(),
+    });
+
+    section.setState({ enabled: true, values: ["default", "custom"] });
+
+    const trustedInput = section.element.querySelector(
+      ".trusted-types-inputs input",
+    ) as HTMLInputElement;
+    expect(document.activeElement).not.toBe(trustedInput);
+  });
+
   it("shows deprecated badges on deprecated directives", () => {
     const onChange = vi.fn();
     const reportUri = DIRECTIVES.find((directive) => directive.name === "report-uri")!;
