@@ -5,7 +5,7 @@
   "type": "module",
   "packageManager": "yarn@1.22.22",
   "engines": {
-    "node": "v26.3.0"
+    "node": ">=22.16.0"
   },
   "scripts": {
     "dev": "vite",

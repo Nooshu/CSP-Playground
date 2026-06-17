@@ -17,14 +17,46 @@
   --color-deprecated-bg: #fef3c7;
   --radius: 8px;
   --shadow: 0 1px 3px rgb(0 0 0 / 8%);
-  --space-xs: 0.25rem;
-  --space-sm: 0.5rem;
-  --space-md: 1rem;
-  --space-lg: 1.5rem;
-  --space-xl: 2rem;
+
+  /*
+    Fluid foundations (Utopia-style), Firefox-safe.
+    Viewport interpolation range: 320px → 1152px.
+
+    Each token uses clamp(min, calc(intercept + slope * vw), max) so we avoid:
+    - division in calc()
+    - nested calc() with mixed unit math
+  */
+
+  /* Fluid type steps */
+  --step--1: clamp(0.875rem, calc(0.826923rem + 0.015024vw), 1rem);
+  --step-0: clamp(1rem, calc(0.951923rem + 0.015024vw), 1.125rem);
+  --step-1: clamp(1.125rem, calc(1.076923rem + 0.015024vw), 1.25rem);
+  --step-2: clamp(1.375rem, calc(1.278846rem + 0.030048vw), 1.625rem);
+  --step-3: clamp(1.75rem, calc(1.605769rem + 0.045072vw), 2.125rem);
+
+  /* Fluid space scale */
+  --space-3xs: clamp(0.25rem, calc(0.201923rem + 0.015024vw), 0.375rem);
+  --space-2xs: clamp(0.5rem, calc(0.403846rem + 0.030048vw), 0.75rem);
+  --space-xs-fluid: clamp(0.75rem, calc(0.653846rem + 0.030048vw), 1rem);
+  --space-s: clamp(1rem, calc(0.807692rem + 0.060096vw), 1.5rem);
+  --space-m: clamp(1.5rem, calc(1.307692rem + 0.060096vw), 2rem);
+  --space-l: clamp(2rem, calc(1.615385rem + 0.120192vw), 3rem);
+  --space-xl-fluid: clamp(3rem, calc(2.615385rem + 0.120192vw), 4rem);
+  --space-2xl: clamp(4rem, calc(3.230769rem + 0.240385vw), 6rem);
+
+  /* Legacy spacing token aliases (minimise selector churn) */
+  --space-xs: var(--space-3xs);
+  --space-sm: var(--space-2xs);
+  --space-md: var(--space-s);
+  --space-lg: var(--space-m);
+  --space-xl: var(--space-l);
+
+  /* Grid foundations */
+  --grid-max: 72rem;
+  --grid-gutter: var(--space-s);
   --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-mono: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, monospace;
-  --max-width: 72rem;
+  --max-width: var(--grid-max);
   --page-top-inset: var(--space-md);
   --score-panel-width: 16rem;
 }
@@ -43,7 +75,7 @@ html {
 body {
   margin: 0;
   font-family: var(--font-sans);
-  font-size: 1rem;
+  font-size: var(--step-0);
   line-height: 1.5;
   color: var(--color-text);
   background: var(--color-bg);
@@ -60,7 +92,7 @@ button:disabled {
 .app {
   max-width: var(--max-width);
   margin: 0 auto;
-  padding: var(--page-top-inset) var(--space-md) var(--space-xl);
+  padding: var(--page-top-inset) var(--grid-gutter) var(--space-xl);
 }
 
 .app-header {
@@ -69,7 +101,7 @@ button:disabled {
 
 .app-header h1 {
   margin: 0 0 var(--space-sm);
-  font-size: 1.75rem;
+  font-size: var(--step-3);
   font-weight: 700;
   letter-spacing: -0.02em;
 }
@@ -96,7 +128,7 @@ button:disabled {
 
 .url-importer h2 {
   margin: 0 0 var(--space-sm);
-  font-size: 1.125rem;
+  font-size: var(--step-1);
 }
 
 .url-importer-description {
@@ -108,7 +140,7 @@ button:disabled {
 .url-importer-form label {
   display: block;
   margin-bottom: var(--space-xs);
-  font-size: 0.875rem;
+  font-size: var(--step--1);
   font-weight: 500;
 }
 
@@ -192,14 +224,14 @@ button:disabled {
 
 .info-header h1 {
   margin: 0 0 var(--space-md);
-  font-size: 1.75rem;
+  font-size: var(--step-3);
   letter-spacing: -0.02em;
 }
 
 .info-lead {
   margin: 0;
   color: var(--color-text-muted);
-  font-size: 1.0625rem;
+  font-size: var(--step-0);
 }
 
 .info-section {
@@ -208,7 +240,7 @@ button:disabled {
 
 .info-section h2 {
   margin: 0 0 var(--space-sm);
-  font-size: 1.125rem;
+  font-size: var(--step-1);
 }
 
 .info-section p {
