@@ -23,6 +23,14 @@ export interface PolicyOutputOptions {
   getState: () => PolicyState;
   /** Optional callback when enforce vs report-only mode changes. */
   onModeChange?: () => void;
+  /**
+   * Optional existing container to progressively enhance.
+   *
+   * @remarks
+   * When provided, the container is cleared and reused rather than creating a
+   * new `<aside>`. This enables build-time rendered HTML with client-side wiring.
+   */
+  container?: HTMLElement;
 }
 
 /**
@@ -37,11 +45,12 @@ export interface PolicyOutputOptions {
  * at the call site for typed access to extension methods.
  */
 export function createPolicyOutput(options: PolicyOutputOptions): HTMLElement {
-  const { getState, onModeChange } = options;
+  const { getState, onModeChange, container } = options;
   let reportOnly = false;
   let selectedServer: WebServerId = "apache";
 
-  const panel = document.createElement("aside");
+  const panel = container ?? document.createElement("aside");
+  panel.innerHTML = "";
   panel.className = "policy-output";
   panel.id = "generated-policy";
   panel.setAttribute("aria-label", "Generated policy");

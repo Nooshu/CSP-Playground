@@ -1,0 +1,104 @@
+import {
+  CATEGORY_LABELS,
+  DIRECTIVES_BY_CATEGORY,
+  type DirectiveCategory,
+  type DirectiveDefinition,
+} from "../csp/directives";
+
+function escapeHtml(value: string): string {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+const CATEGORY_ORDER: DirectiveCategory[] = [
+  "fetch",
+  "document",
+  "navigation",
+  "reporting",
+  "other",
+];
+
+export interface RenderIndexAppOptions {
+  /** Overrides directive grouping (used for tests). */
+  directivesByCategory?: Partial<Record<DirectiveCategory, DirectiveDefinition[]>>;
+  /** Overrides category legend labels (used for tests). */
+  categoryLabels?: Partial<Record<DirectiveCategory, string>>;
+  /** Overrides render ordering (used for tests). */
+  categoryOrder?: DirectiveCategory[];
+}
+
+/**
+ * Build-time renderer for the main `#app` markup.
+ *
+ * @remarks
+ * This output is injected into `index.html` during `vite build` so the app ships
+ * meaningful HTML by default. Client-side code then progressively enhances the
+ * existing DOM by wiring event handlers and live-updating panels.
+ */
+export function renderIndexAppHtml(options: RenderIndexAppOptions = {}): string {
+  const directivesByCategory = options.directivesByCategory ?? DIRECTIVES_BY_CATEGORY;
+  const categoryLabels = options.categoryLabels ?? CATEGORY_LABELS;
+  const categoryOrder = options.categoryOrder ?? CATEGORY_ORDER;
+
+  const header = [
+    `<header class="app-header">`,
+    `<h1>CSP Builder</h1>`,
+    `<p class="app-subtitle">Build a Content Security Policy header by enabling directives and adding source values. Copy the result for your server configuration.</p>`,
+    `</header>`,
+  ].join("");
+
+  const noScript = [
+    `<noscript>`,
+    `<section class="url-importer" aria-label="JavaScript required">`,
+    `<h2>JavaScript required</h2>`,
+    `<p class="url-importer-description">This tool needs JavaScript enabled to generate policy output, compute scores, and provide copy helpers.</p>`,
+    `</section>`,
+    `</noscript>`,
+  ].join("");
+
+  const urlImporterShell = `<section id="url-importer-root" class="url-importer"></section>`;
+
+  const fieldsets = categoryOrder
+    .map((category) => {
+      const directives = directivesByCategory[category];
+    if (!directives?.length) return "";
+
+      const legend = escapeHtml(categoryLabels[category] ?? category);
+
+    const list = directives
+      .map((directive) => {
+        const name = escapeHtml(directive.name);
+        const id = `directive-section-${name}`;
+        return `<article class="directive-section" id="${id}" data-directive="${name}"></article>`;
+      })
+      .join("");
+
+    return [
+      `<fieldset class="category-fieldset">`,
+      `<legend>${legend}</legend>`,
+      `<div class="directive-list">`,
+      list,
+      `</div>`,
+      `</fieldset>`,
+    ].join("");
+    })
+    .join("");
+
+  const form = `<form class="directive-form" novalidate>${fieldsets}</form>`;
+  const outputPanelShell = `<aside id="generated-policy" class="policy-output" aria-label="Generated policy"></aside>`;
+
+  return [
+    header,
+    `<div class="app-layout">`,
+    noScript,
+    urlImporterShell,
+    form,
+    outputPanelShell,
+    `</div>`,
+  ].join("");
+}
+
