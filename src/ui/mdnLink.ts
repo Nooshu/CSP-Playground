@@ -25,6 +25,7 @@ export function createMdnInfoLink(directiveName: string): HTMLAnchorElement {
   link.target = "_blank";
   link.rel = "noopener noreferrer";
   link.referrerPolicy = "no-referrer";
+  link.title = "Opens in a new tab";
   link.setAttribute(
     "aria-label",
     `Learn more about ${directiveName} on MDN (opens in new tab)`,

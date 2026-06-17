@@ -113,9 +113,18 @@ button:disabled {
 }
 
 .url-importer-row {
-  display: grid;
-  grid-template-columns: 1fr;
+  display: flex;
+  flex-wrap: wrap;
   gap: var(--space-sm);
+}
+
+.url-importer-input {
+  flex: 1 1 18rem;
+  min-width: min(18rem, 100%);
+}
+
+.url-importer-submit {
+  flex: 0 0 auto;
 }
 
 .url-importer-input {
@@ -223,13 +232,6 @@ button:disabled {
 
 .info-actions {
   margin: var(--space-xl) 0 0;
-}
-
-@media (min-width: 40rem) {
-  .url-importer-row {
-    grid-template-columns: 1fr auto;
-    align-items: center;
-  }
 }
 
 .category-fieldset {
@@ -361,32 +363,25 @@ button:disabled {
 }
 
 .source-list-actions-row {
-  display: grid;
-  grid-template-columns: 1fr;
+  display: flex;
+  flex-wrap: wrap;
   gap: var(--space-sm);
   align-items: stretch;
 }
 
 .source-list-buttons {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-wrap: wrap;
   gap: var(--space-sm);
+}
+
+.source-list-buttons > * {
+  flex: 1 1 10rem;
 }
 
 .source-list-btn {
   width: 100%;
   white-space: nowrap;
-}
-
-@media (min-width: 36rem) {
-  .source-list-actions-row {
-    grid-template-columns: 1fr auto;
-    align-items: center;
-  }
-
-  .source-list-buttons {
-    width: 16rem;
-  }
 }
 
 .directive-help {
@@ -842,11 +837,9 @@ select {
 }
 
 .security-score-panel {
-  position: fixed;
-  top: var(--page-top-inset);
-  right: var(--space-md);
-  z-index: 200;
-  width: min(var(--score-panel-width), calc(100vw - 2rem));
+  position: static;
+  width: 100%;
+  margin: 0 0 var(--space-xl);
   padding: var(--space-md);
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
@@ -1125,7 +1118,7 @@ select {
   }
 }
 
-@media (min-width: 48rem) {
+@media (min-width: 772px) {
   :root {
     --page-top-inset: var(--space-lg);
   }
@@ -1139,6 +1132,11 @@ select {
   }
 
   .security-score-panel {
+    position: fixed;
+    top: var(--page-top-inset);
     right: max(var(--space-lg), calc((100vw - var(--max-width)) / 2 + var(--space-lg)));
+    z-index: 200;
+    width: min(var(--score-panel-width), calc(100vw - 2rem));
+    margin: 0;
   }
 }

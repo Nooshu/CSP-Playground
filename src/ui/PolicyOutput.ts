@@ -74,6 +74,7 @@ export function createPolicyOutput(options: PolicyOutputOptions): HTMLElement {
   guideLink.target = "_blank";
   guideLink.rel = "noopener noreferrer";
   guideLink.referrerPolicy = "no-referrer";
+  guideLink.title = "Opens in a new tab";
   guideLink.textContent = "MDN: implementing CSP safely";
   guideLink.setAttribute(
     "aria-label",

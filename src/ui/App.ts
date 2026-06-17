@@ -85,7 +85,7 @@ export function createApp(root: HTMLElement): void {
       getState: collectState,
       getReportOnly: () => outputPanel?.getReportOnly() ?? false,
     });
-    document.body.appendChild(securityScorePanel);
+    root.prepend(securityScorePanel);
 
     const form = root.querySelector<HTMLFormElement>(".directive-form");
     if (form) {
@@ -136,7 +136,7 @@ export function createApp(root: HTMLElement): void {
     getState: collectState,
     getReportOnly: () => outputPanel?.getReportOnly() ?? false,
   });
-  document.body.appendChild(securityScorePanel);
+  root.prepend(securityScorePanel);
 
   const header = document.createElement("header");
   header.className = "app-header";
