@@ -82,4 +82,26 @@ describe("createUrlImporter", () => {
       ),
     );
   });
+
+  it("can progressively enhance an existing container element", () => {
+    const sections = DIRECTIVES.slice(0, 1).map((directive) =>
+      createDirectiveSection({ directive, onChange: vi.fn() }),
+    );
+    const outputPanel = createPolicyOutput({ getState: () => ({}) });
+
+    const container = document.createElement("section");
+    container.className = "url-importer";
+    container.innerHTML = "<p>placeholder</p>";
+
+    const mounted = createUrlImporter({
+      sections,
+      outputPanel,
+      onApplied: vi.fn(),
+      container,
+    });
+
+    expect(mounted).toBe(container);
+    expect(container.querySelector("p")?.textContent).not.toBe("placeholder");
+    expect(container.querySelector("form")).not.toBeNull();
+  });
 });

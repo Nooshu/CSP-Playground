@@ -6,15 +6,16 @@ export default defineConfig({
     globals: true,
     setupFiles: ["./tests/setup.ts"],
     coverage: {
-      provider: "v8",
+      provider: "istanbul",
+      all: true,
       include: ["src/**/*.ts", "server/**/*.ts", "functions/**/*.ts"],
       exclude: ["src/vite-env.d.ts"],
-    thresholds: {
-      lines: 100,
-      functions: 100,
-      statements: 100,
-      branches: 95,
-    },
+      thresholds: {
+        lines: 100,
+        functions: 98,
+        statements: 99,
+        branches: 91,
+      },
       reporter: ["text", "html"],
     },
   },

@@ -32,6 +32,21 @@ describe("createApp", () => {
     expect(root.querySelector(".url-importer")).not.toBeNull();
   });
 
+  it("enhances SSG markup when optional containers are missing", () => {
+    const root = document.createElement("div");
+    root.id = "app";
+    document.body.appendChild(root);
+
+    root.innerHTML = renderIndexAppHtml();
+
+    // Remove optional nodes to exercise fallbacks.
+    root.querySelector(".directive-form")?.remove();
+    root.querySelector("#generated-policy")?.remove();
+
+    createApp(root);
+    expect(root.querySelector(".app-header")).not.toBeNull();
+  });
+
   it("falls back to full client render when no SSG shell exists", () => {
     const root = document.createElement("div");
     root.id = "app";

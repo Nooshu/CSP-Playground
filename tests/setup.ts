@@ -5,6 +5,9 @@ vi.mock("../src/style.css", () => ({}));
 afterEach(() => {
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
+  (Element.prototype.scrollIntoView as unknown as { mockClear?: () => void })
+    .mockClear?.();
+  (HTMLElement.prototype.focus as unknown as { mockClear?: () => void }).mockClear?.();
   document.body.innerHTML = "";
 });
 

@@ -20,6 +20,26 @@ describe("createDirectiveSection", () => {
     }
   });
 
+  it("can progressively enhance an existing container element", () => {
+    const onChange = vi.fn();
+    const directive = DIRECTIVES.find((d) => d.name === "default-src")!;
+
+    const existing = document.createElement("article");
+    existing.className = "directive-section";
+    existing.dataset.directive = directive.name;
+    existing.innerHTML = "<p>placeholder</p>";
+
+    const handle = createDirectiveSection({
+      directive,
+      onChange,
+      container: existing,
+    });
+
+    expect(handle.element).toBe(existing);
+    expect(existing.querySelector("p")?.textContent).not.toBe("placeholder");
+    expect(handle.getState()).toEqual({ enabled: false, values: [] });
+  });
+
   it("handles sandbox flags and trusted types interactions", () => {
     const onChange = vi.fn();
     const sandbox = DIRECTIVES.find((directive) => directive.name === "sandbox")!;

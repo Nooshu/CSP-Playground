@@ -67,6 +67,18 @@ describe("createPolicyOutput", () => {
     await vi.waitFor(() => expect(writeText).toHaveBeenCalled());
   });
 
+  it("can progressively enhance an existing container element", () => {
+    const container = document.createElement("aside");
+    container.id = "generated-policy";
+    container.className = "policy-output";
+    container.innerHTML = "<p>placeholder</p>";
+    document.body.appendChild(container);
+
+    const panel = createPolicyOutput({ getState: createState, container });
+    expect(panel).toBe(container);
+    expect(container.querySelector("p")?.textContent).not.toBe("placeholder");
+  });
+
   it("announces copy failures and empty output", async () => {
     const writeText = vi.fn().mockRejectedValue(new Error("denied"));
     Object.assign(navigator, { clipboard: { writeText } });

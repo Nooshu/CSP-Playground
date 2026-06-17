@@ -90,6 +90,31 @@ describe("lookupCspForUrl", () => {
     expect(result.policy).toBe("default-src 'self'");
   });
 
+  it("treats redirects without a location header as errors", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        mockResponse({
+          status: 302,
+          headers: {},
+        }),
+      ),
+    );
+
+    await expect(lookupCspForUrl("https://example.com")).rejects.toThrow(
+      /invalid redirect/i,
+    );
+  });
+
+  it("reports timeouts as fetch failures", async () => {
+    const abort = Object.assign(new Error("aborted"), { name: "AbortError" });
+    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(abort));
+
+    await expect(lookupCspForUrl("https://example.com")).rejects.toThrow(
+      /timed out/i,
+    );
+  });
+
   it("returns report-only CSP from HEAD response", async () => {
     vi.stubGlobal(
       "fetch",
