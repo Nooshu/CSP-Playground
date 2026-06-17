@@ -104,6 +104,7 @@ describe("createSecurityScorePanel", () => {
       panel.querySelector(".security-score-nav-btn")?.textContent,
     ).toBe("View generated policy");
     expect(panel.querySelector(".security-score-back-to-top")).not.toBeNull();
+    expect(panel.querySelector(".security-score-back-to-top-wrap")).not.toBeNull();
   });
 
   it("shows back to top after scrolling and scrolls to top on click", () => {
@@ -119,14 +120,17 @@ describe("createSecurityScorePanel", () => {
     const backToTop = panel.querySelector(
       ".security-score-back-to-top",
     ) as HTMLButtonElement;
+    const backToTopWrap = panel.querySelector(
+      ".security-score-back-to-top-wrap",
+    ) as HTMLElement;
 
     Object.defineProperty(window, "scrollY", { value: 0, configurable: true });
     window.dispatchEvent(new Event("scroll"));
-    expect(backToTop.classList.contains("is-visible")).toBe(false);
+    expect(backToTopWrap.classList.contains("is-visible")).toBe(false);
 
     Object.defineProperty(window, "scrollY", { value: 400, configurable: true });
     window.dispatchEvent(new Event("scroll"));
-    expect(backToTop.classList.contains("is-visible")).toBe(true);
+    expect(backToTopWrap.classList.contains("is-visible")).toBe(true);
 
     backToTop.click();
     expect(scrollTo).toHaveBeenCalledWith({ top: 0, behavior: "smooth" });

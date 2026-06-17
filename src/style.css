@@ -49,6 +49,14 @@ body {
   background: var(--color-bg);
 }
 
+button:not(:disabled) {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
 .app {
   max-width: var(--max-width);
   margin: 0 auto;
@@ -885,6 +893,12 @@ select {
   cursor: pointer;
   font-weight: 500;
   color: var(--color-primary);
+  text-decoration: none;
+}
+
+.security-score-details summary:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 .security-score-factors {
@@ -1013,22 +1027,28 @@ select {
   outline-offset: 2px;
 }
 
-.security-score-back-to-top {
+.security-score-back-to-top-wrap {
+  max-height: 0;
   opacity: 0;
   visibility: hidden;
   transform: translateY(0.25rem);
+  overflow: hidden;
   transition:
+    max-height 0.22s ease,
     opacity 0.2s ease,
     visibility 0.2s ease,
-    transform 0.2s ease,
-    border-color 0.15s ease,
-    background-color 0.15s ease;
+    transform 0.2s ease;
 }
 
-.security-score-back-to-top.is-visible {
+.security-score-back-to-top-wrap.is-visible {
+  max-height: 3.5rem;
   opacity: 1;
   visibility: visible;
   transform: translateY(0);
+}
+
+.security-score-back-to-top-wrap .security-score-back-to-top {
+  width: 100%;
 }
 
 .directive-section.recommendation-highlight,
@@ -1068,7 +1088,8 @@ select {
 
   .security-score-recommendation-btn,
   .security-score-nav-btn,
-  .security-score-back-to-top {
+  .security-score-back-to-top,
+  .security-score-back-to-top-wrap {
     transition: none;
   }
 }
