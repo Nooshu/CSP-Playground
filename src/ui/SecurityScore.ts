@@ -108,11 +108,15 @@ export function createSecurityScorePanel(
     window.scrollTo({ top: 0, behavior: "smooth" });
   });
 
+  const backToTopWrap = document.createElement("div");
+  backToTopWrap.className = "security-score-back-to-top-wrap";
+  backToTopWrap.appendChild(backToTopBtn);
+
   const scrollThreshold = 240;
 
   function updateBackToTopVisibility(): void {
     const visible = window.scrollY > scrollThreshold;
-    backToTopBtn.classList.toggle("is-visible", visible);
+    backToTopWrap.classList.toggle("is-visible", visible);
     backToTopBtn.setAttribute("aria-hidden", visible ? "false" : "true");
     backToTopBtn.tabIndex = visible ? 0 : -1;
   }
@@ -120,7 +124,7 @@ export function createSecurityScorePanel(
   window.addEventListener("scroll", updateBackToTopVisibility, { passive: true });
   updateBackToTopVisibility();
 
-  nav.append(viewPolicyBtn, backToTopBtn);
+  nav.append(viewPolicyBtn, backToTopWrap);
   panel.append(value, grade, summary, breakdownDetails, recommendationDetails, nav);
 
   function update(): void {
