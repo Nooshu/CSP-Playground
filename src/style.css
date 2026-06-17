@@ -266,6 +266,37 @@ button:disabled {
   margin: var(--space-xl) 0 0;
 }
 
+.site-footer {
+  max-width: var(--max-width);
+  margin: var(--space-xl) auto 0;
+  padding: var(--space-lg) var(--grid-gutter) var(--space-xl);
+  text-align: center;
+}
+
+.site-footer-text {
+  margin: 0;
+  font-size: var(--step--1);
+  line-height: 1.5;
+  color: var(--color-text-muted);
+}
+
+.site-footer a {
+  color: var(--color-primary);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.site-footer a:hover {
+  color: var(--color-primary-hover);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.site-footer a:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
 .category-fieldset {
   margin: 0 0 var(--space-lg);
   padding: var(--space-lg);

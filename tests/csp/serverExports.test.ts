@@ -17,6 +17,29 @@ describe("serverExports", () => {
 
   it("looks up exports by id", () => {
     expect(getWebServerExport("nginx")?.name).toBe("Nginx");
+    expect(getWebServerExport("cloudflare")?.name).toBe("Cloudflare Pages");
     expect(getWebServerExport("missing" as "nginx")).toBeUndefined();
+  });
+
+  it("formats Cloudflare HTML-only export with Pages middleware", () => {
+    const cloudflare = getWebServerExport("cloudflare");
+    expect(cloudflare).toBeDefined();
+
+    const output = cloudflare!.format("Content-Security-Policy", policy, {
+      htmlOnly: true,
+    });
+    expect(output).toContain("functions/_middleware.ts");
+    expect(output).toContain('contentType.includes("text/html")');
+    expect(output).not.toContain("/*.html");
+  });
+
+  it("formats Netlify and Vercel HTML-only exports", () => {
+    const netlify = getWebServerExport("netlify");
+    const vercel = getWebServerExport("vercel");
+
+    expect(netlify?.format("Content-Security-Policy", policy, { htmlOnly: true }))
+      .toContain("/*.html");
+    expect(vercel?.format("Content-Security-Policy", policy, { htmlOnly: true }))
+      .toContain('"/(.*)\\.html"');
   });
 });

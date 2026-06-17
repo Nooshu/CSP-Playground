@@ -13,6 +13,9 @@ export type WebServerId =
   | "caddy"
   | "litespeed"
   | "iis"
+  | "cloudflare"
+  | "netlify"
+  | "vercel"
   | "traefik"
   | "envoy";
 
@@ -47,6 +50,33 @@ function escapeApacheValue(value: string): string {
 /** Escapes values embedded in Nginx/Caddy-style double-quoted config strings. */
 function escapeNginxValue(value: string): string {
   return value.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+}
+
+/** Escapes values embedded in JSON string literals. */
+function escapeJsonString(value: string): string {
+  return value
+    .replace(/\\/g, "\\\\")
+    .replace(/"/g, '\\"')
+    .replace(/\n/g, "\\n")
+    .replace(/\r/g, "\\r")
+    .replace(/\t/g, "\\t");
+}
+
+/** Escapes values embedded in TypeScript double-quoted string literals. */
+function escapeTsString(value: string): string {
+  return value
+    .replace(/\\/g, "\\\\")
+    .replace(/"/g, '\\"')
+    .replace(/\$/g, "\\$");
+}
+
+/** Formats a `_headers` file block for static hosts (Cloudflare Pages, Netlify). */
+function formatHeadersFileBlock(
+  path: string,
+  headerName: string,
+  policy: string,
+): string {
+  return `${path}\n  ${headerName}: ${policy}`;
 }
 
 /**
@@ -120,6 +150,76 @@ export const WEB_SERVER_EXPORTS: WebServerExport[] = [
         return `<location path=\"*.html\">\n  <system.webServer>\n    <httpProtocol>\n      <customHeaders>\n        ${headerLine}\n      </customHeaders>\n    </httpProtocol>\n  </system.webServer>\n</location>`;
       }
       return headerLine;
+    },
+  },
+  {
+    id: "cloudflare",
+    name: "Cloudflare Pages",
+    description:
+      "_headers in public/ or build output; HTML-only via Pages Functions middleware",
+    supportsHtmlOnly: true,
+    format: (headerName, policy, options) => {
+      if (options?.htmlOnly) {
+        return `// functions/_middleware.ts
+// Pages _headers matches directory paths only (not file extensions).
+// Use middleware to add CSP only to HTML responses.
+import type { PagesFunction } from "@cloudflare/workers-types";
+
+const CSP_HEADER = "${headerName}";
+const CSP_VALUE = "${escapeTsString(policy)}";
+
+export const onRequest: PagesFunction = async (context) => {
+  const response = await context.next();
+  const contentType = response.headers.get("content-type") ?? "";
+  if (!contentType.includes("text/html")) {
+    return response;
+  }
+
+  const headers = new Headers(response.headers);
+  headers.set(CSP_HEADER, CSP_VALUE);
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
+};`;
+      }
+
+      return formatHeadersFileBlock("/*", headerName, policy);
+    },
+  },
+  {
+    id: "netlify",
+    name: "Netlify",
+    description: "_headers in the publish directory (for example public/)",
+    supportsHtmlOnly: true,
+    format: (headerName, policy, options) => {
+      if (options?.htmlOnly) {
+        return formatHeadersFileBlock("/*.html", headerName, policy);
+      }
+      return formatHeadersFileBlock("/*", headerName, policy);
+    },
+  },
+  {
+    id: "vercel",
+    name: "Vercel",
+    description: "headers array in vercel.json",
+    supportsHtmlOnly: true,
+    format: (headerName, policy, options) => {
+      const source = options?.htmlOnly ? "/(.*)\\.html" : "/(.*)";
+      return `{
+  "headers": [
+    {
+      "source": "${source}",
+      "headers": [
+        {
+          "key": "${headerName}",
+          "value": "${escapeJsonString(policy)}"
+        }
+      ]
+    }
+  ]
+}`;
     },
   },
   {
