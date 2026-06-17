@@ -36,6 +36,15 @@ export interface DirectiveDefinition {
 }
 
 /** Human-readable legend text for each {@link DirectiveCategory}. */
+/** Canonical fieldset order in the builder form and SSG shell. */
+export const CATEGORY_ORDER: DirectiveCategory[] = [
+  "fetch",
+  "document",
+  "navigation",
+  "reporting",
+  "other",
+];
+
 export const CATEGORY_LABELS: Record<DirectiveCategory, string> = {
   fetch: "Fetch directives",
   document: "Document directives",

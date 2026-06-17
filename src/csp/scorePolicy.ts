@@ -45,6 +45,14 @@ export interface SecurityScore {
 export interface ScorePolicyOptions {
   /** When true, applies a penalty because violations are not blocked. */
   reportOnly?: boolean;
+  /**
+   * Pre-serialized policy string.
+   *
+   * @remarks
+   * When provided, skips redundant {@link buildPolicyString} calls inside
+   * {@link scorePolicy} and {@link buildRecommendations}.
+   */
+  policy?: string;
 }
 
 /** Maps a directive name to the `id` of its section in the DOM. */
@@ -146,9 +154,9 @@ function summaryForScore(score: number): string {
 function buildRecommendations(
   state: PolicyState,
   options: ScorePolicyOptions,
+  policy = options.policy ?? buildPolicyString(state),
 ): ScoreRecommendation[] {
   const recommendations: ScoreRecommendation[] = [];
-  const policy = buildPolicyString(state);
 
   if (!policy) {
     recommendations.push({
@@ -366,9 +374,9 @@ export function scorePolicy(
   const factors: ScoreFactor[] = [];
   let rawScore = 0;
 
-  const policy = buildPolicyString(state);
+  const policy = options.policy ?? buildPolicyString(state);
   if (!policy) {
-    const recommendations = buildRecommendations(state, options);
+    const recommendations = buildRecommendations(state, options, policy);
     return {
       score: 0,
       grade: "Poor",
@@ -521,7 +529,7 @@ export function scorePolicy(
   }
 
   const score = Math.max(0, Math.min(100, Math.round(rawScore)));
-  const recommendations = buildRecommendations(state, options);
+  const recommendations = buildRecommendations(state, options, policy);
   const potentialScore = Math.min(
     100,
     score + recommendations.reduce((sum, item) => sum + item.pointsGain, 0),

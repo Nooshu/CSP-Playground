@@ -127,6 +127,9 @@ describe("createSourceListEditor", () => {
       directive: styleDirective,
       onChange,
     });
+    await vi.waitFor(() =>
+      expect(styleContainer.querySelector(".style-hash-helper")).not.toBeNull(),
+    );
     const styleInput = styleContainer.querySelector(
       ".style-hash-helper input.source-input",
     ) as HTMLInputElement;
@@ -141,28 +144,34 @@ describe("createSourceListEditor", () => {
     expect(onChange).not.toHaveBeenCalled();
   });
 
-  it("renders nonce and style hash helpers for relevant directives", () => {
+  it("renders nonce and style hash helpers for relevant directives", async () => {
     const onChange = vi.fn();
     const scriptContainer = document.createElement("div");
     createSourceListEditor(scriptContainer, {
       directive: DIRECTIVES.find((item) => item.name === "script-src")!,
       onChange,
     });
-    expect(scriptContainer.querySelector(".nonce-helper")).not.toBeNull();
+    await vi.waitFor(() =>
+      expect(scriptContainer.querySelector(".nonce-helper")).not.toBeNull(),
+    );
 
     const styleContainer = document.createElement("div");
     createSourceListEditor(styleContainer, {
       directive: DIRECTIVES.find((item) => item.name === "style-src-attr")!,
       onChange,
     });
-    expect(styleContainer.querySelector(".style-hash-helper")).not.toBeNull();
+    await vi.waitFor(() =>
+      expect(styleContainer.querySelector(".style-hash-helper")).not.toBeNull(),
+    );
 
     const styleElemContainer = document.createElement("div");
     createSourceListEditor(styleElemContainer, {
       directive: DIRECTIVES.find((item) => item.name === "style-src-elem")!,
       onChange,
     });
-    expect(styleElemContainer.querySelector(".nonce-helper")).not.toBeNull();
+    await vi.waitFor(() =>
+      expect(styleElemContainer.querySelector(".nonce-helper")).not.toBeNull(),
+    );
     const styleElemInput = styleElemContainer.querySelector(
       "input[type='url']",
     ) as HTMLInputElement;

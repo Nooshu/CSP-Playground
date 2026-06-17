@@ -18,6 +18,7 @@ import {
   TRUSTED_TYPES_FOR_OPTIONS,
 } from "../csp/directives";
 import { createSourceListEditor } from "./SourceListEditor";
+import { debounceInputChange } from "./debounceInputChange";
 import { createFlagInfoIcon } from "./FlagInfoIcon";
 import { createMdnInfoLink } from "./mdnLink";
 
@@ -70,6 +71,7 @@ export function createDirectiveSection(
   options: DirectiveSectionOptions,
 ): DirectiveSectionHandle {
   const { directive, onChange, container } = options;
+  const debouncedOnChange = debounceInputChange(onChange);
   const idPrefix = `directive-${directive.name.replace(/[^a-z0-9-]/gi, "-")}`;
   const helpId = `${idPrefix}-help`;
 
@@ -141,7 +143,7 @@ export function createDirectiveSection(
           ? "e.g. csp-endpoint"
           : "e.g. https://example.com/csp-report";
       singleInput.setAttribute("aria-describedby", helpId);
-      singleInput.addEventListener("input", onChange);
+      singleInput.addEventListener("input", debouncedOnChange);
 
       controls.append(help, label, singleInput);
       break;
@@ -224,7 +226,7 @@ export function createDirectiveSection(
         input.className = "source-input";
         input.placeholder = "e.g. default or *";
         input.setAttribute("aria-describedby", helpId);
-        input.addEventListener("input", onChange);
+        input.addEventListener("input", debouncedOnChange);
 
         const removeBtn = document.createElement("button");
         removeBtn.type = "button";

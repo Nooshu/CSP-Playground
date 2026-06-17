@@ -1,5 +1,6 @@
 import {
   CATEGORY_LABELS,
+  CATEGORY_ORDER,
   DIRECTIVES_BY_CATEGORY,
   type DirectiveCategory,
   type DirectiveDefinition,
@@ -13,14 +14,6 @@ function escapeHtml(value: string): string {
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#39;");
 }
-
-const CATEGORY_ORDER: DirectiveCategory[] = [
-  "fetch",
-  "document",
-  "navigation",
-  "reporting",
-  "other",
-];
 
 export interface RenderIndexAppOptions {
   /** Overrides directive grouping (used for tests). */

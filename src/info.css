@@ -1,0 +1,70 @@
+@import "./base.css";
+
+.info-page {
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: var(--space-xl) var(--space-md) var(--space-xl);
+}
+
+.info-header {
+  margin-bottom: var(--space-xl);
+}
+
+.info-eyebrow {
+  margin: 0 0 var(--space-sm);
+  font-size: 0.875rem;
+}
+
+.info-eyebrow a {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.info-eyebrow a:hover {
+  text-decoration: underline;
+}
+
+.info-header h1 {
+  margin: 0 0 var(--space-md);
+  font-size: var(--step-3);
+  letter-spacing: -0.02em;
+}
+
+.info-lead {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--step-0);
+}
+
+.info-section {
+  margin-bottom: var(--space-xl);
+}
+
+.info-section h2 {
+  margin: 0 0 var(--space-sm);
+  font-size: var(--step-1);
+}
+
+.info-section p {
+  margin: 0 0 var(--space-md);
+  color: var(--color-text-muted);
+}
+
+.info-list {
+  margin: 0;
+  padding-left: 1.25rem;
+  color: var(--color-text-muted);
+}
+
+.info-list li + li {
+  margin-top: var(--space-sm);
+}
+
+.info-list a {
+  color: var(--color-primary);
+}
+
+.info-actions {
+  margin: var(--space-xl) 0 0;
+}

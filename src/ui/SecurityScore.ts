@@ -13,6 +13,7 @@
 import { scrollToRecommendationTarget, scrollToGeneratedPolicy } from "./scrollToTarget";
 import { scorePolicy } from "../csp/scorePolicy";
 import type { PolicyState } from "../csp/buildPolicy";
+import type { PolicyUpdateSnapshot } from "./policyUpdate";
 
 /** Options for the floating security score panel. */
 export interface SecurityScorePanelOptions {
@@ -39,7 +40,7 @@ const GRADE_CLASS: Record<string, string> = {
  */
 export function createSecurityScorePanel(
   options: SecurityScorePanelOptions,
-): HTMLElement & { update: () => void } {
+): HTMLElement & { update: (snapshot?: PolicyUpdateSnapshot) => void } {
   const { getState, getReportOnly } = options;
 
   const panel = document.createElement("aside");
@@ -78,6 +79,17 @@ export function createSecurityScorePanel(
 
   const recommendationList = document.createElement("ul");
   recommendationList.className = "security-score-recommendations-list";
+
+  const recommendationItems = new Map<string, HTMLLIElement>();
+
+  recommendationList.addEventListener("click", (event) => {
+    const button = (event.target as HTMLElement).closest<HTMLButtonElement>(
+      ".security-score-recommendation-btn",
+    );
+    if (!button) return;
+    const targetId = button.dataset.targetId;
+    if (targetId) scrollToRecommendationTarget(targetId);
+  });
 
   breakdownDetails.append(breakdownSummary, factorList);
   recommendationDetails.append(
@@ -127,8 +139,51 @@ export function createSecurityScorePanel(
   nav.append(viewPolicyBtn, backToTopWrap);
   panel.append(value, grade, summary, breakdownDetails, recommendationDetails, nav);
 
-  function update(): void {
-    const result = scorePolicy(getState(), { reportOnly: getReportOnly() });
+  function syncRecommendations(
+    recommendations: ReturnType<typeof scorePolicy>["recommendations"],
+  ): void {
+    const nextIds = new Set(recommendations.map((item) => item.id));
+
+    for (const [id, item] of recommendationItems) {
+      if (!nextIds.has(id)) {
+        item.remove();
+        recommendationItems.delete(id);
+      }
+    }
+
+    for (const recommendation of recommendations) {
+      const text = `${recommendation.label} (+${recommendation.pointsGain})`;
+      const ariaLabel = `${recommendation.label}. Adds up to ${recommendation.pointsGain} points.`;
+
+      let item = recommendationItems.get(recommendation.id);
+      if (!item) {
+        item = document.createElement("li");
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "security-score-recommendation-btn";
+        item.appendChild(button);
+        recommendationItems.set(recommendation.id, item);
+      }
+
+      const button = item.querySelector("button")!;
+      if (button.textContent !== text) button.textContent = text;
+      if (button.getAttribute("aria-label") !== ariaLabel) {
+        button.setAttribute("aria-label", ariaLabel);
+      }
+      if (button.dataset.targetId !== recommendation.targetId) {
+        button.dataset.targetId = recommendation.targetId;
+      }
+
+      recommendationList.appendChild(item);
+    }
+  }
+
+  function update(snapshot?: PolicyUpdateSnapshot): void {
+    const state = snapshot?.state ?? getState();
+    const result = scorePolicy(state, {
+      reportOnly: getReportOnly(),
+      policy: snapshot?.policy,
+    });
 
     panel.className = `security-score-panel ${GRADE_CLASS[result.grade] ?? "score-poor"}`;
     value.textContent = `${result.score}%`;
@@ -155,10 +210,10 @@ export function createSecurityScorePanel(
       factorList.appendChild(item);
     }
 
-    recommendationList.innerHTML = "";
-
     if (result.score >= 100 || result.recommendations.length === 0) {
       recommendationDetails.hidden = true;
+      for (const item of recommendationItems.values()) item.remove();
+      recommendationItems.clear();
       return;
     }
 
@@ -167,29 +222,13 @@ export function createSecurityScorePanel(
     recommendationIntro.textContent =
       "Select a recommendation to jump to the relevant setting. Applying all items below could raise your score toward 100%.";
 
-    for (const recommendation of result.recommendations) {
-      const item = document.createElement("li");
-
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = "security-score-recommendation-btn";
-      button.textContent = `${recommendation.label} (+${recommendation.pointsGain})`;
-      button.setAttribute(
-        "aria-label",
-        `${recommendation.label}. Adds up to ${recommendation.pointsGain} points.`,
-      );
-
-      button.addEventListener("click", () => {
-        scrollToRecommendationTarget(recommendation.targetId);
-      });
-
-      item.appendChild(button);
-      recommendationList.appendChild(item);
-    }
+    syncRecommendations(result.recommendations);
   }
 
   return Object.assign(panel, { update });
 }
 
 /** Security score panel element with imperative refresh. */
-export type SecurityScorePanel = HTMLElement & { update: () => void };
+export type SecurityScorePanel = HTMLElement & {
+  update: (snapshot?: PolicyUpdateSnapshot) => void;
+};

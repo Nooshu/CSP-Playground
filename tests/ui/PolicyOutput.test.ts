@@ -9,7 +9,7 @@ function createState(): PolicyState {
 }
 
 describe("createPolicyOutput", () => {
-  it("updates previews and server export formats", () => {
+  it("updates previews and server export formats", async () => {
     const onModeChange = vi.fn();
     const panel = createPolicyOutput({
       getState: createState,
@@ -25,6 +25,13 @@ describe("createPolicyOutput", () => {
       "Content-Security-Policy:",
     );
 
+    const serverSelect = panel.querySelector(
+      "#server-export-select",
+    ) as HTMLSelectElement;
+    await vi.waitFor(() =>
+      expect(serverSelect.options.length).toBeGreaterThan(1),
+    );
+
     const reportOnlyRadio = panel.querySelector(
       'input[value="report-only"]',
     ) as HTMLInputElement;
@@ -36,13 +43,12 @@ describe("createPolicyOutput", () => {
     panel.setReportOnly(false);
     expect(panel.getReportOnly()).toBe(false);
 
-    const serverSelect = panel.querySelector(
-      "#server-export-select",
-    ) as HTMLSelectElement;
     serverSelect.value = "nginx";
     serverSelect.dispatchEvent(new Event("change", { bubbles: true }));
-    expect(panel.querySelector("#server-export-preview")?.textContent).toContain(
-      "add_header",
+    await vi.waitFor(() =>
+      expect(panel.querySelector("#server-export-preview")?.textContent).toContain(
+        "add_header",
+      ),
     );
   });
 
@@ -53,6 +59,13 @@ describe("createPolicyOutput", () => {
     const panel = createPolicyOutput({ getState: createState });
     document.body.appendChild(panel);
     panel.update();
+
+    const serverSelect = panel.querySelector(
+      "#server-export-select",
+    ) as HTMLSelectElement;
+    await vi.waitFor(() =>
+      expect(serverSelect.options.length).toBeGreaterThan(1),
+    );
 
     const copyPolicyBtn = panel.querySelector(
       ".output-actions .btn.btn-secondary",

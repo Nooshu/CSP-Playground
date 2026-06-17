@@ -66,7 +66,7 @@ describe("coverage gaps", () => {
     expect(response.status).toBe(400);
   });
 
-  it("covers directive section and source editor edge cases", () => {
+  it("covers directive section and source editor edge cases", async () => {
     const onChange = vi.fn();
     const directive = {
       ...DIRECTIVES[0]!,
@@ -97,6 +97,9 @@ describe("coverage gaps", () => {
       directive: scriptDirective,
       onChange,
     });
+    await vi.waitFor(() =>
+      expect(scriptContainer.querySelector(".nonce-generate-btn")).not.toBeNull(),
+    );
     const externalInput = scriptContainer.querySelector(
       "input[type='url']",
     ) as HTMLInputElement;

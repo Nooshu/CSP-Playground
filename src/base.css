@@ -1,0 +1,120 @@
+:root {
+  --color-bg: #f8f9fa;
+  --color-surface: #ffffff;
+  --color-border: #d1d5db;
+  --color-border-subtle: #e5e7eb;
+  --color-text: #111827;
+  --color-text-muted: #6b7280;
+  --color-primary: #2563eb;
+  --color-primary-hover: #1d4ed8;
+  --color-focus: #2563eb;
+  --color-danger: #b91c1c;
+  --color-success: #15803d;
+  --color-success-hover: #166534;
+  --color-chip-bg: #eff6ff;
+  --color-chip-text: #1e40af;
+  --color-deprecated: #92400e;
+  --color-deprecated-bg: #fef3c7;
+  --radius: 8px;
+  --shadow: 0 1px 3px rgb(0 0 0 / 8%);
+
+  /*
+    Fluid foundations (Utopia-style), Firefox-safe.
+    Viewport interpolation range: 320px → 1152px.
+
+    Each token uses clamp(min, calc(intercept + slope * vw), max) so we avoid:
+    - division in calc()
+    - nested calc() with mixed unit math
+  */
+
+  /* Fluid type steps */
+  --step--1: clamp(0.875rem, calc(0.826923rem + 0.015024vw), 1rem);
+  --step-0: clamp(1rem, calc(0.951923rem + 0.015024vw), 1.125rem);
+  --step-1: clamp(1.125rem, calc(1.076923rem + 0.015024vw), 1.25rem);
+  --step-2: clamp(1.375rem, calc(1.278846rem + 0.030048vw), 1.625rem);
+  --step-3: clamp(1.75rem, calc(1.605769rem + 0.045072vw), 2.125rem);
+
+  /* Fluid space scale */
+  --space-3xs: clamp(0.25rem, calc(0.201923rem + 0.015024vw), 0.375rem);
+  --space-2xs: clamp(0.5rem, calc(0.403846rem + 0.030048vw), 0.75rem);
+  --space-xs-fluid: clamp(0.75rem, calc(0.653846rem + 0.030048vw), 1rem);
+  --space-s: clamp(1rem, calc(0.807692rem + 0.060096vw), 1.5rem);
+  --space-m: clamp(1.5rem, calc(1.307692rem + 0.060096vw), 2rem);
+  --space-l: clamp(2rem, calc(1.615385rem + 0.120192vw), 3rem);
+  --space-xl-fluid: clamp(3rem, calc(2.615385rem + 0.120192vw), 4rem);
+  --space-2xl: clamp(4rem, calc(3.230769rem + 0.240385vw), 6rem);
+
+  /* Legacy spacing token aliases (minimise selector churn) */
+  --space-xs: var(--space-3xs);
+  --space-sm: var(--space-2xs);
+  --space-md: var(--space-s);
+  --space-lg: var(--space-m);
+  --space-xl: var(--space-l);
+
+  /* Grid foundations */
+  --grid-max: 72rem;
+  --grid-gutter: var(--space-s);
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, monospace;
+  --max-width: var(--grid-max);
+  --page-top-inset: var(--space-md);
+  --score-panel-width: 16rem;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--step-0);
+  line-height: 1.5;
+  color: var(--color-text);
+  background: var(--color-bg);
+}
+
+button:not(:disabled) {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+.site-footer {
+  max-width: var(--max-width);
+  margin: var(--space-xl) auto 0;
+  padding: var(--space-lg) var(--grid-gutter) var(--space-xl);
+  text-align: center;
+}
+
+.site-footer-text {
+  margin: 0;
+  font-size: var(--step--1);
+  line-height: 1.5;
+  color: var(--color-text-muted);
+}
+
+.site-footer a {
+  color: var(--color-primary);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.site-footer a:hover {
+  color: var(--color-primary-hover);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.site-footer a:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}

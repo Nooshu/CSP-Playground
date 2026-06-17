@@ -15,24 +15,17 @@
 import type { PolicyState } from "../csp/buildPolicy";
 import {
   CATEGORY_LABELS,
+  CATEGORY_ORDER,
   DIRECTIVES_BY_CATEGORY,
-  type DirectiveCategory,
 } from "../csp/directives";
 import {
   createDirectiveSection,
   type DirectiveSectionHandle,
 } from "./DirectiveSection";
 import { createPolicyOutput, type PolicyOutputPanel } from "./PolicyOutput";
+import { createPolicyUpdateSnapshot } from "./policyUpdate";
 import { createSecurityScorePanel } from "./SecurityScore";
 import { createUrlImporter } from "./UrlImporter";
-
-const CATEGORY_ORDER: DirectiveCategory[] = [
-  "fetch",
-  "document",
-  "navigation",
-  "reporting",
-  "other",
-];
 
 /**
  * Mounts the CSP builder into the given DOM root.
@@ -62,8 +55,9 @@ export function createApp(root: HTMLElement): void {
   }
 
   function handleChange(): void {
-    outputPanel?.update();
-    securityScorePanel?.update();
+    const snapshot = createPolicyUpdateSnapshot(collectState());
+    outputPanel?.update(snapshot);
+    securityScorePanel?.update(snapshot);
   }
 
   root.classList.add("app");
