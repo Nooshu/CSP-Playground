@@ -3,7 +3,7 @@ description: Project context and agent conventions (see AGENTS.md)
 alwaysApply: true
 ---
 
-# CSP Builder agent context
+# CSP Playground agent context
 
 Read [AGENTS.md](../../AGENTS.md) for full project guidance.
 

@@ -5,6 +5,7 @@ import {
   type DirectiveCategory,
   type DirectiveDefinition,
 } from "../csp/directives";
+import { SITE_NAME } from "../siteMeta";
 
 function escapeHtml(value: string): string {
   return value
@@ -39,7 +40,7 @@ export function renderIndexAppHtml(options: RenderIndexAppOptions = {}): string 
 
   const header = [
     `<header class="app-header">`,
-    `<h1>CSP Builder</h1>`,
+    `<h1>${escapeHtml(SITE_NAME)}</h1>`,
     `<p class="app-subtitle">Build a Content Security Policy header by enabling directives and adding source values. Copy the result for your server configuration.</p>`,
     `</header>`,
   ].join("");

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { SITE_NAME } from "../../src/siteMeta";
 import { createApp } from "../../src/ui/App";
 import { renderIndexAppHtml } from "../../src/ssg/renderIndexApp";
 
@@ -11,7 +12,7 @@ describe("createApp", () => {
     root.innerHTML = renderIndexAppHtml();
     createApp(root);
 
-    expect(root.querySelector(".app-header h1")?.textContent).toBe("CSP Builder");
+    expect(root.querySelector(".app-header h1")?.textContent).toBe(SITE_NAME);
     expect(root.querySelectorAll(".directive-section").length).toBeGreaterThan(0);
     expect(document.body.querySelector(".security-score-panel")).not.toBeNull();
     expect(root.querySelector(".policy-output")).not.toBeNull();

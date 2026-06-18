@@ -30,7 +30,7 @@ We aim to acknowledge reports within **5 business days** and will keep you updat
 
 In scope:
 
-- The CSP Builder web application and static assets
+- The CSP Playground web application and static assets
 - The `/api/csp-lookup` Pages Function and shared server lookup code
 - Supply-chain or build/deploy configuration that affects production
 

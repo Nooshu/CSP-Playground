@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Guidance for AI coding agents working in the CSP Builder repository.
+Guidance for AI coding agents working in the CSP Playground repository.
 
 > **Compatibility:** Older tooling may reference `AGENT.md`. That file is a symlink to this document.
 

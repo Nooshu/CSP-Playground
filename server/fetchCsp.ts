@@ -166,7 +166,7 @@ async function fetchWithRedirects(
         redirect: "manual",
         signal: controller.signal,
         headers: {
-          "User-Agent": "CSP-Builder/1.0 (+https://github.com/)",
+          "User-Agent": "CSP-Playground/1.0 (+https://github.com/Nooshu/CSP-Playground)",
           Accept: method === "GET" ? "text/html,application/xhtml+xml" : "*/*",
         },
       });

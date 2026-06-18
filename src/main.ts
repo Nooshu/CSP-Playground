@@ -1,5 +1,5 @@
 /**
- * Application entry point: mounts the CSP Builder when `#app` exists.
+ * Application entry point: mounts CSP Playground when `#app` exists.
  */
 
 import { createApp } from "./ui/App";

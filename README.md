@@ -1,4 +1,4 @@
-# CSP Builder
+# CSP Playground
 
 A browser-based tool for building [Content Security Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CSP) (CSP) headers. Enable directives, pick common keywords, add custom source URLs, review a live security score, and copy the generated policy—or ready-made snippets—for your web server.
 
@@ -6,7 +6,7 @@ The app runs entirely in the browser for policy editing. **Import from URL** use
 
 ## Purpose
 
-Content Security Policy is one of the most effective mitigations against cross-site scripting (XSS) and related injection attacks, but the syntax is easy to get wrong. CSP Builder lowers the barrier to authoring a correct policy by:
+Content Security Policy is one of the most effective mitigations against cross-site scripting (XSS) and related injection attacks, but the syntax is easy to get wrong. CSP Playground lowers the barrier to authoring a correct policy by:
 
 - Mapping every standard directive to an accessible form control
 - Explaining sandbox flags and linking to MDN documentation

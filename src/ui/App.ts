@@ -1,5 +1,5 @@
 /**
- * Root application shell for the CSP builder UI.
+ * Root application shell for the CSP Playground UI.
  *
  * @remarks
  * Wires together directive sections (grouped by category), the policy output panel,
@@ -18,6 +18,7 @@ import {
   CATEGORY_ORDER,
   DIRECTIVES_BY_CATEGORY,
 } from "../csp/directives";
+import { SITE_NAME } from "../siteMeta";
 import {
   createDirectiveSection,
   type DirectiveSectionHandle,
@@ -28,7 +29,7 @@ import { createSecurityScorePanel } from "./SecurityScore";
 import { createUrlImporter } from "./UrlImporter";
 
 /**
- * Mounts the CSP builder into the given DOM root.
+ * Mounts CSP Playground into the given DOM root.
  *
  * @param root - Container element (typically `#app` from the page shell).
  *
@@ -136,7 +137,7 @@ export function createApp(root: HTMLElement): void {
   header.className = "app-header";
 
   const title = document.createElement("h1");
-  title.textContent = "CSP Builder";
+  title.textContent = SITE_NAME;
 
   const subtitle = document.createElement("p");
   subtitle.className = "app-subtitle";

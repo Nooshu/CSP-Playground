@@ -33,7 +33,7 @@ export default defineConfig({
   plugins: [
     cspLookupPlugin(),
     {
-      name: "csp-builder-site-meta",
+      name: "csp-playground-site-meta",
       transformIndexHtml(html, ctx) {
         if (!html.includes("<!--SITE_META-->")) return html;
         const page = siteMetaPageFromFilename(ctx.filename);
@@ -41,7 +41,7 @@ export default defineConfig({
       },
     },
     {
-      name: "csp-builder-footer",
+      name: "csp-playground-footer",
       transformIndexHtml(html) {
         if (!html.includes("<!--SITE_FOOTER-->")) return html;
         return html.replace(
@@ -51,7 +51,7 @@ export default defineConfig({
       },
     },
     {
-      name: "csp-builder-ssg",
+      name: "csp-playground-ssg",
       apply: "build",
       transformIndexHtml(html) {
         const rendered = renderIndexAppHtml();

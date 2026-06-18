@@ -1,6 +1,6 @@
 {
-  "name": "CSP Builder",
-  "short_name": "CSP Builder",
+  "name": "CSP Playground",
+  "short_name": "CSP Playground",
   "icons": [
     {
       "src": "/android-chrome-192x192.png",

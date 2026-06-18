@@ -18,7 +18,7 @@ export const OG_IMAGE_HEIGHT = 464;
 export const OG_IMAGE_TYPE = "image/jpeg";
 
 /** Site name shown in Open Graph metadata. */
-export const SITE_NAME = "CSP Builder";
+export const SITE_NAME = "CSP Playground";
 
 /** Page keys supported by {@link renderSiteMetaHtml}. */
 export type SiteMetaPage = "home" | "whyCsp";
@@ -35,21 +35,21 @@ export const SITE_PAGE_META: Record<
   }
 > = {
   home: {
-    title: "CSP Builder — Free Content Security Policy Header Generator",
+    title: "Content Security Policy Header Generator | CSP Playground",
     description:
       "Build and validate Content Security Policy headers in your browser. Import policies from any URL, score your CSP, and copy server snippets for Apache, Nginx, Caddy, and more.",
     path: "/",
     imageAlt:
-      "CSP Builder — free browser-based Content Security Policy header generator",
+      "Content Security Policy header generator — CSP Playground",
     schemaType: "WebApplication",
   },
   whyCsp: {
-    title: "Why use a Content Security Policy? | CSP Builder",
+    title: "Why Use Content Security Policy (CSP)? | CSP Playground",
     description:
       "Learn why Content Security Policy matters for XSS protection, what risks you face without a CSP, and how to adopt a policy safely with report-only mode.",
     path: "/why-csp.html",
     imageAlt:
-      "Why use a Content Security Policy — security guide from CSP Builder",
+      "Why use Content Security Policy — security guide from CSP Playground",
     schemaType: "Article",
   },
 };
