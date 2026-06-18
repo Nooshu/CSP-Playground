@@ -183,6 +183,19 @@ export function createPolicyOutput(options: PolicyOutputOptions): HTMLElement {
   serverLabel.htmlFor = "server-export-select";
   serverLabel.textContent = "Web server export";
 
+  const serverExportWarning = document.createElement("div");
+  serverExportWarning.className = "policy-warning server-export-warning";
+  serverExportWarning.setAttribute("role", "note");
+  serverExportWarning.setAttribute(
+    "aria-label",
+    "Web server export syntax reminder",
+  );
+
+  const serverExportWarningText = document.createElement("p");
+  serverExportWarningText.textContent =
+    "Double-check the syntax before deploying.";
+  serverExportWarning.appendChild(serverExportWarningText);
+
   const serverSelect = document.createElement("select");
   serverSelect.id = "server-export-select";
   serverSelect.className = "server-select";
@@ -219,7 +232,14 @@ export function createPolicyOutput(options: PolicyOutputOptions): HTMLElement {
   serverPreview.setAttribute("aria-describedby", "server-export-help");
   serverPreview.textContent = "";
 
-  serverGroup.append(serverLabel, serverSelect, serverHelp, htmlOnlyLabel, serverPreview);
+  serverGroup.append(
+    serverLabel,
+    serverExportWarning,
+    serverSelect,
+    serverHelp,
+    htmlOnlyLabel,
+    serverPreview,
+  );
   panel.appendChild(serverGroup);
 
   const actions = document.createElement("div");

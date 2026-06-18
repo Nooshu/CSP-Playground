@@ -46,6 +46,9 @@ describe("createPolicyOutput", () => {
     await vi.waitFor(() =>
       expect(serverSelect.options.length).toBeGreaterThan(1),
     );
+    expect(
+      panel.querySelector(".server-export-warning")?.textContent,
+    ).toContain("Double-check the syntax before deploying.");
 
     const reportOnlyRadio = panel.querySelector(
       'input[value="report-only"]',

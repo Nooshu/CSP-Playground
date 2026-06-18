@@ -748,6 +748,10 @@ select {
   color: var(--color-text-muted);
 }
 
+.server-export-warning {
+  margin: var(--space-xs) 0 var(--space-sm);
+}
+
 .mode-fieldset {
   margin: 0 0 var(--space-md);
   padding: var(--space-md);
