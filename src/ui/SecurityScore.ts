@@ -45,7 +45,15 @@ export function createSecurityScorePanel(
 
   const panel = document.createElement("aside");
   panel.className = "security-score-panel";
-  panel.setAttribute("aria-label", "CSP security score");
+  panel.setAttribute(
+    "aria-labelledby",
+    "security-score-heading security-score-summary",
+  );
+
+  const panelHeading = document.createElement("h2");
+  panelHeading.id = "security-score-heading";
+  panelHeading.className = "security-score-heading";
+  panelHeading.textContent = "Security score";
 
   const value = document.createElement("p");
   value.className = "security-score-value";
@@ -56,6 +64,7 @@ export function createSecurityScorePanel(
   grade.className = "security-score-grade";
 
   const summary = document.createElement("p");
+  summary.id = "security-score-summary";
   summary.className = "security-score-summary";
 
   const breakdownDetails = document.createElement("details");
@@ -137,7 +146,15 @@ export function createSecurityScorePanel(
   updateBackToTopVisibility();
 
   nav.append(viewPolicyBtn, backToTopWrap);
-  panel.append(value, grade, summary, breakdownDetails, recommendationDetails, nav);
+  panel.append(
+    panelHeading,
+    value,
+    grade,
+    summary,
+    breakdownDetails,
+    recommendationDetails,
+    nav,
+  );
 
   function syncRecommendations(
     recommendations: ReturnType<typeof scorePolicy>["recommendations"],
@@ -189,11 +206,6 @@ export function createSecurityScorePanel(
     value.textContent = `${result.score}%`;
     grade.textContent = result.grade;
     summary.textContent = result.summary;
-
-    panel.setAttribute(
-      "aria-label",
-      `CSP security score: ${result.score} percent, ${result.grade}. ${result.summary}`,
-    );
 
     factorList.innerHTML = "";
     for (const factor of result.factors) {

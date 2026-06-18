@@ -1,6 +1,8 @@
 @import "./base.css";
 
 .app {
+  display: flex;
+  flex-direction: column;
   max-width: var(--max-width);
   margin: 0 auto;
   padding: var(--page-top-inset) var(--grid-gutter) var(--space-xl);
@@ -180,6 +182,9 @@
 }
 
 .category-fieldset {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
   margin: 0 0 var(--space-lg);
   padding: var(--space-lg);
   border: 1px solid var(--color-border);
@@ -192,12 +197,6 @@
   padding: 0 var(--space-sm);
   font-size: 1.125rem;
   font-weight: 600;
-}
-
-.directive-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-md);
 }
 
 .directive-section {
@@ -267,6 +266,7 @@
 }
 
 .directive-name {
+  margin: 0;
   font-family: var(--font-mono);
   font-size: 0.9375rem;
   font-weight: 600;
@@ -882,10 +882,8 @@ select {
   box-shadow: var(--shadow);
 }
 
-.security-score-panel::before {
-  content: "Security score";
-  display: block;
-  margin-bottom: var(--space-xs);
+.security-score-heading {
+  margin: 0 0 var(--space-xs);
   font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.04em;
@@ -1150,6 +1148,12 @@ select {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+@media (max-width: 771px) {
+  .security-score-panel {
+    order: -1;
   }
 }
 

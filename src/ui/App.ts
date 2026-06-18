@@ -28,6 +28,19 @@ import { createPolicyUpdateSnapshot } from "./policyUpdate";
 import { createSecurityScorePanel } from "./SecurityScore";
 import { createUrlImporter } from "./UrlImporter";
 
+function mountSecurityScorePanel(
+  panel: HTMLElement,
+  root: HTMLElement,
+): void {
+  const layout = root.querySelector(".app-layout");
+  if (layout) {
+    layout.insertAdjacentElement("afterend", panel);
+    return;
+  }
+
+  root.appendChild(panel);
+}
+
 /**
  * Mounts CSP Playground into the given DOM root.
  *
@@ -80,7 +93,7 @@ export function createApp(root: HTMLElement): void {
       getState: collectState,
       getReportOnly: () => outputPanel?.getReportOnly() ?? false,
     });
-    root.prepend(securityScorePanel);
+    mountSecurityScorePanel(securityScorePanel, root);
 
     const form = root.querySelector<HTMLFormElement>(".directive-form");
     if (form) {
@@ -131,7 +144,6 @@ export function createApp(root: HTMLElement): void {
     getState: collectState,
     getReportOnly: () => outputPanel?.getReportOnly() ?? false,
   });
-  root.prepend(securityScorePanel);
 
   const header = document.createElement("header");
   header.className = "app-header";
@@ -151,10 +163,21 @@ export function createApp(root: HTMLElement): void {
   layout.className = "app-layout";
   root.appendChild(layout);
 
+  const builderSection = document.createElement("section");
+  builderSection.className = "policy-builder";
+  builderSection.setAttribute("aria-labelledby", "policy-builder-heading");
+
+  const builderHeading = document.createElement("h2");
+  builderHeading.id = "policy-builder-heading";
+  builderHeading.className = "visually-hidden";
+  builderHeading.textContent = "CSP directive editor";
+
   const form = document.createElement("form");
   form.className = "directive-form";
   form.setAttribute("novalidate", "");
   form.addEventListener("submit", (e) => e.preventDefault());
+
+  builderSection.append(builderHeading, form);
 
   for (const category of CATEGORY_ORDER) {
     const directives = DIRECTIVES_BY_CATEGORY[category];
@@ -167,23 +190,17 @@ export function createApp(root: HTMLElement): void {
     legend.textContent = CATEGORY_LABELS[category];
     fieldset.appendChild(legend);
 
-    const list = document.createElement("div");
-    list.className = "directive-list";
-
     for (const directive of directives) {
       const section = createDirectiveSection({
         directive,
         onChange: handleChange,
       });
       sections.push(section);
-      list.appendChild(section.element);
+      fieldset.appendChild(section.element);
     }
 
-    fieldset.appendChild(list);
     form.appendChild(fieldset);
   }
-
-  form.appendChild(outputPanel);
 
   const urlImporter = createUrlImporter({
     sections,
@@ -191,7 +208,8 @@ export function createApp(root: HTMLElement): void {
     onApplied: handleChange,
   });
 
-  layout.append(urlImporter, form);
+  layout.append(urlImporter, builderSection, outputPanel);
+  mountSecurityScorePanel(securityScorePanel, root);
 
   handleChange();
 }

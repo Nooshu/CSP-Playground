@@ -74,16 +74,19 @@ export function renderIndexAppHtml(options: RenderIndexAppOptions = {}): string 
     return [
       `<fieldset class="category-fieldset">`,
       `<legend>${legend}</legend>`,
-      `<div class="directive-list">`,
       list,
-      `</div>`,
       `</fieldset>`,
     ].join("");
     })
     .join("");
 
-  const form = `<form class="directive-form" novalidate>${fieldsets}</form>`;
-  const outputPanelShell = `<aside id="generated-policy" class="policy-output" aria-label="Generated policy"></aside>`;
+  const form = [
+    `<section class="policy-builder" aria-labelledby="policy-builder-heading">`,
+    `<h2 id="policy-builder-heading" class="visually-hidden">CSP directive editor</h2>`,
+    `<form class="directive-form" novalidate>${fieldsets}</form>`,
+    `</section>`,
+  ].join("");
+  const outputPanelShell = `<aside id="generated-policy" class="policy-output" aria-labelledby="generated-policy-heading"></aside>`;
 
   return [
     header,

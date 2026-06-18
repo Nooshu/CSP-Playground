@@ -31,6 +31,8 @@ function getToastContainer(): HTMLElement {
   const container = document.createElement("div");
   container.id = TOAST_CONTAINER_ID;
   container.className = "toast-container";
+  container.setAttribute("role", "region");
+  container.setAttribute("aria-label", "Notifications");
   container.setAttribute("aria-live", "polite");
   container.setAttribute("aria-atomic", "true");
   document.body.appendChild(container);

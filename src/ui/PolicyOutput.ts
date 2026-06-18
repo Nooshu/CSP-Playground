@@ -56,16 +56,16 @@ export function createPolicyOutput(options: PolicyOutputOptions): HTMLElement {
   panel.innerHTML = "";
   panel.className = "policy-output";
   panel.id = "generated-policy";
-  panel.setAttribute("aria-label", "Generated policy");
+  panel.setAttribute("aria-labelledby", "generated-policy-heading");
 
   const heading = document.createElement("h2");
+  heading.id = "generated-policy-heading";
   heading.textContent = "Generated policy";
   heading.tabIndex = -1;
   panel.appendChild(heading);
 
-  const warning = document.createElement("div");
+  const warning = document.createElement("aside");
   warning.className = "policy-warning";
-  warning.setAttribute("role", "note");
   warning.setAttribute("aria-label", "Content Security Policy disclaimer");
 
   const warningText = document.createElement("p");
@@ -140,7 +140,7 @@ export function createPolicyOutput(options: PolicyOutputOptions): HTMLElement {
   modeFieldset.append(enforceLabel, reportOnlyLabel);
   panel.appendChild(modeFieldset);
 
-  const policyGroup = document.createElement("div");
+  const policyGroup = document.createElement("section");
   policyGroup.className = "output-group";
 
   const policyLabel = document.createElement("span");
@@ -159,7 +159,7 @@ export function createPolicyOutput(options: PolicyOutputOptions): HTMLElement {
   policyGroup.append(policyLabel, policyPreview);
   panel.appendChild(policyGroup);
 
-  const headerGroup = document.createElement("div");
+  const headerGroup = document.createElement("section");
   headerGroup.className = "output-group";
 
   const headerLabel = document.createElement("span");
@@ -177,16 +177,15 @@ export function createPolicyOutput(options: PolicyOutputOptions): HTMLElement {
   headerGroup.append(headerLabel, headerPreview);
   panel.appendChild(headerGroup);
 
-  const serverGroup = document.createElement("div");
+  const serverGroup = document.createElement("section");
   serverGroup.className = "output-group";
 
   const serverLabel = document.createElement("label");
   serverLabel.htmlFor = "server-export-select";
   serverLabel.textContent = "Web server export";
 
-  const serverExportWarning = document.createElement("div");
+  const serverExportWarning = document.createElement("aside");
   serverExportWarning.className = "policy-warning server-export-warning";
-  serverExportWarning.setAttribute("role", "note");
   serverExportWarning.setAttribute(
     "aria-label",
     "Web server export syntax reminder",
@@ -257,8 +256,9 @@ export function createPolicyOutput(options: PolicyOutputOptions): HTMLElement {
   );
   panel.appendChild(serverGroup);
 
-  const actions = document.createElement("div");
+  const actions = document.createElement("section");
   actions.className = "output-actions";
+  actions.setAttribute("aria-label", "Copy actions");
 
   const copyPolicyBtn = document.createElement("button");
   copyPolicyBtn.type = "button";

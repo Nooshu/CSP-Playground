@@ -81,7 +81,7 @@ export function createDirectiveSection(
   article.id = `directive-section-${directive.name}`;
   article.dataset.directive = directive.name;
 
-  const header = document.createElement("div");
+  const header = document.createElement("header");
   header.className = "directive-header";
 
   const enableLabel = document.createElement("label");
@@ -92,7 +92,7 @@ export function createDirectiveSection(
   enableCheckbox.id = `${idPrefix}-enable`;
   enableCheckbox.className = "enable-checkbox";
 
-  const title = document.createElement("span");
+  const title = document.createElement("h3");
   title.className = "directive-name";
   title.textContent = directive.name;
 

@@ -10,6 +10,14 @@ describe("renderIndexAppHtml", () => {
     expect(html).toContain("Fetch directives");
   });
 
+  it("includes semantic landmarks and headings", () => {
+    const html = renderIndexAppHtml();
+    expect(html).toContain('<section class="policy-builder"');
+    expect(html).toContain('id="policy-builder-heading"');
+    expect(html).toContain('aria-labelledby="generated-policy-heading"');
+    expect(html).toContain("<article ");
+  });
+
   it("escapes legend text and skips empty categories", () => {
     const html = renderIndexAppHtml({
       categoryOrder: ["fetch", "document"],

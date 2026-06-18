@@ -119,12 +119,17 @@ export function createUrlImporter(options: UrlImporterOptions): HTMLElement {
   status.setAttribute("role", "status");
   status.setAttribute("aria-live", "polite");
 
-  const validationPanel = document.createElement("div");
+  const validationPanel = document.createElement("section");
   validationPanel.id = "url-importer-validation";
   validationPanel.className = "url-importer-validation";
   validationPanel.hidden = true;
+  validationPanel.setAttribute(
+    "aria-labelledby",
+    "url-importer-validation-heading",
+  );
 
   const validationHeading = document.createElement("h3");
+  validationHeading.id = "url-importer-validation-heading";
   validationHeading.className = "url-importer-validation-heading";
   validationHeading.textContent = "Validation results";
 
