@@ -13,6 +13,7 @@
 import { buildHeaderLine, buildPolicyString } from "../csp/buildPolicy";
 import type { PolicyState } from "../csp/buildPolicy";
 import { WEB_SERVER_EXPORTS, type WebServerId } from "../csp/serverExports";
+import { GITHUB_REPO_URL } from "../siteBuildInfo";
 import { createFlagInfoIcon } from "./FlagInfoIcon";
 import type { PolicyUpdateSnapshot } from "./policyUpdate";
 import { showToast } from "./toast";
@@ -193,7 +194,21 @@ export function createPolicyOutput(options: PolicyOutputOptions): HTMLElement {
 
   const serverExportWarningText = document.createElement("p");
   serverExportWarningText.textContent =
-    "Double-check the syntax before deploying.";
+    "Double-check the syntax before deploying. Please ";
+
+  const issuesLink = document.createElement("a");
+  issuesLink.href = `${GITHUB_REPO_URL}/issues`;
+  issuesLink.target = "_blank";
+  issuesLink.rel = "noopener noreferrer";
+  issuesLink.referrerPolicy = "no-referrer";
+  issuesLink.title = "Opens in a new tab";
+  issuesLink.textContent = "log an issue";
+  issuesLink.setAttribute(
+    "aria-label",
+    "Log an issue on GitHub (opens in new tab)",
+  );
+
+  serverExportWarningText.append(issuesLink, " if incorrect.");
   serverExportWarning.appendChild(serverExportWarningText);
 
   const serverSelect = document.createElement("select");

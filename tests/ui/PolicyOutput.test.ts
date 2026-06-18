@@ -49,6 +49,12 @@ describe("createPolicyOutput", () => {
     expect(
       panel.querySelector(".server-export-warning")?.textContent,
     ).toContain("Double-check the syntax before deploying.");
+    expect(
+      panel.querySelector(".server-export-warning a")?.getAttribute("href"),
+    ).toBe("https://github.com/Nooshu/CSP-Playground/issues");
+    expect(
+      panel.querySelector(".server-export-warning a")?.textContent,
+    ).toBe("log an issue");
 
     const reportOnlyRadio = panel.querySelector(
       'input[value="report-only"]',
