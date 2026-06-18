@@ -1,7 +1,16 @@
 {
-  "name": "csp-builder",
+  "name": "csp-playground",
   "private": true,
   "version": "1.0.0",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Nooshu/CSP-Playground.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Nooshu/CSP-Playground/issues"
+  },
+  "homepage": "https://csp-playground.dev",
   "type": "module",
   "packageManager": "yarn@1.22.22",
   "engines": {
