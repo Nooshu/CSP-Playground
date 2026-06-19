@@ -1,17 +1,23 @@
 /**
- * Form for importing an existing CSP from a live site URL.
+ * Form for importing an existing CSP from a live site URL or pasted headers.
  *
  * @remarks
- * Fetches policy text via {@link lookupCspFromUrl}, parses it with
- * {@link parsePolicyString}, and applies values through {@link applyParsedPolicy}.
- * Also syncs report-only mode on the output panel when the source used
- * `Content-Security-Policy-Report-Only`.
+ * URL mode fetches policy text via {@link lookupCspFromUrl}. Paste mode extracts
+ * CSP from response headers or a raw policy string via {@link extractCspFromText}.
+ * Both paths parse with {@link parsePolicyString} and apply values through
+ * {@link applyParsedPolicy}.
  *
  * @see {@link lookupCspFromUrl}
+ * @see {@link extractCspFromText}
  * @see {@link applyParsedPolicy}
  */
 
 import { lookupCspFromUrl, type CspLookupFailure } from "../api/lookupCsp";
+import {
+  ExtractCspError,
+  extractCspFromText,
+  type ExtractCspSource,
+} from "../csp/extractCspFromText";
 import { parsePolicyString } from "../csp/parsePolicy";
 import {
   validatePolicyString,
@@ -21,6 +27,9 @@ import { applyParsedPolicy } from "./applyPolicy";
 import type { DirectiveSectionHandle } from "./DirectiveSection";
 import type { PolicyOutputPanel } from "./PolicyOutput";
 import { showToast } from "./toast";
+
+/** Import method shown in the section UI. */
+type ImportMode = "url" | "paste";
 
 /** Options for the URL policy importer section. */
 export interface UrlImporterOptions {
@@ -40,27 +49,44 @@ export interface UrlImporterOptions {
   container?: HTMLElement;
 }
 
-/** Result of fetching and applying a policy from a URL. */
-interface ImportResult {
+/** Normalized policy payload used by import and validate flows. */
+interface ResolvedImport {
   policy: string;
   reportOnly: boolean;
-  url: string;
   source: string;
   appliedCount: number;
+  originLabel: string;
 }
 
+const URL_DESCRIPTION =
+  "Enter a site URL to fetch its Content-Security-Policy from HTTP headers or HTML meta tags and pre-fill the form below.";
+const PASTE_DESCRIPTION =
+  "Paste full HTTP response headers or only the Content-Security-Policy header line. The CSP is extracted automatically and used to pre-fill the form below.";
+const PASTE_PLACEHOLDER = [
+  "Simply paste all headers:",
+  "Access-Control-Allow-Origin: https://example.com",
+  "Cache-Control: public, max-age=31536000",
+  "Content-Security-Policy: default-src 'self'; script-src 'self'",
+  "X-Frame-Options: DENY",
+  "",
+  "Or paste only the CSP header line:",
+  "Content-Security-Policy: default-src 'self'; script-src 'self'",
+].join("\n");
+
 /**
- * Creates the "Import existing policy" section with URL lookup form.
+ * Creates the "Import existing policy" section with URL lookup and paste forms.
  *
  * @param options - Directive handles, output panel, and post-import callback.
  * @returns The mounted `<section>` element.
  *
  * @remarks
- * Lookup runs asynchronously on submit; controls are disabled while fetching.
+ * URL lookup runs asynchronously on submit; controls are disabled while fetching.
  * A missing CSP shows an inline link to `/why-csp.html` rather than an error tone.
  */
 export function createUrlImporter(options: UrlImporterOptions): HTMLElement {
   const { sections, outputPanel, onApplied, container } = options;
+
+  let importMode: ImportMode = "url";
 
   const section = container ?? document.createElement("section");
   section.innerHTML = "";
@@ -73,32 +99,87 @@ export function createUrlImporter(options: UrlImporterOptions): HTMLElement {
 
   const description = document.createElement("p");
   description.className = "url-importer-description";
-  description.textContent =
-    "Enter a site URL to fetch its Content-Security-Policy from HTTP headers or HTML meta tags and pre-fill the form below.";
+  description.textContent = URL_DESCRIPTION;
 
   const form = document.createElement("form");
   form.className = "url-importer-form";
   form.noValidate = true;
 
-  const label = document.createElement("label");
-  label.htmlFor = "site-url";
-  label.textContent = "Site URL";
+  const modeFieldset = document.createElement("fieldset");
+  modeFieldset.className = "url-importer-mode mode-fieldset";
 
-  const inputRow = document.createElement("div");
-  inputRow.className = "url-importer-row";
+  const modeLegend = document.createElement("legend");
+  modeLegend.textContent = "Import method";
 
-  const input = document.createElement("input");
-  input.type = "url";
-  input.id = "site-url";
-  input.name = "site-url";
-  input.className = "url-importer-input";
-  input.placeholder = "https://example.com";
-  input.setAttribute("autocomplete", "url");
-  input.inputMode = "url";
-  input.setAttribute(
+  const urlModeLabel = document.createElement("label");
+  urlModeLabel.className = "mode-label";
+
+  const urlModeRadio = document.createElement("input");
+  urlModeRadio.type = "radio";
+  urlModeRadio.name = "import-mode";
+  urlModeRadio.value = "url";
+  urlModeRadio.checked = true;
+
+  const urlModeText = document.createElement("span");
+  urlModeText.textContent = "Import from URL";
+
+  const pasteModeLabel = document.createElement("label");
+  pasteModeLabel.className = "mode-label";
+
+  const pasteModeRadio = document.createElement("input");
+  pasteModeRadio.type = "radio";
+  pasteModeRadio.name = "import-mode";
+  pasteModeRadio.value = "paste";
+
+  const pasteModeText = document.createElement("span");
+  pasteModeText.textContent = "Paste headers or policy";
+
+  urlModeLabel.append(urlModeRadio, urlModeText);
+  pasteModeLabel.append(pasteModeRadio, pasteModeText);
+  modeFieldset.append(modeLegend, urlModeLabel, pasteModeLabel);
+
+  const urlPanel = document.createElement("div");
+  urlPanel.className = "url-importer-url-panel";
+
+  const urlLabel = document.createElement("label");
+  urlLabel.htmlFor = "site-url";
+  urlLabel.textContent = "Site URL";
+
+  const urlInput = document.createElement("input");
+  urlInput.type = "url";
+  urlInput.id = "site-url";
+  urlInput.name = "site-url";
+  urlInput.className = "url-importer-input";
+  urlInput.placeholder = "https://example.com";
+  urlInput.setAttribute("autocomplete", "url");
+  urlInput.inputMode = "url";
+  urlInput.setAttribute(
     "aria-describedby",
     "url-importer-status url-importer-validation",
   );
+
+  urlPanel.append(urlLabel, urlInput);
+
+  const pastePanel = document.createElement("div");
+  pastePanel.className = "url-importer-paste-panel";
+  pastePanel.hidden = true;
+
+  const pasteLabel = document.createElement("label");
+  pasteLabel.htmlFor = "csp-paste";
+  pasteLabel.textContent = "Headers or CSP policy";
+
+  const pasteInput = document.createElement("textarea");
+  pasteInput.id = "csp-paste";
+  pasteInput.name = "csp-paste";
+  pasteInput.className = "url-importer-textarea";
+  pasteInput.rows = 8;
+  pasteInput.placeholder = PASTE_PLACEHOLDER;
+  pasteInput.setAttribute(
+    "aria-describedby",
+    "url-importer-status url-importer-validation",
+  );
+
+  pastePanel.append(pasteLabel, pasteInput);
 
   const actions = document.createElement("div");
   actions.className = "url-importer-actions";
@@ -167,9 +248,27 @@ export function createUrlImporter(options: UrlImporterOptions): HTMLElement {
   );
 
   actions.append(submitBtn, validateBtn);
-  inputRow.append(input, actions);
-  form.append(label, inputRow, status, validationPanel);
+  form.append(
+    modeFieldset,
+    urlPanel,
+    pastePanel,
+    actions,
+    status,
+    validationPanel,
+  );
   section.append(heading, description, form);
+
+  function setImportMode(mode: ImportMode): void {
+    importMode = mode;
+    const isUrl = mode === "url";
+    urlPanel.hidden = !isUrl;
+    pastePanel.hidden = isUrl;
+    urlInput.disabled = !isUrl;
+    pasteInput.disabled = isUrl;
+    description.textContent = isUrl ? URL_DESCRIPTION : PASTE_DESCRIPTION;
+    clearValidationPanel();
+    setStatus("", "neutral");
+  }
 
   function setStatus(
     message: string,
@@ -182,9 +281,12 @@ export function createUrlImporter(options: UrlImporterOptions): HTMLElement {
   function setLoading(loading: boolean, mode: "import" | "validate" = "import"): void {
     submitBtn.disabled = loading;
     validateBtn.disabled = loading;
-    input.disabled = loading;
+    urlInput.disabled = loading || importMode !== "url";
+    pasteInput.disabled = loading || importMode !== "paste";
+    urlModeRadio.disabled = loading;
+    pasteModeRadio.disabled = loading;
     submitBtn.textContent =
-      loading && mode === "import" ? "Looking up…" : "Import CSP";
+      loading && mode === "import" ? "Importing…" : "Import CSP";
     validateBtn.textContent =
       loading && mode === "validate" ? "Validating…" : "Validate CSP";
   }
@@ -252,79 +354,189 @@ export function createUrlImporter(options: UrlImporterOptions): HTMLElement {
     copyCorrectedBtn.disabled = !result.correctedPolicy;
   }
 
-  async function importFromUrl(url: string): Promise<ImportResult> {
-    const result = await lookupCspFromUrl(url);
-    const parsed = parsePolicyString(result.policy);
-    parsed.reportOnly = result.reportOnly;
+  function applyPolicy(
+    policy: string,
+    reportOnly: boolean,
+  ): number {
+    const parsed = parsePolicyString(policy);
+    parsed.reportOnly = reportOnly;
 
     const appliedCount = applyParsedPolicy(sections, parsed);
-    outputPanel.setReportOnly(result.reportOnly);
+    outputPanel.setReportOnly(reportOnly);
     onApplied();
+    return appliedCount;
+  }
+
+  async function resolveUrlImport(url: string): Promise<ResolvedImport> {
+    const result = await lookupCspFromUrl(url);
+    const appliedCount = applyPolicy(result.policy, result.reportOnly);
 
     return {
       policy: result.policy,
       reportOnly: result.reportOnly,
-      url: result.url,
       source: result.source,
       appliedCount,
+      originLabel: result.url,
     };
   }
 
-  function sourceLabel(source: string): string {
-    return source.startsWith("meta") ? "HTML meta tag" : "HTTP response header";
+  function resolvePasteImport(text: string): ResolvedImport {
+    const extracted = extractCspFromText(text);
+    const appliedCount = applyPolicy(extracted.policy, extracted.reportOnly);
+
+    return {
+      policy: extracted.policy,
+      reportOnly: extracted.reportOnly,
+      source: extracted.source,
+      appliedCount,
+      originLabel: pasteOriginLabel(extracted.source),
+    };
   }
 
-  function handleLookupFailure(error: unknown): void {
-    const failure = error as CspLookupFailure;
+  function pasteOriginLabel(source: ExtractCspSource): string {
+    switch (source) {
+      case "header-enforce":
+        return "pasted headers";
+      case "header-report-only":
+        return "pasted report-only headers";
+      case "raw":
+        return "pasted policy";
+    }
+  }
+
+  function sourceLabel(source: string): string {
+    if (source.startsWith("meta")) {
+      return "HTML meta tag";
+    }
+    if (source === "header-enforce" || source === "header-report-only") {
+      return "HTTP response header";
+    }
+    if (source === "raw") {
+      return "pasted policy";
+    }
+    return source;
+  }
+
+  function successMessage(result: ResolvedImport): string {
+    const countLabel = `${result.appliedCount} directive${result.appliedCount === 1 ? "" : "s"}`;
+
+    if (importMode === "url") {
+      return `Imported ${countLabel} from ${result.originLabel} (${sourceLabel(result.source)}).`;
+    }
+
+    return `Imported ${countLabel} from ${result.originLabel}.`;
+  }
+
+  function handleNoCspFound(message: string): void {
+    setStatus("", "neutral");
+    status.innerHTML = "";
+    const paragraph = document.createElement("p");
+    paragraph.className = "url-importer-no-csp";
+    paragraph.textContent = message;
+
+    const link = document.createElement("a");
+    link.href = "/why-csp.html";
+    link.textContent = "Learn why your site should use a CSP";
+    link.className = "url-importer-learn-link";
+
+    status.append(paragraph, link);
+  }
+
+  function handleImportFailure(error: unknown): void {
     clearValidationPanel();
 
-    if (failure?.error === "no_csp") {
-      setStatus("", "neutral");
-      status.innerHTML = "";
-      const message = document.createElement("p");
-      message.className = "url-importer-no-csp";
-      message.textContent =
-        "No Content-Security-Policy was found for that URL.";
+    if (importMode === "url") {
+      const failure = error as CspLookupFailure;
+      if (failure?.error === "no_csp") {
+        handleNoCspFound(
+          "No Content-Security-Policy was found for that URL.",
+        );
+        return;
+      }
 
-      const link = document.createElement("a");
-      link.href = "/why-csp.html";
-      link.textContent = "Learn why your site should use a CSP";
-      link.className = "url-importer-learn-link";
-
-      status.append(message, link);
+      setStatus(
+        failure?.message ?? "Could not import a policy from that URL.",
+        "error",
+      );
       return;
     }
 
-    setStatus(
-      failure?.message ?? "Could not import a policy from that URL.",
-      "error",
-    );
+    if (error instanceof ExtractCspError) {
+      if (error.code === "no_csp") {
+        handleNoCspFound(
+          "No Content-Security-Policy was found in the pasted text.",
+        );
+        return;
+      }
+
+      setStatus(error.message, "error");
+      return;
+    }
+
+    setStatus("Could not import a policy from the pasted text.", "error");
   }
+
+  function validateActiveInput(): string | null {
+    if (importMode === "url") {
+      const url = urlInput.value.trim();
+      if (!url) {
+        setStatus("Enter a URL to import a policy.", "error");
+        urlInput.focus();
+        return null;
+      }
+      return url;
+    }
+
+    const text = pasteInput.value.trim();
+    if (!text) {
+      setStatus("Paste headers or a CSP policy to import.", "error");
+      pasteInput.focus();
+      return null;
+    }
+    return text;
+  }
+
+  async function resolveImport(value: string): Promise<ResolvedImport> {
+    if (importMode === "url") {
+      return resolveUrlImport(value);
+    }
+    return resolvePasteImport(value);
+  }
+
+  function loadingMessage(): string {
+    return importMode === "url"
+      ? "Fetching policy from the site…"
+      : "Extracting policy from pasted text…";
+  }
+
+  urlModeRadio.addEventListener("change", () => {
+    if (urlModeRadio.checked) {
+      setImportMode("url");
+    }
+  });
+
+  pasteModeRadio.addEventListener("change", () => {
+    if (pasteModeRadio.checked) {
+      setImportMode("paste");
+    }
+  });
 
   form.addEventListener("submit", (event) => {
     event.preventDefault();
 
-    const url = input.value.trim();
-    if (!url) {
-      setStatus("Enter a URL to import a policy.", "error");
-      input.focus();
-      return;
-    }
+    const value = validateActiveInput();
+    if (!value) return;
 
     void (async () => {
       setLoading(true, "import");
-      setStatus("Fetching policy from the site…", "neutral");
+      setStatus(loadingMessage(), "neutral");
       clearValidationPanel();
 
       try {
-        const result = await importFromUrl(url);
-
-        setStatus(
-          `Imported ${result.appliedCount} directive${result.appliedCount === 1 ? "" : "s"} from ${result.url} (${sourceLabel(result.source)}).`,
-          "success",
-        );
+        const result = await resolveImport(value);
+        setStatus(successMessage(result), "success");
       } catch (error) {
-        handleLookupFailure(error);
+        handleImportFailure(error);
       } finally {
         setLoading(false);
       }
@@ -332,29 +544,22 @@ export function createUrlImporter(options: UrlImporterOptions): HTMLElement {
   });
 
   validateBtn.addEventListener("click", () => {
-    const url = input.value.trim();
-    if (!url) {
-      setStatus("Enter a URL to import a policy.", "error");
-      input.focus();
-      return;
-    }
+    const value = validateActiveInput();
+    if (!value) return;
 
     void (async () => {
       setLoading(true, "validate");
-      setStatus("Fetching policy from the site…", "neutral");
+      setStatus(loadingMessage(), "neutral");
       clearValidationPanel();
 
       try {
-        const result = await importFromUrl(url);
+        const result = await resolveImport(value);
         const validation = validatePolicyString(result.policy);
 
-        setStatus(
-          `Imported ${result.appliedCount} directive${result.appliedCount === 1 ? "" : "s"} from ${result.url} (${sourceLabel(result.source)}).`,
-          "success",
-        );
+        setStatus(successMessage(result), "success");
         renderValidationResults(validation);
       } catch (error) {
-        handleLookupFailure(error);
+        handleImportFailure(error);
       } finally {
         setLoading(false);
       }

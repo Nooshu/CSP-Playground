@@ -48,6 +48,75 @@ describe("createUrlImporter", () => {
     expect(onApplied).toHaveBeenCalled();
   });
 
+  it("imports policies from pasted headers", async () => {
+    const sections = DIRECTIVES.slice(0, 3).map((directive) =>
+      createDirectiveSection({ directive, onChange: vi.fn() }),
+    );
+    const outputPanel = createPolicyOutput({ getState: () => ({}) });
+    const onApplied = vi.fn();
+
+    const importer = createUrlImporter({ sections, outputPanel, onApplied });
+    document.body.appendChild(importer);
+
+    importer.querySelector<HTMLInputElement>(
+      'input[name="import-mode"][value="paste"]',
+    )?.click();
+
+    const textarea = importer.querySelector("#csp-paste") as HTMLTextAreaElement;
+    textarea.value = [
+      "HTTP/1.1 200 OK",
+      "Content-Security-Policy: default-src 'self'",
+    ].join("\n");
+
+    importer.querySelector("form")?.dispatchEvent(
+      new Event("submit", { bubbles: true, cancelable: true }),
+    );
+
+    await vi.waitFor(() =>
+      expect(importer.querySelector("#url-importer-status")?.textContent).toContain(
+        "Imported",
+      ),
+    );
+    expect(onApplied).toHaveBeenCalled();
+    expect(sections[0]?.getState()).toEqual({
+      enabled: true,
+      values: ["'self'"],
+    });
+  });
+
+  it("validates pasted raw policy text", async () => {
+    const sections = DIRECTIVES.slice(0, 3).map((directive) =>
+      createDirectiveSection({ directive, onChange: vi.fn() }),
+    );
+    const outputPanel = createPolicyOutput({ getState: () => ({}) });
+    const onApplied = vi.fn();
+
+    const importer = createUrlImporter({ sections, outputPanel, onApplied });
+    document.body.appendChild(importer);
+
+    importer.querySelector<HTMLInputElement>(
+      'input[name="import-mode"][value="paste"]',
+    )?.click();
+
+    const textarea = importer.querySelector("#csp-paste") as HTMLTextAreaElement;
+    textarea.value = "default-src self; script-src 'self' 'self'";
+
+    importer
+      .querySelector(".url-importer-validate")
+      ?.dispatchEvent(new Event("click", { bubbles: true }));
+
+    await vi.waitFor(() =>
+      expect(
+        importer.querySelector("#url-importer-validation")?.hidden,
+      ).toBe(false),
+    );
+
+    expect(onApplied).toHaveBeenCalled();
+    expect(
+      importer.querySelector(".url-importer-validation-issues")?.children.length,
+    ).toBeGreaterThan(0);
+  });
+
   it("shows validation, no-csp, and error states", async () => {
     const sections = DIRECTIVES.slice(0, 1).map((directive) =>
       createDirectiveSection({ directive, onChange: vi.fn() }),
@@ -66,6 +135,20 @@ describe("createUrlImporter", () => {
     expect(importer.querySelector("#url-importer-status")?.dataset.tone).toBe(
       "error",
     );
+
+    importer.querySelector<HTMLInputElement>(
+      'input[name="import-mode"][value="paste"]',
+    )?.click();
+    importer.querySelector("form")?.dispatchEvent(
+      new Event("submit", { bubbles: true, cancelable: true }),
+    );
+    expect(importer.querySelector("#url-importer-status")?.dataset.tone).toBe(
+      "error",
+    );
+
+    importer.querySelector<HTMLInputElement>(
+      'input[name="import-mode"][value="url"]',
+    )?.click();
 
     vi.spyOn(lookupApi, "lookupCspFromUrl").mockRejectedValue({
       error: "no_csp",

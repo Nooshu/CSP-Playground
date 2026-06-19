@@ -2,7 +2,7 @@
 
 A browser-based tool for building [Content Security Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CSP) (CSP) headers. Enable directives, pick common keywords, add custom source URLs, review a live security score, and copy the generated policy—or ready-made snippets—for your web server.
 
-The app runs entirely in the browser for policy editing. **Import from URL** uses a small server-side lookup (Vite middleware in development, [Cloudflare Pages Functions](https://developers.cloudflare.com/pages/functions/) in production) so you can fetch an existing policy from HTTP headers or HTML meta tags.
+The app runs entirely in the browser for policy editing. **Import from URL** uses a small server-side lookup (Vite middleware in development, [Cloudflare Pages Functions](https://developers.cloudflare.com/pages/functions/) in production) so you can fetch an existing policy from HTTP headers or HTML meta tags. **Paste headers or policy** runs entirely in the browser—paste a full response header block or a single `Content-Security-Policy` line to extract and import the CSP.
 
 ## Purpose
 
@@ -32,12 +32,18 @@ If a site has no CSP yet, the importer links to [why-csp.html](why-csp.html)—a
 - **Trusted Types** directives with appropriate single- or multi-value controls
 - **MDN documentation links** beside each directive name
 
-### Import from URL
+### Import existing policy
 
-- Enter a site URL and fetch its CSP from:
+Import an existing CSP into the builder from a live URL or pasted text:
+
+- **Import from URL** — enter a site URL and fetch its CSP from:
   - `Content-Security-Policy` / `Content-Security-Policy-Report-Only` response headers
   - `<meta http-equiv="Content-Security-Policy">` tags in HTML
+- **Paste headers or policy** — paste directly into the form (no server lookup):
+  - Full HTTP response headers; `Content-Security-Policy` is extracted automatically
+  - A single `Content-Security-Policy:` header line on its own
 - Pre-fills the builder form from the parsed policy
+- **Validate CSP** checks formatting and suggests corrections (URL and paste import)
 - Graceful handling when no policy is found (links to the why-CSP guide)
 
 ### Nonce and hash helpers
@@ -135,7 +141,7 @@ See [AGENTS.md](AGENTS.md) for the full dependency policy.
 
 ## Usage
 
-1. Optionally enter a site URL at the top and click **Import CSP** to load an existing policy.
+1. Optionally use **Import existing policy** at the top—fetch from a URL, or paste response headers / a `Content-Security-Policy` header line—and click **Import CSP**.
 2. Enable a directive (e.g. `default-src`) using its checkbox.
 3. Add keywords from the dropdown or enter custom sources (e.g. `https://cdn.example.com`).
 4. Use nonce or style-hash helpers where inline content needs to be allowed safely.

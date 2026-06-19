@@ -57,6 +57,24 @@
   font-weight: 500;
 }
 
+.url-importer-mode {
+  margin: 0 0 var(--space-md);
+}
+
+.url-importer-url-panel,
+.url-importer-paste-panel {
+  margin-bottom: var(--space-sm);
+}
+
+.url-importer-textarea {
+  width: 100%;
+  min-height: 9rem;
+  resize: vertical;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
 .url-importer-row {
   display: flex;
   flex-wrap: wrap;
@@ -143,15 +161,19 @@
   margin-top: var(--space-xs);
 }
 
-.url-importer-input {
+.url-importer-input,
+.url-importer-textarea {
   width: 100%;
-  min-height: 2.75rem;
   padding: var(--space-sm) var(--space-md);
   font: inherit;
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
   background: var(--color-surface);
   color: var(--color-text);
+}
+
+.url-importer-input {
+  min-height: 2.75rem;
 }
 
 .url-importer-status {
@@ -771,6 +793,25 @@ select {
   min-height: 2.75rem;
   margin-right: var(--space-lg);
   cursor: pointer;
+}
+
+.url-importer-mode.mode-fieldset {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm) var(--space-lg);
+  padding: var(--space-sm) var(--space-md);
+}
+
+.url-importer-mode.mode-fieldset legend {
+  flex: 0 0 100%;
+  padding: 0 var(--space-xs);
+  margin: 0;
+}
+
+.url-importer-mode.mode-fieldset .mode-label {
+  min-height: auto;
+  margin-right: 0;
 }
 
 .output-actions {
