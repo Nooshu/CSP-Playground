@@ -13,6 +13,8 @@ import {
 const AUTHOR_URL = "https://nooshu.com";
 const CLOUDFLARE_URL = "https://www.cloudflare.com";
 const CURSOR_REFERRAL_URL = "https://cursor.com/referral?code=XDKDHWAJX4RJ";
+const CURSOR_REFERRAL_TITLE =
+  "Matt Hobbs's Cursor referral link — get 50% off your first month of Pro, Pro+, or Ultra. Opens in a new tab.";
 const FOOTER_START_YEAR = 2009;
 
 declare const __GIT_COMMIT_SHORT__: string | undefined;
@@ -49,7 +51,7 @@ export function getFooterEndYear(): number {
 }
 
 function footerTextHtml(): string {
-  return `© ${FOOTER_START_YEAR} - <span class="site-footer-year"></span> <a href="${AUTHOR_URL}" target="_blank" rel="noopener noreferrer" title="Opens in a new tab" aria-label="Matt Hobbs (opens in new tab)">Matt Hobbs</a>. All Rights Reserved. Built with <a href="${CLOUDFLARE_URL}" target="_blank" rel="noopener noreferrer" title="Opens in a new tab" aria-label="Cloudflare (opens in new tab)">Cloudflare</a>, ❤️, and <a href="${CURSOR_REFERRAL_URL}" target="_blank" rel="noopener noreferrer" title="Opens in a new tab" aria-label="Cursor referral (opens in new tab)">🤖</a>.`;
+  return `© ${FOOTER_START_YEAR} - <span class="site-footer-year"></span> <a href="${AUTHOR_URL}" target="_blank" rel="noopener noreferrer" title="Opens in a new tab" aria-label="Matt Hobbs (opens in new tab)">Matt Hobbs</a>. All Rights Reserved. Built with <a href="${CLOUDFLARE_URL}" target="_blank" rel="noopener noreferrer" title="Opens in a new tab" aria-label="Cloudflare (opens in new tab)">Cloudflare</a>, ❤️, and <a href="${CURSOR_REFERRAL_URL}" target="_blank" rel="noopener noreferrer" title="${CURSOR_REFERRAL_TITLE}" aria-label="${CURSOR_REFERRAL_TITLE}">🤖</a>.`;
 }
 
 function footerMetaHtml(buildInfo: SiteBuildInfo): string {

@@ -31,6 +31,9 @@ describe("siteFooter", () => {
     expect(html).toContain(">Cloudflare</a>");
     expect(html).toContain('href="https://www.cloudflare.com"');
     expect(html).toContain('href="https://cursor.com/referral?code=XDKDHWAJX4RJ"');
+    expect(html).toContain(
+      "title=\"Matt Hobbs's Cursor referral link — get 50% off your first month of Pro, Pro+, or Ultra. Opens in a new tab.\"",
+    );
     expect(html).toContain("/site-footer-year.mjs");
   });
 
