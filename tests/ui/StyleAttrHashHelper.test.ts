@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+import * as hashModule from "../../src/csp/hash";
 import { createStyleAttrHashHelper } from "../../src/ui/StyleAttrHashHelper";
 
 describe("createStyleAttrHashHelper", () => {
@@ -36,7 +37,11 @@ describe("createStyleAttrHashHelper", () => {
     (helper.querySelector(".btn.btn-primary") as HTMLButtonElement).click();
     await vi.waitFor(() => expect(writeText).toHaveBeenCalled());
 
-    (helper.querySelector(".nonce-result-actions .btn.btn-secondary") as HTMLButtonElement).click();
+    (
+      helper.querySelector(
+        ".nonce-result-actions .btn.btn-secondary",
+      ) as HTMLButtonElement
+    ).click();
     await vi.waitFor(() => expect(writeText).toHaveBeenCalledTimes(2));
   });
 
@@ -55,14 +60,39 @@ describe("createStyleAttrHashHelper", () => {
     });
     (helper.querySelector(".btn.btn-primary") as HTMLButtonElement).click();
     await vi.waitFor(() =>
-      expect(helper.querySelector(".nonce-helper-status")?.textContent).toContain(
-        "Copy failed",
-      ),
+      expect(
+        helper.querySelector(".nonce-helper-status")?.textContent,
+      ).toContain("Copy failed"),
     );
 
-    (helper.querySelector(".nonce-result-actions .btn.btn-secondary") as HTMLButtonElement).click();
+    (
+      helper.querySelector(
+        ".nonce-result-actions .btn.btn-secondary",
+      ) as HTMLButtonElement
+    ).click();
     expect(helper.querySelector(".nonce-helper-status")?.textContent).toContain(
       "Generate a hash first.",
+    );
+  });
+
+  it("shows an error when hash generation fails", async () => {
+    vi.spyOn(hashModule, "sha256Base64FromText").mockRejectedValue(
+      "hash failed",
+    );
+    const helper = createStyleAttrHashHelper({
+      idPrefix: "style-attr-error",
+      helpId: "style-attr-error-help",
+      addValue: vi.fn(),
+      getValues: () => [],
+      onChange: vi.fn(),
+    });
+    document.body.appendChild(helper);
+    (helper.querySelector("input") as HTMLInputElement).value = "color:red";
+    (helper.querySelector(".nonce-generate-btn") as HTMLButtonElement).click();
+    await vi.waitFor(() =>
+      expect(helper.querySelector(".nonce-helper-status")?.textContent).toBe(
+        "Could not generate a hash.",
+      ),
     );
   });
 });

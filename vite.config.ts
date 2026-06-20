@@ -1,9 +1,9 @@
 import { execSync } from "node:child_process";
 import { defineConfig } from "vite";
 import { cspLookupPlugin } from "./server/cspLookupPlugin";
-import { renderIndexAppHtml } from "./src/ssg/renderIndexApp";
 import { SITE_VERSION } from "./src/siteBuildInfo";
 import { renderSiteMetaHtml, siteMetaPageFromFilename } from "./src/siteMeta";
+import { renderIndexAppHtml } from "./src/ssg/renderIndexApp";
 import { renderSiteFooterHtml } from "./src/ui/siteFooter";
 
 function resolveGitCommitShort(): string {

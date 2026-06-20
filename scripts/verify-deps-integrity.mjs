@@ -1,13 +1,14 @@
 #!/usr/bin/env node
+
 /**
  * Verifies dependency pinning and SHA integrity in yarn.lock.
  * Run once after all dependency updates are complete: yarn verify:deps
  */
 
-import { readFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
-import { fileURLToPath } from "node:url";
+import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const packageJsonPath = join(root, "package.json");

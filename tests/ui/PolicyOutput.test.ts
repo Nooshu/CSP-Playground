@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { createPolicyOutput } from "../../src/ui/PolicyOutput";
 import type { PolicyState } from "../../src/csp/buildPolicy";
+import { createPolicyOutput } from "../../src/ui/PolicyOutput";
 
 const { showToast } = vi.hoisted(() => ({
   showToast: vi.fn(),
@@ -52,9 +52,9 @@ describe("createPolicyOutput", () => {
     expect(
       panel.querySelector(".server-export-warning a")?.getAttribute("href"),
     ).toBe("https://github.com/Nooshu/CSP-Playground/issues");
-    expect(
-      panel.querySelector(".server-export-warning a")?.textContent,
-    ).toBe("log an issue");
+    expect(panel.querySelector(".server-export-warning a")?.textContent).toBe(
+      "log an issue",
+    );
 
     const reportOnlyRadio = panel.querySelector(
       'input[value="report-only"]',
@@ -70,9 +70,9 @@ describe("createPolicyOutput", () => {
     serverSelect.value = "nginx";
     serverSelect.dispatchEvent(new Event("change", { bubbles: true }));
     await vi.waitFor(() =>
-      expect(panel.querySelector("#server-export-preview")?.textContent).toContain(
-        "add_header",
-      ),
+      expect(
+        panel.querySelector("#server-export-preview")?.textContent,
+      ).toContain("add_header"),
     );
   });
 
@@ -98,12 +98,18 @@ describe("createPolicyOutput", () => {
     await vi.waitFor(() => expect(writeText).toHaveBeenCalled());
 
     writeText.mockClear();
-    (panel.querySelector(".output-actions .btn.btn-primary") as HTMLButtonElement).click();
+    (
+      panel.querySelector(
+        ".output-actions .btn.btn-primary",
+      ) as HTMLButtonElement
+    ).click();
     await vi.waitFor(() => expect(writeText).toHaveBeenCalled());
 
     writeText.mockClear();
     (
-      panel.querySelectorAll(".output-actions .btn.btn-secondary")[1] as HTMLButtonElement
+      panel.querySelectorAll(
+        ".output-actions .btn.btn-secondary",
+      )[1] as HTMLButtonElement
     ).click();
     await vi.waitFor(() => expect(writeText).toHaveBeenCalled());
     expect(showToast).toHaveBeenCalledWith(
@@ -118,7 +124,9 @@ describe("createPolicyOutput", () => {
     panel.update();
 
     (
-      panel.querySelectorAll(".output-actions .btn.btn-secondary")[1] as HTMLButtonElement
+      panel.querySelectorAll(
+        ".output-actions .btn.btn-secondary",
+      )[1] as HTMLButtonElement
     ).click();
 
     await vi.waitFor(() =>
@@ -177,17 +185,17 @@ describe("createPolicyOutput", () => {
 
     (panel.querySelector(".btn.btn-secondary") as HTMLButtonElement).click();
     await vi.waitFor(() =>
-      expect(panel.querySelector("[aria-live='polite']")?.textContent).toContain(
-        "Copy failed",
-      ),
+      expect(
+        panel.querySelector("[aria-live='polite']")?.textContent,
+      ).toContain("Copy failed"),
     );
 
     const emptyPanel = createPolicyOutput({ getState: () => ({}) });
     document.body.appendChild(emptyPanel);
     emptyPanel.update();
-    expect(
-      emptyPanel.querySelector(".policy-preview")?.textContent,
-    ).toContain("(no directives configured)");
+    expect(emptyPanel.querySelector(".policy-preview")?.textContent).toContain(
+      "(no directives configured)",
+    );
 
     (
       emptyPanel.querySelectorAll(".btn.btn-secondary")[0] as HTMLButtonElement
@@ -197,5 +205,48 @@ describe("createPolicyOutput", () => {
         emptyPanel.querySelector("[aria-live='polite']")?.textContent,
       ).toContain("Nothing to copy"),
     );
+  });
+
+  it("switches back to enforce mode via the header mode radio", () => {
+    const panel = createPolicyOutput({
+      getState: () => ({
+        "default-src": { enabled: true, values: ["'self'"] },
+      }),
+    });
+    document.body.appendChild(panel);
+    panel.setReportOnly(true);
+    const enforceRadio = panel.querySelector(
+      'input[value="enforce"]',
+    ) as HTMLInputElement;
+    enforceRadio.dispatchEvent(new Event("change", { bubbles: true }));
+    expect(panel.getReportOnly()).toBe(false);
+  });
+
+  it("handles server export copy when the selected server id is invalid", async () => {
+    Object.assign(navigator, {
+      clipboard: { writeText: vi.fn().mockRejectedValue(new Error("denied")) },
+    });
+
+    const panel = createPolicyOutput({
+      getState: () => ({
+        "default-src": { enabled: true, values: ["'self'"] },
+      }),
+    });
+    document.body.appendChild(panel);
+    panel.update();
+
+    const serverSelect = panel.querySelector(
+      "#server-export-select",
+    ) as HTMLSelectElement;
+    await vi.waitFor(() =>
+      expect(serverSelect.options.length).toBeGreaterThan(1),
+    );
+
+    serverSelect.value = "invalid-server";
+    (
+      panel.querySelectorAll(
+        ".output-actions .btn.btn-secondary",
+      )[1] as HTMLButtonElement
+    ).click();
   });
 });

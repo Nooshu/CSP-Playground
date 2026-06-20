@@ -135,7 +135,7 @@ export const DIRECTIVES: DirectiveDefinition[] = [
     category: "fetch",
     type: "source-list",
     description:
-      "Valid sources for <style> elements and <link rel=\"stylesheet\">.",
+      'Valid sources for <style> elements and <link rel="stylesheet">.',
   },
   {
     name: "style-src-attr",
@@ -178,7 +178,8 @@ export const DIRECTIVES: DirectiveDefinition[] = [
     name: "frame-src",
     category: "fetch",
     type: "source-list",
-    description: "Valid sources for nested browsing contexts in <frame> and <iframe>.",
+    description:
+      "Valid sources for nested browsing contexts in <frame> and <iframe>.",
   },
   {
     name: "child-src",
@@ -217,7 +218,8 @@ export const DIRECTIVES: DirectiveDefinition[] = [
     name: "base-uri",
     category: "document",
     type: "source-list",
-    description: "Restricts URLs that can be used in a document's <base> element.",
+    description:
+      "Restricts URLs that can be used in a document's <base> element.",
   },
   {
     name: "sandbox",

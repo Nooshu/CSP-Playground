@@ -10,10 +10,13 @@
  * @see {@link scrollToRecommendationTarget}
  */
 
-import { scrollToRecommendationTarget, scrollToGeneratedPolicy } from "./scrollToTarget";
-import { scorePolicy } from "../csp/scorePolicy";
 import type { PolicyState } from "../csp/buildPolicy";
+import { scorePolicy } from "../csp/scorePolicy";
 import type { PolicyUpdateSnapshot } from "./policyUpdate";
+import {
+  scrollToGeneratedPolicy,
+  scrollToRecommendationTarget,
+} from "./scrollToTarget";
 
 /** Options for the floating security score panel. */
 export interface SecurityScorePanelOptions {
@@ -142,7 +145,9 @@ export function createSecurityScorePanel(
     backToTopBtn.tabIndex = visible ? 0 : -1;
   }
 
-  window.addEventListener("scroll", updateBackToTopVisibility, { passive: true });
+  window.addEventListener("scroll", updateBackToTopVisibility, {
+    passive: true,
+  });
   updateBackToTopVisibility();
 
   nav.append(viewPolicyBtn, backToTopWrap);

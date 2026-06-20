@@ -48,7 +48,10 @@ function getToastContainer(): HTMLElement {
  * @remarks
  * Replaces any toast currently visible. Multiple rapid calls reset the timer.
  */
-export function showToast(message: string, variant: ToastVariant = "success"): void {
+export function showToast(
+  message: string,
+  variant: ToastVariant = "success",
+): void {
   const container = getToastContainer();
 
   clearTimers();

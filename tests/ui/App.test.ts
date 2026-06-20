@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { SITE_NAME } from "../../src/siteMeta";
-import { createApp, mountSecurityScorePanel } from "../../src/ui/App";
 import { renderIndexAppHtml } from "../../src/ssg/renderIndexApp";
+import { createApp, mountSecurityScorePanel } from "../../src/ui/App";
 
 describe("createApp", () => {
   it("renders the full builder UI", () => {
@@ -13,7 +13,9 @@ describe("createApp", () => {
     createApp(root);
 
     expect(root.querySelector(".app-header h1")?.textContent).toBe(SITE_NAME);
-    expect(root.querySelectorAll(".directive-section").length).toBeGreaterThan(0);
+    expect(root.querySelectorAll(".directive-section").length).toBeGreaterThan(
+      0,
+    );
     expect(document.body.querySelector(".security-score-panel")).not.toBeNull();
     expect(root.querySelector(".policy-output")).not.toBeNull();
     expect(root.querySelector("#generated-policy")).not.toBeNull();
@@ -120,5 +122,21 @@ describe("createApp", () => {
         new Event("submit", { bubbles: true, cancelable: true }),
       ),
     ).toBe(false);
+  });
+
+  it("collects state when a section lacks data-directive but has a directive name label", () => {
+    const root = document.createElement("div");
+    document.body.appendChild(root);
+    createApp(root);
+    const firstSection = root.querySelector(
+      ".directive-section",
+    ) as HTMLElement;
+    delete firstSection.dataset.directive;
+    const enableCheckbox = firstSection.querySelector(
+      ".enable-checkbox",
+    ) as HTMLInputElement;
+    enableCheckbox.checked = true;
+    enableCheckbox.dispatchEvent(new Event("change", { bubbles: true }));
+    expect(root.querySelector("#policy-preview")?.textContent).toBeTruthy();
   });
 });

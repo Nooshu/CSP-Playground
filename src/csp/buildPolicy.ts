@@ -92,10 +92,7 @@ export function buildPolicyString(state: PolicyState): string {
  * @param reportOnly - When true, uses `Content-Security-Policy-Report-Only`.
  * @returns Header line (`Name: value`) or an empty string when there is no policy.
  */
-export function buildHeaderLine(
-  policy: string,
-  reportOnly: boolean,
-): string {
+export function buildHeaderLine(policy: string, reportOnly: boolean): string {
   if (!policy) return "";
   const headerName = reportOnly
     ? "Content-Security-Policy-Report-Only"

@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+
 /**
  * Pre-compresses build output with Brotli quality 11.
  *
@@ -9,10 +10,10 @@
  * `functions/_middleware.ts`.
  */
 
-import { brotliCompressSync, constants } from "node:zlib";
 import { readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
-import { extname, join, basename } from "node:path";
+import { basename, extname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { brotliCompressSync, constants } from "node:zlib";
 
 if (typeof brotliCompressSync !== "function") {
   console.error(

@@ -13,14 +13,11 @@
  */
 
 import type { DirectiveDefinition } from "../csp/directives";
-import {
-  SANDBOX_FLAGS,
-  TRUSTED_TYPES_FOR_OPTIONS,
-} from "../csp/directives";
-import { createSourceListEditor } from "./SourceListEditor";
+import { SANDBOX_FLAGS, TRUSTED_TYPES_FOR_OPTIONS } from "../csp/directives";
 import { debounceInputChange } from "./debounceInputChange";
 import { createFlagInfoIcon } from "./FlagInfoIcon";
 import { createMdnInfoLink } from "./mdnLink";
+import { createSourceListEditor } from "./SourceListEditor";
 
 /** Configuration for constructing one directive section in the builder form. */
 export interface DirectiveSectionOptions {
@@ -106,7 +103,7 @@ export function createDirectiveSection(
   article.appendChild(controls);
 
   let sourceEditor: ReturnType<typeof createSourceListEditor> | null = null;
-  let sandboxCheckboxes: HTMLInputElement[] = [];
+  const sandboxCheckboxes: HTMLInputElement[] = [];
   let singleInput: HTMLInputElement | null = null;
   let trustedTypesInputs: HTMLInputElement[] = [];
   let trustedTypesForSelect: HTMLSelectElement | null = null;
@@ -309,9 +306,9 @@ export function createDirectiveSection(
   function setControlsEnabled(enabled: boolean): void {
     if (sourceEditor) sourceEditor.setEnabled(enabled);
     controls
-      .querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLButtonElement>(
-        "input, select, button",
-      )
+      .querySelectorAll<
+        HTMLInputElement | HTMLSelectElement | HTMLButtonElement
+      >("input, select, button")
       .forEach((el) => {
         el.disabled = !enabled;
       });
@@ -419,7 +416,9 @@ export function createDirectiveSection(
       case "require-trusted-types-for":
         return {
           enabled: true,
-          values: trustedTypesForSelect?.value ? [trustedTypesForSelect.value] : [],
+          values: trustedTypesForSelect?.value
+            ? [trustedTypesForSelect.value]
+            : [],
         };
       case "boolean":
         return { enabled: true, values: [] };

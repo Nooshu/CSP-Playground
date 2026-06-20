@@ -100,4 +100,19 @@ describe("scrollToRecommendationTarget", () => {
     vi.advanceTimersByTime(1600);
     vi.useRealTimers();
   });
+
+  it("scrolls to nested elements located via data-directive on a child", () => {
+    const child = document.createElement("span");
+    child.dataset.directive = "default-src";
+    const section = document.createElement("article");
+    section.className = "directive-section";
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.className = "enable-checkbox";
+    section.append(checkbox, child);
+    document.body.appendChild(section);
+
+    scrollToRecommendationTarget("default-src");
+    expect(Element.prototype.scrollIntoView).toHaveBeenCalled();
+  });
 });

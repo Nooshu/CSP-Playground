@@ -28,10 +28,16 @@ describe("normalizeLookupUrl", () => {
     expect(url.protocol).toBe("https:");
   });
 
+  it("allows public IPv4 hostnames", () => {
+    expect(normalizeLookupUrl("https://8.8.8.8/path").hostname).toBe("8.8.8.8");
+  });
+
   it("rejects invalid, blocked, and credential-bearing URLs", () => {
     expect(() => normalizeLookupUrl("")).toThrow(CspLookupError);
     expect(() => normalizeLookupUrl("not a url")).toThrow(/not valid/);
-    expect(() => normalizeLookupUrl("ftp://example.com")).toThrow(/HTTP and HTTPS/);
+    expect(() => normalizeLookupUrl("ftp://example.com")).toThrow(
+      /HTTP and HTTPS/,
+    );
     expect(() => normalizeLookupUrl("https://user:pass@example.com")).toThrow(
       /credentials/,
     );
@@ -110,15 +116,16 @@ describe("lookupCspForUrl", () => {
     vi.useFakeTimers();
     vi.stubGlobal(
       "fetch",
-      vi.fn((_url, init?: RequestInit) =>
-        new Promise((_resolve, reject) => {
-          init?.signal?.addEventListener("abort", () => {
-            const abort = Object.assign(new Error("aborted"), {
-              name: "AbortError",
+      vi.fn(
+        (_url, init?: RequestInit) =>
+          new Promise((_resolve, reject) => {
+            init?.signal?.addEventListener("abort", () => {
+              const abort = Object.assign(new Error("aborted"), {
+                name: "AbortError",
+              });
+              reject(abort);
             });
-            reject(abort);
-          });
-        }),
+          }),
       ),
     );
 
@@ -243,7 +250,9 @@ describe("lookupCspForUrl", () => {
       vi
         .fn()
         .mockResolvedValueOnce(mockResponse({ status: 200 }))
-        .mockResolvedValueOnce(mockResponse({ status: 200, text: "<html></html>" })),
+        .mockResolvedValueOnce(
+          mockResponse({ status: 200, text: "<html></html>" }),
+        ),
     );
     await expect(lookupCspForUrl("https://example.com")).rejects.toMatchObject({
       code: "no_csp",
@@ -264,9 +273,7 @@ describe("lookupCspForUrl", () => {
   it("handles redirect, timeout, and network errors", async () => {
     vi.stubGlobal(
       "fetch",
-      vi.fn().mockResolvedValue(
-        mockResponse({ status: 302, headers: {} }),
-      ),
+      vi.fn().mockResolvedValue(mockResponse({ status: 302, headers: {} })),
     );
     await expect(lookupCspForUrl("https://example.com")).rejects.toMatchObject({
       code: "fetch_failed",
@@ -280,7 +287,10 @@ describe("lookupCspForUrl", () => {
       message: /timed out/,
     });
 
-    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("network down")));
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockRejectedValue(new Error("network down")),
+    );
     await expect(lookupCspForUrl("https://example.com")).rejects.toMatchObject({
       code: "fetch_failed",
       message: /Could not reach/,

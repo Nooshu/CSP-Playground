@@ -8,7 +8,10 @@
  */
 
 import type { Connect, Plugin } from "vite";
-import { cspLookupJsonResponse, handleCspLookupRequest } from "./handleCspLookup";
+import {
+  cspLookupJsonResponse,
+  handleCspLookupRequest,
+} from "./handleCspLookup";
 
 /** Creates Connect middleware that handles CSP lookup POST requests. */
 function createLookupHandler(): Connect.NextHandleFunction {
@@ -25,14 +28,20 @@ function createLookupHandler(): Connect.NextHandleFunction {
       if (body.length > 4_096) {
         res.statusCode = 413;
         res.setHeader("Content-Type", "application/json");
-        res.end(JSON.stringify({ error: "invalid_url", message: "Request body is too large." }));
+        res.end(
+          JSON.stringify({
+            error: "invalid_url",
+            message: "Request body is too large.",
+          }),
+        );
         req.destroy();
       }
     });
 
     req.on("end", () => {
       void (async () => {
-        const { status, body: responseBody } = await handleCspLookupRequest(body);
+        const { status, body: responseBody } =
+          await handleCspLookupRequest(body);
         const response = cspLookupJsonResponse(status, responseBody);
         res.statusCode = response.status;
         response.headers.forEach((value, key) => {

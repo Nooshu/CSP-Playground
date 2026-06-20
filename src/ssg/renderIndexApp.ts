@@ -18,7 +18,9 @@ function escapeHtml(value: string): string {
 
 export interface RenderIndexAppOptions {
   /** Overrides directive grouping (used for tests). */
-  directivesByCategory?: Partial<Record<DirectiveCategory, DirectiveDefinition[]>>;
+  directivesByCategory?: Partial<
+    Record<DirectiveCategory, DirectiveDefinition[]>
+  >;
   /** Overrides category legend labels (used for tests). */
   categoryLabels?: Partial<Record<DirectiveCategory, string>>;
   /** Overrides render ordering (used for tests). */
@@ -33,8 +35,11 @@ export interface RenderIndexAppOptions {
  * meaningful HTML by default. Client-side code then progressively enhances the
  * existing DOM by wiring event handlers and live-updating panels.
  */
-export function renderIndexAppHtml(options: RenderIndexAppOptions = {}): string {
-  const directivesByCategory = options.directivesByCategory ?? DIRECTIVES_BY_CATEGORY;
+export function renderIndexAppHtml(
+  options: RenderIndexAppOptions = {},
+): string {
+  const directivesByCategory =
+    options.directivesByCategory ?? DIRECTIVES_BY_CATEGORY;
   const categoryLabels = options.categoryLabels ?? CATEGORY_LABELS;
   const categoryOrder = options.categoryOrder ?? CATEGORY_ORDER;
 
@@ -59,24 +64,24 @@ export function renderIndexAppHtml(options: RenderIndexAppOptions = {}): string 
   const fieldsets = categoryOrder
     .map((category) => {
       const directives = directivesByCategory[category];
-    if (!directives?.length) return "";
+      if (!directives?.length) return "";
 
       const legend = escapeHtml(categoryLabels[category] ?? category);
 
-    const list = directives
-      .map((directive) => {
-        const name = escapeHtml(directive.name);
-        const id = `directive-section-${name}`;
-        return `<article class="directive-section" id="${id}" data-directive="${name}"></article>`;
-      })
-      .join("");
+      const list = directives
+        .map((directive) => {
+          const name = escapeHtml(directive.name);
+          const id = `directive-section-${name}`;
+          return `<article class="directive-section" id="${id}" data-directive="${name}"></article>`;
+        })
+        .join("");
 
-    return [
-      `<fieldset class="category-fieldset">`,
-      `<legend>${legend}</legend>`,
-      list,
-      `</fieldset>`,
-    ].join("");
+      return [
+        `<fieldset class="category-fieldset">`,
+        `<legend>${legend}</legend>`,
+        list,
+        `</fieldset>`,
+      ].join("");
     })
     .join("");
 
@@ -98,4 +103,3 @@ export function renderIndexAppHtml(options: RenderIndexAppOptions = {}): string 
     `</div>`,
   ].join("");
 }
-

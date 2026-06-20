@@ -58,9 +58,8 @@ export function scrollToRecommendationTarget(targetId: string): void {
     : target.closest<HTMLElement>(".directive-section");
 
   if (directiveSection) {
-    const enableCheckbox = directiveSection.querySelector<HTMLInputElement>(
-      ".enable-checkbox",
-    );
+    const enableCheckbox =
+      directiveSection.querySelector<HTMLInputElement>(".enable-checkbox");
     if (enableCheckbox && !enableCheckbox.checked) {
       enableCheckbox.checked = true;
       // Synthetic change so DirectiveSection shows controls and syncs disabled state.

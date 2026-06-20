@@ -30,9 +30,9 @@ describe("nonce helpers", () => {
 
   it("builds escaped HTML snippets", () => {
     const nonce = "abc123";
-    expect(buildExternalScriptSnippet(nonce, 'https://x.com/a"&<.js')).toContain(
-      "a&quot;&amp;&lt;.js",
-    );
+    expect(
+      buildExternalScriptSnippet(nonce, 'https://x.com/a"&<.js'),
+    ).toContain("a&quot;&amp;&lt;.js");
     expect(buildInlineScriptSnippet(nonce, "  alert(1)  ")).toBe(
       `<script nonce="${nonce}">\nalert(1)\n</script>`,
     );

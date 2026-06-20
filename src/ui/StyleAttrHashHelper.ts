@@ -13,8 +13,8 @@
 import {
   buildInlineStyleAttributeSnippet,
   formatSha256HashForCsp,
-  sha256Base64FromText,
   STYLE_ATTR_UNSAFE_HASHES,
+  sha256Base64FromText,
 } from "../csp/hash";
 
 /** Options for the style-attribute hash helper in a source list editor. */
@@ -55,7 +55,7 @@ export function createStyleAttrHashHelper(
   const intro = document.createElement("p");
   intro.className = "nonce-helper-intro";
   intro.textContent =
-    "Inline style=\"\" attributes cannot use nonces. Paste the exact attribute value, generate a SHA-256 hash, and add it to style-src-attr.";
+    'Inline style="" attributes cannot use nonces. Paste the exact attribute value, generate a SHA-256 hash, and add it to style-src-attr.';
 
   const fieldLabel = document.createElement("label");
   fieldLabel.htmlFor = `${idPrefix}-style-attr-value`;
@@ -66,7 +66,10 @@ export function createStyleAttrHashHelper(
   input.id = `${idPrefix}-style-attr-value`;
   input.className = "source-input";
   input.placeholder = "display:none";
-  input.setAttribute("aria-describedby", `${helpId} ${idPrefix}-style-attr-hint`);
+  input.setAttribute(
+    "aria-describedby",
+    `${helpId} ${idPrefix}-style-attr-hint`,
+  );
 
   const hint = document.createElement("p");
   hint.id = `${idPrefix}-style-attr-hint`;
@@ -187,7 +190,10 @@ export function createStyleAttrHashHelper(
   });
 
   copySnippetBtn.addEventListener("click", () => {
-    void copyText(snippet.textContent ?? "", "HTML example copied to clipboard.");
+    void copyText(
+      snippet.textContent ?? "",
+      "HTML example copied to clipboard.",
+    );
   });
 
   copyHashBtn.addEventListener("click", () => {

@@ -36,7 +36,11 @@ export const KEYWORD_OPTIONS: KeywordOption[] = [
     quoted: true,
   },
   { value: "'report-sample'", label: "'report-sample'", quoted: true },
-  { value: "'trusted-types-eval'", label: "'trusted-types-eval'", quoted: true },
+  {
+    value: "'trusted-types-eval'",
+    label: "'trusted-types-eval'",
+    quoted: true,
+  },
   { value: "https:", label: "https:", quoted: false },
   { value: "http:", label: "http:", quoted: false },
   { value: "data:", label: "data:", quoted: false },

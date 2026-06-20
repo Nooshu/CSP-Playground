@@ -33,9 +33,7 @@ export interface CspLookupFailure {
  * @returns Parsed lookup result on success.
  * @throws {@link CspLookupFailure} When the server returns an error response.
  */
-export async function lookupCspFromUrl(
-  url: string,
-): Promise<CspLookupSuccess> {
+export async function lookupCspFromUrl(url: string): Promise<CspLookupSuccess> {
   const response = await fetch("/api/csp-lookup", {
     method: "POST",
     headers: {
@@ -45,7 +43,9 @@ export async function lookupCspFromUrl(
     body: JSON.stringify({ url }),
   });
 
-  const payload = (await response.json()) as CspLookupSuccess | CspLookupFailure;
+  const payload = (await response.json()) as
+    | CspLookupSuccess
+    | CspLookupFailure;
 
   if (!response.ok) {
     const failure = payload as CspLookupFailure;

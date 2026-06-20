@@ -61,10 +61,7 @@ function directiveTarget(name: string): string {
 }
 
 /** Returns enabled directive values, or `null` when the directive is off. */
-function getDirectiveValues(
-  state: PolicyState,
-  name: string,
-): string[] | null {
+function getDirectiveValues(state: PolicyState, name: string): string[] | null {
   const directive = state[name];
   if (!directive?.enabled) return null;
   if (name === "upgrade-insecure-requests") return [];
@@ -235,7 +232,8 @@ function buildRecommendations(
     if (hasWildcardSource(scriptValues)) {
       recommendations.push({
         id: "tighten-script-sources",
-        label: "Replace wildcards or broad schemes in script sources with specific hosts",
+        label:
+          "Replace wildcards or broad schemes in script sources with specific hosts",
         pointsGain: 12,
         targetId: directiveTarget(scriptDirective),
       });
@@ -444,7 +442,10 @@ export function scorePolicy(
       rawScore -= 12;
     }
   } else {
-    factors.push({ label: "No script-src or default-src coverage", points: -10 });
+    factors.push({
+      label: "No script-src or default-src coverage",
+      points: -10,
+    });
     rawScore -= 10;
   }
 
@@ -469,7 +470,10 @@ export function scorePolicy(
     }
 
     if (hasWildcardSource(defaultValues)) {
-      factors.push({ label: "Wildcard or broad scheme in default-src", points: -10 });
+      factors.push({
+        label: "Wildcard or broad scheme in default-src",
+        points: -10,
+      });
       rawScore -= 10;
     }
   }
@@ -479,7 +483,10 @@ export function scorePolicy(
     factors.push({ label: "frame-ancestors limits embedding", points: 8 });
     rawScore += 8;
     if (hasWildcardSource(frameAncestors)) {
-      factors.push({ label: "frame-ancestors is overly permissive", points: -6 });
+      factors.push({
+        label: "frame-ancestors is overly permissive",
+        points: -6,
+      });
       rawScore -= 6;
     }
   } else {

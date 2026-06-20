@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import * as lookupApi from "../../src/api/lookupCsp";
 import { DIRECTIVES } from "../../src/csp/directives";
+import * as extractCspModule from "../../src/csp/extractCspFromText";
+import { ExtractCspError } from "../../src/csp/extractCspFromText";
 import { createDirectiveSection } from "../../src/ui/DirectiveSection";
 import { createPolicyOutput } from "../../src/ui/PolicyOutput";
 import { createUrlImporter } from "../../src/ui/UrlImporter";
-import * as lookupApi from "../../src/api/lookupCsp";
-import * as extractCspModule from "../../src/csp/extractCspFromText";
-import { ExtractCspError } from "../../src/csp/extractCspFromText";
 
 const { showToast } = vi.hoisted(() => ({
   showToast: vi.fn(),
@@ -38,14 +38,14 @@ describe("createUrlImporter", () => {
 
     const input = importer.querySelector("#site-url") as HTMLInputElement;
     input.value = "https://example.com";
-    importer.querySelector("form")?.dispatchEvent(
-      new Event("submit", { bubbles: true, cancelable: true }),
-    );
+    importer
+      .querySelector("form")
+      ?.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
 
     await vi.waitFor(() =>
-      expect(importer.querySelector("#url-importer-status")?.textContent).toContain(
-        "Imported",
-      ),
+      expect(
+        importer.querySelector("#url-importer-status")?.textContent,
+      ).toContain("Imported"),
     );
     expect(onApplied).toHaveBeenCalled();
   });
@@ -60,24 +60,28 @@ describe("createUrlImporter", () => {
     const importer = createUrlImporter({ sections, outputPanel, onApplied });
     document.body.appendChild(importer);
 
-    importer.querySelector<HTMLInputElement>(
-      'input[name="import-mode"][value="paste"]',
-    )?.click();
+    importer
+      .querySelector<HTMLInputElement>(
+        'input[name="import-mode"][value="paste"]',
+      )
+      ?.click();
 
-    const textarea = importer.querySelector("#csp-paste") as HTMLTextAreaElement;
+    const textarea = importer.querySelector(
+      "#csp-paste",
+    ) as HTMLTextAreaElement;
     textarea.value = [
       "HTTP/1.1 200 OK",
       "Content-Security-Policy: default-src 'self'",
     ].join("\n");
 
-    importer.querySelector("form")?.dispatchEvent(
-      new Event("submit", { bubbles: true, cancelable: true }),
-    );
+    importer
+      .querySelector("form")
+      ?.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
 
     await vi.waitFor(() =>
-      expect(importer.querySelector("#url-importer-status")?.textContent).toContain(
-        "Imported",
-      ),
+      expect(
+        importer.querySelector("#url-importer-status")?.textContent,
+      ).toContain("Imported"),
     );
     expect(onApplied).toHaveBeenCalled();
     expect(sections[0]?.getState()).toEqual({
@@ -96,11 +100,15 @@ describe("createUrlImporter", () => {
     const importer = createUrlImporter({ sections, outputPanel, onApplied });
     document.body.appendChild(importer);
 
-    importer.querySelector<HTMLInputElement>(
-      'input[name="import-mode"][value="paste"]',
-    )?.click();
+    importer
+      .querySelector<HTMLInputElement>(
+        'input[name="import-mode"][value="paste"]',
+      )
+      ?.click();
 
-    const textarea = importer.querySelector("#csp-paste") as HTMLTextAreaElement;
+    const textarea = importer.querySelector(
+      "#csp-paste",
+    ) as HTMLTextAreaElement;
     textarea.value = "default-src self; script-src 'self' 'self'";
 
     importer
@@ -108,14 +116,15 @@ describe("createUrlImporter", () => {
       ?.dispatchEvent(new Event("click", { bubbles: true }));
 
     await vi.waitFor(() =>
-      expect(
-        importer.querySelector("#url-importer-validation")?.hidden,
-      ).toBe(false),
+      expect(importer.querySelector("#url-importer-validation")?.hidden).toBe(
+        false,
+      ),
     );
 
     expect(onApplied).toHaveBeenCalled();
     expect(
-      importer.querySelector(".url-importer-validation-issues")?.children.length,
+      importer.querySelector(".url-importer-validation-issues")?.children
+        .length,
     ).toBeGreaterThan(0);
   });
 
@@ -131,26 +140,28 @@ describe("createUrlImporter", () => {
     });
     document.body.appendChild(importer);
 
-    importer.querySelector("form")?.dispatchEvent(
-      new Event("submit", { bubbles: true, cancelable: true }),
-    );
+    importer
+      .querySelector("form")
+      ?.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
     expect(importer.querySelector("#url-importer-status")?.dataset.tone).toBe(
       "error",
     );
 
-    importer.querySelector<HTMLInputElement>(
-      'input[name="import-mode"][value="paste"]',
-    )?.click();
-    importer.querySelector("form")?.dispatchEvent(
-      new Event("submit", { bubbles: true, cancelable: true }),
-    );
+    importer
+      .querySelector<HTMLInputElement>(
+        'input[name="import-mode"][value="paste"]',
+      )
+      ?.click();
+    importer
+      .querySelector("form")
+      ?.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
     expect(importer.querySelector("#url-importer-status")?.dataset.tone).toBe(
       "error",
     );
 
-    importer.querySelector<HTMLInputElement>(
-      'input[name="import-mode"][value="url"]',
-    )?.click();
+    importer
+      .querySelector<HTMLInputElement>('input[name="import-mode"][value="url"]')
+      ?.click();
 
     vi.spyOn(lookupApi, "lookupCspFromUrl").mockRejectedValue({
       error: "no_csp",
@@ -158,9 +169,9 @@ describe("createUrlImporter", () => {
     });
     const input = importer.querySelector("#site-url") as HTMLInputElement;
     input.value = "https://example.com";
-    importer.querySelector("form")?.dispatchEvent(
-      new Event("submit", { bubbles: true, cancelable: true }),
-    );
+    importer
+      .querySelector("form")
+      ?.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
     await vi.waitFor(() =>
       expect(importer.querySelector(".url-importer-learn-link")).not.toBeNull(),
     );
@@ -169,9 +180,9 @@ describe("createUrlImporter", () => {
       error: "fetch_failed",
       message: "Network error.",
     });
-    importer.querySelector("form")?.dispatchEvent(
-      new Event("submit", { bubbles: true, cancelable: true }),
-    );
+    importer
+      .querySelector("form")
+      ?.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
     await vi.waitFor(() =>
       expect(importer.querySelector("#url-importer-status")?.dataset.tone).toBe(
         "error",
@@ -225,14 +236,15 @@ describe("createUrlImporter", () => {
       ?.dispatchEvent(new Event("click", { bubbles: true }));
 
     await vi.waitFor(() =>
-      expect(
-        importer.querySelector("#url-importer-validation")?.hidden,
-      ).toBe(false),
+      expect(importer.querySelector("#url-importer-validation")?.hidden).toBe(
+        false,
+      ),
     );
 
     expect(onApplied).toHaveBeenCalled();
     expect(
-      importer.querySelector(".url-importer-validation-issues")?.children.length,
+      importer.querySelector(".url-importer-validation-issues")?.children
+        .length,
     ).toBeGreaterThan(0);
     expect(
       importer.querySelector(".url-importer-corrected")?.textContent,
@@ -336,7 +348,9 @@ describe("createUrlImporter", () => {
     );
 
     (
-      importer.querySelector(".url-importer-copy-corrected") as HTMLButtonElement
+      importer.querySelector(
+        ".url-importer-copy-corrected",
+      ) as HTMLButtonElement
     ).click();
 
     await vi.waitFor(() => expect(writeText).toHaveBeenCalled());
@@ -358,15 +372,19 @@ describe("createUrlImporter", () => {
     });
     document.body.appendChild(importer);
 
-    importer.querySelector<HTMLInputElement>(
-      'input[name="import-mode"][value="paste"]',
-    )?.click();
+    importer
+      .querySelector<HTMLInputElement>(
+        'input[name="import-mode"][value="paste"]',
+      )
+      ?.click();
 
-    const textarea = importer.querySelector("#csp-paste") as HTMLTextAreaElement;
+    const textarea = importer.querySelector(
+      "#csp-paste",
+    ) as HTMLTextAreaElement;
     textarea.value = "Content-Type: text/html";
-    importer.querySelector("form")?.dispatchEvent(
-      new Event("submit", { bubbles: true, cancelable: true }),
-    );
+    importer
+      .querySelector("form")
+      ?.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
     await vi.waitFor(() =>
       expect(importer.querySelector(".url-importer-learn-link")).not.toBeNull(),
     );
@@ -377,9 +395,9 @@ describe("createUrlImporter", () => {
       .querySelector(".url-importer-validate")
       ?.dispatchEvent(new Event("click", { bubbles: true }));
     await vi.waitFor(() =>
-      expect(
-        importer.querySelector("#url-importer-validation")?.hidden,
-      ).toBe(false),
+      expect(importer.querySelector("#url-importer-validation")?.hidden).toBe(
+        false,
+      ),
     );
 
     textarea.value = "default-src 'self'; block-all-mixed-content";
@@ -393,13 +411,13 @@ describe("createUrlImporter", () => {
     );
 
     textarea.value = "default-src 'self'";
-    importer.querySelector("form")?.dispatchEvent(
-      new Event("submit", { bubbles: true, cancelable: true }),
-    );
+    importer
+      .querySelector("form")
+      ?.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
     await vi.waitFor(() =>
-      expect(importer.querySelector("#url-importer-status")?.textContent).toContain(
-        "pasted policy",
-      ),
+      expect(
+        importer.querySelector("#url-importer-status")?.textContent,
+      ).toContain("pasted policy"),
     );
 
     vi.spyOn(lookupApi, "lookupCspFromUrl").mockResolvedValue({
@@ -408,18 +426,18 @@ describe("createUrlImporter", () => {
       reportOnly: true,
       source: "header-report-only",
     });
-    importer.querySelector<HTMLInputElement>(
-      'input[name="import-mode"][value="url"]',
-    )?.click();
+    importer
+      .querySelector<HTMLInputElement>('input[name="import-mode"][value="url"]')
+      ?.click();
     const urlInput = importer.querySelector("#site-url") as HTMLInputElement;
     urlInput.value = "https://example.com";
-    importer.querySelector("form")?.dispatchEvent(
-      new Event("submit", { bubbles: true, cancelable: true }),
-    );
+    importer
+      .querySelector("form")
+      ?.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
     await vi.waitFor(() =>
-      expect(importer.querySelector("#url-importer-status")?.textContent).toContain(
-        "HTTP response header",
-      ),
+      expect(
+        importer.querySelector("#url-importer-status")?.textContent,
+      ).toContain("HTTP response header"),
     );
   });
 
@@ -438,10 +456,14 @@ describe("createUrlImporter", () => {
     });
     document.body.appendChild(importer);
 
-    importer.querySelector<HTMLInputElement>(
-      'input[name="import-mode"][value="paste"]',
-    )?.click();
-    const textarea = importer.querySelector("#csp-paste") as HTMLTextAreaElement;
+    importer
+      .querySelector<HTMLInputElement>(
+        'input[name="import-mode"][value="paste"]',
+      )
+      ?.click();
+    const textarea = importer.querySelector(
+      "#csp-paste",
+    ) as HTMLTextAreaElement;
     textarea.value = "default-src self; script-src 'self' 'self'";
     importer
       .querySelector(".url-importer-validate")
@@ -454,7 +476,9 @@ describe("createUrlImporter", () => {
     );
 
     (
-      importer.querySelector(".url-importer-copy-corrected") as HTMLButtonElement
+      importer.querySelector(
+        ".url-importer-copy-corrected",
+      ) as HTMLButtonElement
     ).click();
     await vi.waitFor(() =>
       expect(showToast).toHaveBeenCalledWith("Copy failed", "error"),
@@ -464,7 +488,9 @@ describe("createUrlImporter", () => {
       importer.querySelector(".url-importer-corrected") as HTMLElement
     ).textContent = "";
     (
-      importer.querySelector(".url-importer-copy-corrected") as HTMLButtonElement
+      importer.querySelector(
+        ".url-importer-copy-corrected",
+      ) as HTMLButtonElement
     ).click();
     expect(showToast).toHaveBeenCalledWith("Nothing to copy", "error");
   });
@@ -481,15 +507,19 @@ describe("createUrlImporter", () => {
     });
     document.body.appendChild(importer);
 
-    importer.querySelector<HTMLInputElement>(
-      'input[name="import-mode"][value="paste"]',
-    )?.click();
-    const textarea = importer.querySelector("#csp-paste") as HTMLTextAreaElement;
+    importer
+      .querySelector<HTMLInputElement>(
+        'input[name="import-mode"][value="paste"]',
+      )
+      ?.click();
+    const textarea = importer.querySelector(
+      "#csp-paste",
+    ) as HTMLTextAreaElement;
 
     textarea.value = "";
-    importer.querySelector("form")?.dispatchEvent(
-      new Event("submit", { bubbles: true, cancelable: true }),
-    );
+    importer
+      .querySelector("form")
+      ?.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
     await vi.waitFor(() =>
       expect(importer.querySelector("#url-importer-status")?.dataset.tone).toBe(
         "error",
@@ -510,18 +540,18 @@ describe("createUrlImporter", () => {
       reportOnly: false,
       source: "custom-source" as "header-enforce",
     });
-    importer.querySelector<HTMLInputElement>(
-      'input[name="import-mode"][value="url"]',
-    )?.click();
+    importer
+      .querySelector<HTMLInputElement>('input[name="import-mode"][value="url"]')
+      ?.click();
     (importer.querySelector("#site-url") as HTMLInputElement).value =
       "https://example.com";
-    importer.querySelector("form")?.dispatchEvent(
-      new Event("submit", { bubbles: true, cancelable: true }),
-    );
+    importer
+      .querySelector("form")
+      ?.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
     await vi.waitFor(() =>
-      expect(importer.querySelector("#url-importer-status")?.textContent).toContain(
-        "custom-source",
-      ),
+      expect(
+        importer.querySelector("#url-importer-status")?.textContent,
+      ).toContain("custom-source"),
     );
   });
 
@@ -537,20 +567,23 @@ describe("createUrlImporter", () => {
     });
     document.body.appendChild(importer);
 
-    importer.querySelector<HTMLInputElement>(
-      'input[name="import-mode"][value="paste"]',
-    )?.click();
-    const textarea = importer.querySelector("#csp-paste") as HTMLTextAreaElement;
+    importer
+      .querySelector<HTMLInputElement>(
+        'input[name="import-mode"][value="paste"]',
+      )
+      ?.click();
+    const textarea = importer.querySelector(
+      "#csp-paste",
+    ) as HTMLTextAreaElement;
 
-    textarea.value =
-      "Content-Security-Policy-Report-Only: default-src 'none'";
-    importer.querySelector("form")?.dispatchEvent(
-      new Event("submit", { bubbles: true, cancelable: true }),
-    );
+    textarea.value = "Content-Security-Policy-Report-Only: default-src 'none'";
+    importer
+      .querySelector("form")
+      ?.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
     await vi.waitFor(() =>
-      expect(importer.querySelector("#url-importer-status")?.textContent).toContain(
-        "pasted report-only headers",
-      ),
+      expect(
+        importer.querySelector("#url-importer-status")?.textContent,
+      ).toContain("pasted report-only headers"),
     );
 
     vi.spyOn(lookupApi, "lookupCspFromUrl").mockResolvedValue({
@@ -559,30 +592,32 @@ describe("createUrlImporter", () => {
       reportOnly: false,
       source: "raw" as "header-enforce",
     });
-    importer.querySelector<HTMLInputElement>(
-      'input[name="import-mode"][value="url"]',
-    )?.click();
+    importer
+      .querySelector<HTMLInputElement>('input[name="import-mode"][value="url"]')
+      ?.click();
     (importer.querySelector("#site-url") as HTMLInputElement).value =
       "https://example.com";
-    importer.querySelector("form")?.dispatchEvent(
-      new Event("submit", { bubbles: true, cancelable: true }),
-    );
+    importer
+      .querySelector("form")
+      ?.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
     await vi.waitFor(() =>
-      expect(importer.querySelector("#url-importer-status")?.textContent).toContain(
-        "pasted policy",
-      ),
+      expect(
+        importer.querySelector("#url-importer-status")?.textContent,
+      ).toContain("pasted policy"),
     );
 
-    importer.querySelector<HTMLInputElement>(
-      'input[name="import-mode"][value="paste"]',
-    )?.click();
+    importer
+      .querySelector<HTMLInputElement>(
+        'input[name="import-mode"][value="paste"]',
+      )
+      ?.click();
     textarea.value = "default-src 'self'";
     vi.spyOn(extractCspModule, "extractCspFromText").mockImplementation(() => {
       throw new ExtractCspError("empty", "Paste is empty.");
     });
-    importer.querySelector("form")?.dispatchEvent(
-      new Event("submit", { bubbles: true, cancelable: true }),
-    );
+    importer
+      .querySelector("form")
+      ?.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
     await vi.waitFor(() =>
       expect(importer.querySelector("#url-importer-status")?.textContent).toBe(
         "Paste is empty.",
@@ -599,6 +634,48 @@ describe("createUrlImporter", () => {
       expect(importer.querySelector("#url-importer-status")?.textContent).toBe(
         "Could not import a policy from the pasted text.",
       ),
+    );
+  });
+
+  it("labels meta-tag URL imports and handles unknown lookup failures", async () => {
+    const sections = DIRECTIVES.slice(0, 2).map((directive) =>
+      createDirectiveSection({ directive, onChange: vi.fn() }),
+    );
+    const outputPanel = createPolicyOutput({ getState: () => ({}) });
+    const importer = createUrlImporter({
+      sections,
+      outputPanel,
+      onApplied: vi.fn(),
+    });
+    document.body.appendChild(importer);
+
+    vi.spyOn(lookupApi, "lookupCspFromUrl").mockResolvedValue({
+      url: "https://example.com",
+      policy: "default-src 'self'",
+      reportOnly: false,
+      source: "meta-enforce",
+    });
+    const importerInput = importer.querySelector(
+      ".url-importer-input",
+    ) as HTMLInputElement;
+    importerInput.value = "https://example.com";
+    importer
+      .querySelector("form")
+      ?.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+    await vi.waitFor(() =>
+      expect(
+        importer.querySelector(".url-importer-status")?.textContent,
+      ).toContain("HTML meta tag"),
+    );
+
+    vi.spyOn(lookupApi, "lookupCspFromUrl").mockRejectedValue({});
+    importer
+      .querySelector("form")
+      ?.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+    await vi.waitFor(() =>
+      expect(
+        importer.querySelector(".url-importer-status")?.textContent,
+      ).toContain("Could not import"),
     );
   });
 });

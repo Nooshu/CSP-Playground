@@ -52,7 +52,10 @@ describe("applyParsedPolicy", () => {
 
     expect(applied).toBe(1);
     expect(defaultSection.resetCalls).toBe(1);
-    expect(defaultSection.lastState).toEqual({ enabled: true, values: ["'self'"] });
+    expect(defaultSection.lastState).toEqual({
+      enabled: true,
+      values: ["'self'"],
+    });
     expect(scriptSection.lastState).toBeNull();
   });
 

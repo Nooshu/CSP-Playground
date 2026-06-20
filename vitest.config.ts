@@ -17,6 +17,7 @@ export default defineConfig({
         lines: 100,
         functions: 100,
         statements: 99,
+        // DOM UI code has defensive branches; feature tests target behavior, not 100% branches.
         branches: 93,
       },
       reporter: ["text", "html"],

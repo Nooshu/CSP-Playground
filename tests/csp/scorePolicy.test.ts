@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { scorePolicy, type PolicyState } from "../../src/csp/scorePolicy";
+import { type PolicyState, scorePolicy } from "../../src/csp/scorePolicy";
 
 function state(
   entries: Record<string, { enabled: boolean; values: string[] }>,
@@ -53,6 +53,38 @@ describe("scorePolicy", () => {
     expect(strong.summary.length).toBeGreaterThan(0);
   });
 
+  it("uses Strong and Excellent summary copy for high-scoring policies", () => {
+    const strong = scorePolicy(
+      state({
+        "default-src": { enabled: true, values: ["'self'"] },
+        "script-src": { enabled: true, values: ["'nonce-abc'"] },
+        "object-src": { enabled: true, values: ["'none'"] },
+        "base-uri": { enabled: true, values: ["'self'"] },
+      }),
+    );
+    expect(strong.score).toBeGreaterThanOrEqual(70);
+    expect(strong.score).toBeLessThan(85);
+    expect(strong.summary).toContain("Strong policy");
+
+    const excellent = scorePolicy(
+      state({
+        "default-src": { enabled: true, values: ["'self'"] },
+        "script-src": {
+          enabled: true,
+          values: ["'nonce-abc'", "'strict-dynamic'"],
+        },
+        "object-src": { enabled: true, values: ["'none'"] },
+        "frame-ancestors": { enabled: true, values: ["'self'"] },
+        "base-uri": { enabled: true, values: ["'self'"] },
+        "form-action": { enabled: true, values: ["'self'"] },
+        "upgrade-insecure-requests": { enabled: true, values: [] },
+        "require-trusted-types-for": { enabled: true, values: ["'script'"] },
+        "trusted-types": { enabled: true, values: ["default"] },
+      }),
+    );
+    expect(excellent.summary).toContain("Excellent protection");
+  });
+
   it("uses default-src as script fallback and scores wildcard frame ancestors", () => {
     const result = scorePolicy(
       state({
@@ -65,13 +97,17 @@ describe("scorePolicy", () => {
     );
 
     expect(
-      result.factors.some((factor) => factor.label.includes("overly permissive")),
+      result.factors.some((factor) =>
+        factor.label.includes("overly permissive"),
+      ),
     ).toBe(true);
     expect(
       result.recommendations.some((item) => item.id === "enforce-policy"),
     ).toBe(true);
     expect(
-      result.recommendations.some((item) => item.id === "tighten-frame-ancestors"),
+      result.recommendations.some(
+        (item) => item.id === "tighten-frame-ancestors",
+      ),
     ).toBe(true);
     expect(
       result.recommendations.some((item) => item.id === "restrict-base-uri"),
@@ -83,7 +119,12 @@ describe("scorePolicy", () => {
       state({
         "script-src": {
           enabled: true,
-          values: ["'unsafe-inline'", "'unsafe-eval'", "data:", "*.example.com"],
+          values: [
+            "'unsafe-inline'",
+            "'unsafe-eval'",
+            "data:",
+            "*.example.com",
+          ],
         },
       }),
     );
@@ -125,7 +166,9 @@ describe("scorePolicy", () => {
       }),
     );
     expect(
-      result.recommendations.some((item) => item.id === "remove-default-wildcards"),
+      result.recommendations.some(
+        (item) => item.id === "remove-default-wildcards",
+      ),
     ).toBe(true);
     expect(
       result.recommendations.some((item) => item.id === "restrict-default-src"),
@@ -151,7 +194,9 @@ describe("scorePolicy", () => {
       }),
     );
     expect(
-      noScript.recommendations.some((item) => item.id === "add-script-coverage"),
+      noScript.recommendations.some(
+        (item) => item.id === "add-script-coverage",
+      ),
     ).toBe(true);
   });
 

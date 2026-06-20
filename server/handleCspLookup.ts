@@ -43,7 +43,10 @@ export async function handleCspLookupRequest(
   } catch {
     return {
       status: 400,
-      body: { error: "invalid_url", message: "Request body must be valid JSON." },
+      body: {
+        error: "invalid_url",
+        message: "Request body must be valid JSON.",
+      },
     };
   }
 

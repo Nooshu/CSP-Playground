@@ -2,10 +2,10 @@ import { describe, expect, it } from "vitest";
 import {
   GITHUB_DEFAULT_BRANCH,
   GITHUB_REPO_URL,
-  LICENSE_FILE_PATH,
-  SITE_VERSION,
   githubCommitUrl,
   githubLicenseUrl,
+  LICENSE_FILE_PATH,
+  SITE_VERSION,
 } from "../src/siteBuildInfo";
 
 describe("siteBuildInfo", () => {

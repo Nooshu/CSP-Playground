@@ -5,7 +5,7 @@ import {
 } from "../../src/csp/serverExports";
 
 describe("serverExports", () => {
-  const policy = `default-src 'self'; script-src 'self' "unsafe\"value"`;
+  const policy = `default-src 'self'; script-src 'self' "unsafe"value"`;
 
   it("formats exports for each supported server", () => {
     for (const server of WEB_SERVER_EXPORTS) {
@@ -24,18 +24,48 @@ describe("serverExports", () => {
   it("formats html-only exports for Apache, Nginx, Caddy, Lighttpd, and IIS", () => {
     const options = { htmlOnly: true };
 
-    expect(getWebServerExport("apache")!.format("Content-Security-Policy", policy, options))
-      .toContain("<FilesMatch");
-    expect(getWebServerExport("nginx")!.format("Content-Security-Policy", policy, options))
-      .toContain("add_header Content-Security-Policy");
-    expect(getWebServerExport("nginx")!.format("Content-Security-Policy", policy, options))
-      .toContain(".html$");
-    expect(getWebServerExport("caddy")!.format("Content-Security-Policy", policy, options))
-      .toContain("@html");
-    expect(getWebServerExport("litespeed")!.format("Content-Security-Policy", policy, options))
-      .toContain("<FilesMatch");
-    expect(getWebServerExport("iis")!.format("Content-Security-Policy", policy, options))
-      .toContain("<location path=");
+    expect(
+      getWebServerExport("apache")!.format(
+        "Content-Security-Policy",
+        policy,
+        options,
+      ),
+    ).toContain("<FilesMatch");
+    expect(
+      getWebServerExport("nginx")!.format(
+        "Content-Security-Policy",
+        policy,
+        options,
+      ),
+    ).toContain("add_header Content-Security-Policy");
+    expect(
+      getWebServerExport("nginx")!.format(
+        "Content-Security-Policy",
+        policy,
+        options,
+      ),
+    ).toContain(".html$");
+    expect(
+      getWebServerExport("caddy")!.format(
+        "Content-Security-Policy",
+        policy,
+        options,
+      ),
+    ).toContain("@html");
+    expect(
+      getWebServerExport("litespeed")!.format(
+        "Content-Security-Policy",
+        policy,
+        options,
+      ),
+    ).toContain("<FilesMatch");
+    expect(
+      getWebServerExport("iis")!.format(
+        "Content-Security-Policy",
+        policy,
+        options,
+      ),
+    ).toContain("<location path=");
   });
 
   it("formats Cloudflare HTML-only export with Pages middleware", () => {
@@ -54,9 +84,11 @@ describe("serverExports", () => {
     const netlify = getWebServerExport("netlify");
     const vercel = getWebServerExport("vercel");
 
-    expect(netlify?.format("Content-Security-Policy", policy, { htmlOnly: true }))
-      .toContain("/*.html");
-    expect(vercel?.format("Content-Security-Policy", policy, { htmlOnly: true }))
-      .toContain('"/(.*)\\.html"');
+    expect(
+      netlify?.format("Content-Security-Policy", policy, { htmlOnly: true }),
+    ).toContain("/*.html");
+    expect(
+      vercel?.format("Content-Security-Policy", policy, { htmlOnly: true }),
+    ).toContain('"/(.*)\\.html"');
   });
 });

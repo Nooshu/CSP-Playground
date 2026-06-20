@@ -31,7 +31,11 @@ export interface CspLookupResult {
   url: string;
   policy: string;
   reportOnly: boolean;
-  source: "header-enforce" | "header-report-only" | "meta-enforce" | "meta-report-only";
+  source:
+    | "header-enforce"
+    | "header-report-only"
+    | "meta-enforce"
+    | "meta-report-only";
 }
 
 /** Machine-readable lookup failure codes mapped to HTTP status by the handler. */
@@ -96,11 +100,17 @@ export function normalizeLookupUrl(input: string): URL {
   }
 
   if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
-    throw new CspLookupError("invalid_url", "Only HTTP and HTTPS URLs are supported.");
+    throw new CspLookupError(
+      "invalid_url",
+      "Only HTTP and HTTPS URLs are supported.",
+    );
   }
 
   if (parsed.username || parsed.password) {
-    throw new CspLookupError("invalid_url", "URLs with credentials are not allowed.");
+    throw new CspLookupError(
+      "invalid_url",
+      "URLs with credentials are not allowed.",
+    );
   }
 
   const hostname = parsed.hostname.toLowerCase();
@@ -110,7 +120,10 @@ export function normalizeLookupUrl(input: string): URL {
     hostname.endsWith(".local") ||
     isPrivateIpv4(hostname)
   ) {
-    throw new CspLookupError("blocked_url", "That URL cannot be looked up for security reasons.");
+    throw new CspLookupError(
+      "blocked_url",
+      "That URL cannot be looked up for security reasons.",
+    );
   }
 
   return parsed;
@@ -151,7 +164,11 @@ async function fetchWithRedirects(
 ): Promise<Response> {
   let currentUrl = startUrl;
 
-  for (let redirectCount = 0; redirectCount <= MAX_REDIRECTS; redirectCount += 1) {
+  for (
+    let redirectCount = 0;
+    redirectCount <= MAX_REDIRECTS;
+    redirectCount += 1
+  ) {
     normalizeLookupUrl(currentUrl.toString());
 
     const controller = new AbortController();
@@ -163,7 +180,8 @@ async function fetchWithRedirects(
         redirect: "manual",
         signal: controller.signal,
         headers: {
-          "User-Agent": "CSP-Playground/1.0 (+https://github.com/Nooshu/CSP-Playground)",
+          "User-Agent":
+            "CSP-Playground/1.0 (+https://github.com/Nooshu/CSP-Playground)",
           Accept: method === "GET" ? "text/html,application/xhtml+xml" : "*/*",
         },
       });
@@ -171,7 +189,10 @@ async function fetchWithRedirects(
       if (response.status >= 300 && response.status < 400) {
         const location = response.headers.get("location");
         if (!location) {
-          throw new CspLookupError("fetch_failed", "The server returned an invalid redirect.");
+          throw new CspLookupError(
+            "fetch_failed",
+            "The server returned an invalid redirect.",
+          );
         }
         currentUrl = new URL(location, currentUrl);
         continue;
@@ -192,7 +213,10 @@ async function fetchWithRedirects(
     }
   }
 
-  throw new CspLookupError("fetch_failed", "Too many redirects while fetching the URL.");
+  throw new CspLookupError(
+    "fetch_failed",
+    "Too many redirects while fetching the URL.",
+  );
 }
 
 /**

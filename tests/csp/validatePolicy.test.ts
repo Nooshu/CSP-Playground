@@ -3,7 +3,9 @@ import { validatePolicyString } from "../../src/csp/validatePolicy";
 
 describe("validatePolicyString", () => {
   it("reports no issues for a well-formed policy", () => {
-    const result = validatePolicyString("default-src 'self'; script-src 'self'");
+    const result = validatePolicyString(
+      "default-src 'self'; script-src 'self'",
+    );
     expect(result.hasErrors).toBe(false);
     expect(result.issues).toHaveLength(0);
     expect(result.correctedPolicy).toBe(
@@ -16,9 +18,11 @@ describe("validatePolicyString", () => {
       "script-src 'self'; default-src 'none'; script-src https://cdn.example.com",
     );
     expect(result.hasErrors).toBe(true);
-    expect(result.issues.some((issue) => issue.message.includes("script-src appears 2 times"))).toBe(
-      true,
-    );
+    expect(
+      result.issues.some((issue) =>
+        issue.message.includes("script-src appears 2 times"),
+      ),
+    ).toBe(true);
     expect(result.correctedPolicy).toBe(
       "default-src 'none'; script-src 'self' https://cdn.example.com",
     );
@@ -38,9 +42,7 @@ describe("validatePolicyString", () => {
   });
 
   it("flags none combined with other sources and corrects", () => {
-    const result = validatePolicyString(
-      "img-src 'none' https://example.com",
-    );
+    const result = validatePolicyString("img-src 'none' https://example.com");
     expect(result.hasErrors).toBe(true);
     expect(
       result.issues.some((issue) =>
@@ -77,7 +79,9 @@ describe("validatePolicyString", () => {
     expect(result.hasErrors).toBe(true);
     expect(
       result.issues.some((issue) =>
-        issue.message.includes("upgrade-insecure-requests must not have a value list"),
+        issue.message.includes(
+          "upgrade-insecure-requests must not have a value list",
+        ),
       ),
     ).toBe(true);
     expect(result.correctedPolicy).toBe("upgrade-insecure-requests");
@@ -95,7 +99,9 @@ describe("validatePolicyString", () => {
           issue.message.includes("deprecated"),
       ),
     ).toBe(true);
-    expect(result.correctedPolicy).toContain("report-uri https://example.com/report");
+    expect(result.correctedPolicy).toContain(
+      "report-uri https://example.com/report",
+    );
   });
 
   it("warns for block-all-mixed-content not in builder", () => {

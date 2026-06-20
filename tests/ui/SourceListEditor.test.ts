@@ -26,7 +26,9 @@ describe("createSourceListEditor", () => {
     container
       .querySelector(".add-source-btn")
       ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
-    const input = container.querySelector(".custom-source-row input") as HTMLInputElement;
+    const input = container.querySelector(
+      ".custom-source-row input",
+    ) as HTMLInputElement;
     input.value = "https://cdn.example.com";
     container
       .querySelector(".confirm-source-btn")
@@ -58,9 +60,9 @@ describe("createSourceListEditor", () => {
     editor.setValues(["'none'"]);
     expect(editor.getValues()).toEqual(["'none'"]);
     editor.setEnabled(false);
-    expect((container.querySelector("select") as HTMLSelectElement).disabled).toBe(
-      true,
-    );
+    expect(
+      (container.querySelector("select") as HTMLSelectElement).disabled,
+    ).toBe(true);
     editor.setEnabled(true);
   });
 
@@ -83,7 +85,9 @@ describe("createSourceListEditor", () => {
     container
       .querySelector(".add-source-btn")
       ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
-    const input = container.querySelector(".custom-source-row input") as HTMLInputElement;
+    const input = container.querySelector(
+      ".custom-source-row input",
+    ) as HTMLInputElement;
     input.dispatchEvent(
       new KeyboardEvent("keydown", { key: "Enter", bubbles: true }),
     );
@@ -122,7 +126,9 @@ describe("createSourceListEditor", () => {
     );
 
     const styleContainer = document.createElement("div");
-    const styleDirective = DIRECTIVES.find((item) => item.name === "style-src-attr")!;
+    const styleDirective = DIRECTIVES.find(
+      (item) => item.name === "style-src-attr",
+    )!;
     createSourceListEditor(styleContainer, {
       directive: styleDirective,
       onChange,
@@ -176,6 +182,54 @@ describe("createSourceListEditor", () => {
       "input[type='url']",
     ) as HTMLInputElement;
     styleElemInput.value = "https://cdn.example.com/styles.css";
-    (styleElemContainer.querySelector(".nonce-generate-btn") as HTMLButtonElement).click();
+    (
+      styleElemContainer.querySelector(
+        ".nonce-generate-btn",
+      ) as HTMLButtonElement
+    ).click();
+  });
+
+  it("clears pending custom inputs when values are set programmatically", async () => {
+    const onChange = vi.fn();
+    const imgDirective = DIRECTIVES.find((item) => item.name === "img-src")!;
+    const container = document.createElement("div");
+    const editor = createSourceListEditor(container, {
+      directive: imgDirective,
+      onChange,
+    });
+
+    container
+      .querySelector(".add-source-btn")
+      ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    const input = container.querySelector(
+      ".custom-source-row input",
+    ) as HTMLInputElement;
+    input.value = "https://pending.example";
+    editor.setValues(["'self'"]);
+    expect(container.querySelector(".custom-source-row")).toBeNull();
+  });
+
+  it("generates external script snippets from the nonce helper", async () => {
+    const onChange = vi.fn();
+    const scriptContainer = document.createElement("div");
+    createSourceListEditor(scriptContainer, {
+      directive: DIRECTIVES.find((item) => item.name === "script-src")!,
+      onChange,
+    });
+    await vi.waitFor(() =>
+      expect(
+        scriptContainer.querySelector(".nonce-generate-btn"),
+      ).not.toBeNull(),
+    );
+    const externalInput = scriptContainer.querySelector(
+      "input[type='url']",
+    ) as HTMLInputElement;
+    externalInput.value = "https://cdn.example.com/app.js";
+    const generateBtn = scriptContainer.querySelector(
+      ".nonce-generate-btn",
+    ) as HTMLButtonElement;
+    generateBtn.click();
+    generateBtn.click();
+    expect(onChange).toHaveBeenCalled();
   });
 });

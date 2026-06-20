@@ -47,7 +47,9 @@ const KNOWN_DIRECTIVES = new Set([
   "block-all-mixed-content",
 ]);
 
-const BUILDER_DIRECTIVES = new Set(DIRECTIVES.map((directive) => directive.name));
+const BUILDER_DIRECTIVES = new Set(
+  DIRECTIVES.map((directive) => directive.name),
+);
 
 const DEPRECATED_DIRECTIVES = new Set(
   DIRECTIVES.filter((directive) => directive.deprecated).map(
@@ -82,7 +84,9 @@ function parsePolicySegments(policy: string): PolicySegment[] {
     if (!trimmed) continue;
 
     const spaceIndex = trimmed.indexOf(" ");
-    const name = (spaceIndex === -1 ? trimmed : trimmed.slice(0, spaceIndex)).trim();
+    const name = (
+      spaceIndex === -1 ? trimmed : trimmed.slice(0, spaceIndex)
+    ).trim();
     const valuePart =
       spaceIndex === -1 ? "" : trimmed.slice(spaceIndex + 1).trim();
 
@@ -181,7 +185,10 @@ function buildCorrectedState(segments: PolicySegment[]): PolicyState {
 
   for (const name of DIRECTIVE_ORDER) {
     if (!merged.has(name)) continue;
-    state[name] = { enabled: true, values: applyNoneRule(merged.get(name) ?? []) };
+    state[name] = {
+      enabled: true,
+      values: applyNoneRule(merged.get(name) ?? []),
+    };
   }
 
   return state;
@@ -352,7 +359,8 @@ export function validatePolicyString(policy: string): PolicyValidationResult {
           severity: "error",
           directive: segment.name,
           message: `'none' in ${segment.name} must not be combined with other sources.`,
-          suggestion: "Use only 'none' or remove 'none' and list explicit sources.",
+          suggestion:
+            "Use only 'none' or remove 'none' and list explicit sources.",
         });
       }
 
@@ -381,7 +389,8 @@ export function validatePolicyString(policy: string): PolicyValidationResult {
         severity: "error",
         directive: name,
         message: `${name} appears ${count} times.`,
-        suggestion: "Merge into a single directive with one combined source list.",
+        suggestion:
+          "Merge into a single directive with one combined source list.",
       });
     }
   }

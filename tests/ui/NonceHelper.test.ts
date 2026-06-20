@@ -50,7 +50,11 @@ describe("createNonceHelper", () => {
     Object.assign(navigator, { clipboard: { writeText } });
     (helper.querySelector(".btn.btn-primary") as HTMLButtonElement).click();
     await vi.waitFor(() => expect(writeText).toHaveBeenCalled());
-    (helper.querySelector(".nonce-result-actions .btn.btn-secondary") as HTMLButtonElement).click();
+    (
+      helper.querySelector(
+        ".nonce-result-actions .btn.btn-secondary",
+      ) as HTMLButtonElement
+    ).click();
     await vi.waitFor(() => expect(writeText).toHaveBeenCalledTimes(2));
   });
 
@@ -98,12 +102,16 @@ describe("createNonceHelper", () => {
     });
     (helper.querySelector(".btn.btn-primary") as HTMLButtonElement).click();
     await vi.waitFor(() =>
-      expect(helper.querySelector(".nonce-helper-status")?.textContent).toContain(
-        "Copy failed",
-      ),
+      expect(
+        helper.querySelector(".nonce-helper-status")?.textContent,
+      ).toContain("Copy failed"),
     );
 
-    (helper.querySelector(".nonce-result-actions .btn.btn-secondary") as HTMLButtonElement).click();
+    (
+      helper.querySelector(
+        ".nonce-result-actions .btn.btn-secondary",
+      ) as HTMLButtonElement
+    ).click();
     expect(helper.querySelector(".nonce-helper-status")?.textContent).toContain(
       "Generate a nonce first.",
     );
@@ -123,6 +131,58 @@ describe("createNonceHelper", () => {
     (helper.querySelector(".nonce-generate-btn") as HTMLButtonElement).click();
     expect(helper.querySelector(".nonce-helper-status")?.textContent).toContain(
       "Enter the URL of the script.",
+    );
+  });
+
+  it("ignores external mode when the external radio is not checked", () => {
+    const onChange = vi.fn();
+    const helper = createNonceHelper({
+      idPrefix: "nonce-external-unchecked",
+      helpId: "nonce-external-unchecked-help",
+      variant: "script",
+      addValue: vi.fn(),
+      getValues: () => [],
+      onChange,
+    });
+    document.body.appendChild(helper);
+    const externalRadio = helper.querySelector(
+      'input[value="external"]',
+    ) as HTMLInputElement;
+    externalRadio.checked = false;
+    externalRadio.dispatchEvent(new Event("change", { bubbles: true }));
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it("handles mode toggles and non-Error crypto failures", () => {
+    const onChange = vi.fn();
+    const helper = createNonceHelper({
+      idPrefix: "branch-nonce",
+      helpId: "branch-nonce-help",
+      variant: "script",
+      addValue: vi.fn(),
+      getValues: () => ["'nonce-existing'"],
+      onChange,
+    });
+    document.body.appendChild(helper);
+
+    const externalRadio = helper.querySelector(
+      'input[value="external"]',
+    ) as HTMLInputElement;
+    externalRadio.checked = true;
+    externalRadio.dispatchEvent(new Event("change", { bubbles: true }));
+
+    const inlineRadio = helper.querySelector(
+      'input[value="inline"]',
+    ) as HTMLInputElement;
+    inlineRadio.checked = true;
+    inlineRadio.dispatchEvent(new Event("change", { bubbles: true }));
+
+    vi.spyOn(globalThis.crypto, "getRandomValues").mockImplementation(() => {
+      throw "not an Error";
+    });
+    (helper.querySelector(".nonce-generate-btn") as HTMLButtonElement).click();
+    expect(helper.querySelector(".nonce-helper-status")?.textContent).toBe(
+      "Could not generate a nonce.",
     );
   });
 });

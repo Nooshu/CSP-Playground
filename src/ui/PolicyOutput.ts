@@ -10,8 +10,8 @@
  * @see {@link buildHeaderLine}
  */
 
-import { buildHeaderLine, buildPolicyString } from "../csp/buildPolicy";
 import type { PolicyState } from "../csp/buildPolicy";
+import { buildHeaderLine, buildPolicyString } from "../csp/buildPolicy";
 import { WEB_SERVER_EXPORTS, type WebServerId } from "../csp/serverExports";
 import { GITHUB_REPO_URL } from "../siteBuildInfo";
 import { createFlagInfoIcon } from "./FlagInfoIcon";
@@ -73,7 +73,8 @@ export function createPolicyOutput(options: PolicyOutputOptions): HTMLElement {
     "A CSP deployed without careful testing can break your site. Use at your own risk: the author accepts no liability for outages or regressions. For more information see: ";
 
   const guideLink = document.createElement("a");
-  guideLink.href = "https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CSP";
+  guideLink.href =
+    "https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CSP";
   guideLink.target = "_blank";
   guideLink.rel = "noopener noreferrer";
   guideLink.referrerPolicy = "no-referrer";
@@ -345,7 +346,9 @@ export function createPolicyOutput(options: PolicyOutputOptions): HTMLElement {
   }
 
   function updateServerPreview(policy: string, headerName: string): void {
-    const server = WEB_SERVER_EXPORTS.find((item) => item.id === selectedServer);
+    const server = WEB_SERVER_EXPORTS.find(
+      (item) => item.id === selectedServer,
+    );
     if (server && policy) {
       serverHelp.textContent = server.description;
       htmlOnlyCheckbox.disabled = !server.supportsHtmlOnly;
@@ -353,7 +356,9 @@ export function createPolicyOutput(options: PolicyOutputOptions): HTMLElement {
         htmlOnly = false;
         htmlOnlyCheckbox.checked = false;
       }
-      serverPreview.textContent = server.format(headerName, policy, { htmlOnly });
+      serverPreview.textContent = server.format(headerName, policy, {
+        htmlOnly,
+      });
     } else {
       serverPreview.textContent = "(no server config to display)";
     }
@@ -405,10 +410,7 @@ export function createPolicyOutput(options: PolicyOutputOptions): HTMLElement {
   });
 
   copyServerBtn.addEventListener("click", () => {
-    void copyText(
-      getServerExportText(),
-      "Server config copied to clipboard",
-    );
+    void copyText(getServerExportText(), "Server config copied to clipboard");
   });
 
   return Object.assign(panel, {

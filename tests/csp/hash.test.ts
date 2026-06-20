@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import {
   buildInlineStyleAttributeSnippet,
   formatSha256HashForCsp,
-  sha256Base64FromText,
   STYLE_ATTR_UNSAFE_HASHES,
+  sha256Base64FromText,
 } from "../../src/csp/hash";
 
 describe("hash helpers", () => {

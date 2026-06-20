@@ -73,14 +73,19 @@ export function parsePolicyString(policy: string): ParsedPolicy {
     if (!trimmed) continue;
 
     const spaceIndex = trimmed.indexOf(" ");
-    const name = (spaceIndex === -1 ? trimmed : trimmed.slice(0, spaceIndex)).trim();
+    const name = (
+      spaceIndex === -1 ? trimmed : trimmed.slice(0, spaceIndex)
+    ).trim();
     const valuePart =
       spaceIndex === -1 ? "" : trimmed.slice(spaceIndex + 1).trim();
 
     if (!name) continue;
 
     // Legacy boolean directives have no source list.
-    if (name === "upgrade-insecure-requests" || name === "block-all-mixed-content") {
+    if (
+      name === "upgrade-insecure-requests" ||
+      name === "block-all-mixed-content"
+    ) {
       directives[name] = [];
       continue;
     }

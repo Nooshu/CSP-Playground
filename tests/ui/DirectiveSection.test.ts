@@ -42,7 +42,9 @@ describe("createDirectiveSection", () => {
 
   it("handles sandbox flags and trusted types interactions", () => {
     const onChange = vi.fn();
-    const sandbox = DIRECTIVES.find((directive) => directive.name === "sandbox")!;
+    const sandbox = DIRECTIVES.find(
+      (directive) => directive.name === "sandbox",
+    )!;
     const section = createDirectiveSection({ directive: sandbox, onChange });
 
     section.setState({
@@ -83,7 +85,9 @@ describe("createDirectiveSection", () => {
 
   it("enables and disables controls with the checkbox", () => {
     const onChange = vi.fn();
-    const script = DIRECTIVES.find((directive) => directive.name === "script-src")!;
+    const script = DIRECTIVES.find(
+      (directive) => directive.name === "script-src",
+    )!;
     const section = createDirectiveSection({ directive: script, onChange });
     const checkbox = section.element.querySelector(
       ".enable-checkbox",
@@ -108,7 +112,9 @@ describe("createDirectiveSection", () => {
 
   it("supports report-to and require-trusted-types-for directives", () => {
     const onChange = vi.fn();
-    const reportTo = DIRECTIVES.find((directive) => directive.name === "report-to")!;
+    const reportTo = DIRECTIVES.find(
+      (directive) => directive.name === "report-to",
+    )!;
     const reportSection = createDirectiveSection({
       directive: reportTo,
       onChange,
@@ -146,7 +152,9 @@ describe("createDirectiveSection", () => {
 
   it("shows deprecated badges on deprecated directives", () => {
     const onChange = vi.fn();
-    const reportUri = DIRECTIVES.find((directive) => directive.name === "report-uri")!;
+    const reportUri = DIRECTIVES.find(
+      (directive) => directive.name === "report-uri",
+    )!;
     const section = createDirectiveSection({ directive: reportUri, onChange });
     section.setState({ enabled: true, values: ["https://example.com/report"] });
     expect(
@@ -168,7 +176,9 @@ describe("createDirectiveSection", () => {
     section.reset();
     expect(section.getState()).toEqual({ enabled: false, values: [] });
 
-    const single = DIRECTIVES.find((directive) => directive.type === "source-single")!;
+    const single = DIRECTIVES.find(
+      (directive) => directive.type === "source-single",
+    )!;
     const singleSection = createDirectiveSection({
       directive: single,
       onChange,
@@ -176,5 +186,16 @@ describe("createDirectiveSection", () => {
     singleSection.setState({ enabled: true, values: ["endpoint"] });
     singleSection.reset();
     expect(singleSection.getState()).toEqual({ enabled: false, values: [] });
+  });
+
+  it("ignores state for unrecognized directive control types", () => {
+    const onChange = vi.fn();
+    const directive = {
+      ...DIRECTIVES[0]!,
+      type: "unknown-type" as "source-list",
+    };
+    const section = createDirectiveSection({ directive, onChange });
+    section.setState({ enabled: true, values: [] });
+    expect(section.getState()).toEqual({ enabled: false, values: [] });
   });
 });

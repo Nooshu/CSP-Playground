@@ -39,8 +39,7 @@ export const SITE_PAGE_META: Record<
     description:
       "Build and validate Content Security Policy headers in your browser. Import policies from any URL, score your CSP, and copy server snippets for Apache, Nginx, Caddy, and more.",
     path: "/",
-    imageAlt:
-      "Content Security Policy header generator — CSP Playground",
+    imageAlt: "Content Security Policy header generator — CSP Playground",
     schemaType: "WebApplication",
   },
   whyCsp: {

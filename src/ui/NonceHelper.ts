@@ -77,7 +77,8 @@ const NONCE_VARIANTS: Record<NonceHelperVariant, NonceVariantConfig> = {
     parseExternalUrl: parseStylesheetUrl,
     buildExternalSnippet: buildExternalStylesheetSnippet,
     buildInlineSnippet: buildInlineStyleSnippet,
-    emptyInlineError: "Paste the inline CSS you want to allow inside a <style> element.",
+    emptyInlineError:
+      "Paste the inline CSS you want to allow inside a <style> element.",
   },
 };
 
@@ -149,7 +150,10 @@ export function createNonceHelper(options: NonceHelperOptions): HTMLElement {
   inlineRadio.name = `${idPrefix}-nonce-mode`;
   inlineRadio.value = "inline";
 
-  externalLabel.append(externalRadio, document.createTextNode(config.externalLabel));
+  externalLabel.append(
+    externalRadio,
+    document.createTextNode(config.externalLabel),
+  );
   inlineLabel.append(inlineRadio, document.createTextNode(config.inlineLabel));
   modeFieldset.append(modeLegend, externalLabel, inlineLabel);
 
@@ -307,7 +311,10 @@ export function createNonceHelper(options: NonceHelperOptions): HTMLElement {
   });
 
   copySnippetBtn.addEventListener("click", () => {
-    void copyText(snippet.textContent ?? "", "HTML snippet copied to clipboard.");
+    void copyText(
+      snippet.textContent ?? "",
+      "HTML snippet copied to clipboard.",
+    );
   });
 
   copyNonceBtn.addEventListener("click", () => {

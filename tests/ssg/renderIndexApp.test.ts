@@ -23,7 +23,14 @@ describe("renderIndexAppHtml", () => {
       categoryOrder: ["fetch", "document"],
       categoryLabels: { fetch: "Fetch 'directives'" },
       directivesByCategory: {
-        fetch: [{ name: "weird'src", category: "fetch", type: "source-list", description: "x" }],
+        fetch: [
+          {
+            name: "weird'src",
+            category: "fetch",
+            type: "source-list",
+            description: "x",
+          },
+        ],
         document: [],
       },
     });
@@ -38,11 +45,17 @@ describe("renderIndexAppHtml", () => {
       categoryOrder: ["fetch"],
       categoryLabels: {},
       directivesByCategory: {
-        fetch: [{ name: "default-src", category: "fetch", type: "source-list", description: "x" }],
+        fetch: [
+          {
+            name: "default-src",
+            category: "fetch",
+            type: "source-list",
+            description: "x",
+          },
+        ],
       },
     });
 
     expect(html).toContain("<legend>fetch</legend>");
   });
 });
-

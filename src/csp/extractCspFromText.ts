@@ -8,10 +8,7 @@
  */
 
 /** Where the extracted policy text came from. */
-export type ExtractCspSource =
-  | "header-enforce"
-  | "header-report-only"
-  | "raw";
+export type ExtractCspSource = "header-enforce" | "header-report-only" | "raw";
 
 /** Successful extraction result. */
 export interface ExtractCspResult {
@@ -49,10 +46,7 @@ function normalizeInput(input: string): string {
 }
 
 /** Collects all CSP header values matching `pattern` across a multi-line paste. */
-function collectHeaderValues(
-  text: string,
-  pattern: RegExp,
-): string[] {
+function collectHeaderValues(text: string, pattern: RegExp): string[] {
   const values: string[] = [];
 
   for (const line of text.split("\n")) {
@@ -124,7 +118,10 @@ function extractFromSingleHeaderLine(text: string): ExtractCspResult | null {
 export function extractCspFromText(input: string): ExtractCspResult {
   const normalized = normalizeInput(input);
   if (!normalized) {
-    throw new ExtractCspError("empty", "Paste headers or a CSP policy to import.");
+    throw new ExtractCspError(
+      "empty",
+      "Paste headers or a CSP policy to import.",
+    );
   }
 
   const enforceValues = collectHeaderValues(normalized, ENFORCE_HEADER_PATTERN);

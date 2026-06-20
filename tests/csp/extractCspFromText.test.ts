@@ -60,9 +60,7 @@ describe("extractCspFromText", () => {
 
   it("extracts CSP when header name and value are on separate lines", () => {
     expect(
-      extractCspFromText(
-        "Content-Security-Policy:\ndefault-src 'self'",
-      ),
+      extractCspFromText("Content-Security-Policy:\ndefault-src 'self'"),
     ).toEqual({
       policy: "default-src 'self'",
       reportOnly: false,
@@ -122,16 +120,20 @@ describe("extractCspFromText", () => {
   });
 
   it("accepts raw policy text", () => {
-    expect(extractCspFromText("default-src 'self'; object-src 'none'")).toEqual({
-      policy: "default-src 'self'; object-src 'none'",
-      reportOnly: false,
-      source: "raw",
-    });
+    expect(extractCspFromText("default-src 'self'; object-src 'none'")).toEqual(
+      {
+        policy: "default-src 'self'; object-src 'none'",
+        reportOnly: false,
+        source: "raw",
+      },
+    );
   });
 
   it("treats multiline raw policy as one value", () => {
     expect(
-      extractCspFromText("default-src 'self';\nscript-src 'self' https://cdn.example.com"),
+      extractCspFromText(
+        "default-src 'self';\nscript-src 'self' https://cdn.example.com",
+      ),
     ).toEqual({
       policy: "default-src 'self'; script-src 'self' https://cdn.example.com",
       reportOnly: false,

@@ -1,9 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:recommended",
-    ":pinAllExceptPeerDependencies"
-  ],
+  "extends": ["config:recommended", ":pinAllExceptPeerDependencies"],
   "timezone": "Europe/London",
   "schedule": ["* 6 * * *"],
   "labels": ["dependencies"],

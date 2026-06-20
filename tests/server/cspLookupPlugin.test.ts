@@ -19,7 +19,11 @@ function createMockReqRes(
   method: string,
   url: string,
 ): {
-  req: EventEmitter & { method: string; url: string; destroy: ReturnType<typeof vi.fn> };
+  req: EventEmitter & {
+    method: string;
+    url: string;
+    destroy: ReturnType<typeof vi.fn>;
+  };
   res: {
     statusCode: number;
     headers: Record<string, string>;

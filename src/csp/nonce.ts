@@ -141,7 +141,9 @@ function parseHttpUrl(input: string, resourceLabel: string): string {
   try {
     const url = new URL(trimmed);
     if (url.protocol !== "http:" && url.protocol !== "https:") {
-      throw new Error(`Only HTTP and HTTPS ${resourceLabel} URLs are supported.`);
+      throw new Error(
+        `Only HTTP and HTTPS ${resourceLabel} URLs are supported.`,
+      );
     }
     return url.toString();
   } catch (error) {

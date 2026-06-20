@@ -18,7 +18,9 @@ describe("siteMeta", () => {
     expect(html).toContain(`rel="canonical" href="${SITE_ORIGIN}/"`);
     expect(html).toContain('property="og:type" content="website"');
     expect(html).toContain(`property="og:title" content="${title}"`);
-    expect(html).toContain(`property="og:description" content="${description}"`);
+    expect(html).toContain(
+      `property="og:description" content="${description}"`,
+    );
     expect(html).toContain(`property="og:url" content="${SITE_ORIGIN}/"`);
     expect(html).toContain(
       `property="og:image" content="${SITE_ORIGIN}${OG_IMAGE_PATH}"`,
@@ -26,7 +28,9 @@ describe("siteMeta", () => {
     expect(html).toContain(
       `property="og:image:secure_url" content="${SITE_ORIGIN}${OG_IMAGE_PATH}"`,
     );
-    expect(html).toContain(`property="og:image:type" content="${OG_IMAGE_TYPE}"`);
+    expect(html).toContain(
+      `property="og:image:type" content="${OG_IMAGE_TYPE}"`,
+    );
     expect(html).toContain('property="og:image:width" content="1200"');
     expect(html).toContain('property="og:image:height" content="464"');
     expect(html).toContain('name="twitter:card" content="summary_large_image"');
@@ -43,10 +47,16 @@ describe("siteMeta", () => {
 
     expect(html).toContain(`<title>${title}</title>`);
     expect(html).toContain(`name="description" content="${description}"`);
-    expect(html).toContain(`rel="canonical" href="${SITE_ORIGIN}/why-csp.html"`);
+    expect(html).toContain(
+      `rel="canonical" href="${SITE_ORIGIN}/why-csp.html"`,
+    );
     expect(html).toContain(`property="og:title" content="${title}"`);
-    expect(html).toContain(`property="og:description" content="${description}"`);
-    expect(html).toContain(`property="og:url" content="${SITE_ORIGIN}/why-csp.html"`);
+    expect(html).toContain(
+      `property="og:description" content="${description}"`,
+    );
+    expect(html).toContain(
+      `property="og:url" content="${SITE_ORIGIN}/why-csp.html"`,
+    );
     expect(html).toContain('"@type":"Article"');
   });
 

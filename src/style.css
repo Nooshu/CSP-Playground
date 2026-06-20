@@ -264,7 +264,9 @@
   color: var(--color-text-muted);
   border-radius: var(--radius);
   text-decoration: none;
-  transition: color 0.15s ease, background-color 0.15s ease;
+  transition:
+    color 0.15s ease,
+    background-color 0.15s ease;
 }
 
 .directive-info-link:hover {
@@ -554,7 +556,9 @@ select {
   border: 1px solid transparent;
   border-radius: var(--radius);
   cursor: pointer;
-  transition: background-color 0.15s ease, border-color 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
 }
 
 .btn:disabled {
@@ -639,7 +643,9 @@ select {
   line-height: 1.4;
   text-align: center;
   color: #fff;
-  box-shadow: var(--shadow), 0 4px 12px rgb(0 0 0 / 12%);
+  box-shadow:
+    var(--shadow),
+    0 4px 12px rgb(0 0 0 / 12%);
   opacity: 0;
   transform: translateY(-1rem);
 }
@@ -1218,14 +1224,19 @@ select {
     padding-left: var(--space-xl);
     /* Panel width + panel inset + gutter matching --space-xl section gaps */
     padding-right: calc(
-      var(--score-panel-width) + var(--page-top-inset) + var(--space-xl)
+      var(--score-panel-width) +
+      var(--page-top-inset) +
+      var(--space-xl)
     );
   }
 
   .security-score-panel {
     position: fixed;
     top: var(--page-top-inset);
-    right: max(var(--space-lg), calc((100vw - var(--max-width)) / 2 + var(--space-lg)));
+    right: max(
+      var(--space-lg),
+      calc((100vw - var(--max-width)) / 2 + var(--space-lg))
+    );
     z-index: 200;
     width: min(var(--score-panel-width), calc(100vw - 2rem));
     margin: 0;

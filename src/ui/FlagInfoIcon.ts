@@ -42,10 +42,7 @@ export function createFlagInfoIcon(options: FlagInfoIconOptions): HTMLElement {
   const button = document.createElement("button");
   button.type = "button";
   button.className = "flag-info-btn";
-  button.setAttribute(
-    "aria-label",
-    `More information about ${flagKey}`,
-  );
+  button.setAttribute("aria-label", `More information about ${flagKey}`);
   button.innerHTML = HELP_ICON_SVG;
 
   const tooltip = document.createElement("span");
@@ -99,7 +96,10 @@ export function createFlagInfoIcon(options: FlagInfoIconOptions): HTMLElement {
     const description = await getFlagDescription(group, flagKey);
     isLoading = false;
 
-    if (!button.matches(":hover, :focus-visible") && !tooltip.matches(":hover")) {
+    if (
+      !button.matches(":hover, :focus-visible") &&
+      !tooltip.matches(":hover")
+    ) {
       // User moved away before the async fetch completed; discard stale tooltip.
       hideTooltip();
       return;

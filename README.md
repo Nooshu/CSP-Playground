@@ -86,6 +86,7 @@ Import an existing CSP into the builder from a live URL or pasted text:
 | Bundler | [Vite](https://vite.dev/) |
 | Package manager | [Yarn v1](https://classic.yarnpkg.com/) (`yarn.lock` is canonical) |
 | Tests | [Vitest](https://vitest.dev/) + jsdom, Istanbul coverage |
+| Lint / format | [Biome](https://biomejs.dev/) |
 | Deployment | Static `dist/` on [Cloudflare Pages](https://pages.cloudflare.com/) + Pages Functions |
 
 ## Getting started
@@ -135,6 +136,14 @@ yarn test:coverage     # Coverage with thresholds (100% lines/functions, 99% sta
 yarn typecheck         # Client (src/) + server/functions shared code
 ```
 
+### Lint and format
+
+```bash
+yarn lint              # Biome check (CI runs this)
+yarn lint:fix          # Apply safe fixes and formatting
+yarn format            # Format only
+```
+
 ### Dependency integrity
 
 Direct dependencies are **pinned to exact versions**. After any dependency update, run verification **once** when all changes are complete:
@@ -166,6 +175,7 @@ src/api/          Client fetch wrapper for CSP lookup
 server/           Shared lookup logic + Vite dev middleware
 functions/api/    Cloudflare Pages Function (production API)
 tests/            Vitest unit and integration tests
+docs/             Architecture and contributor docs
 public/data/      Sandbox flag descriptions (loaded for tooltips)
 ```
 
@@ -201,6 +211,7 @@ Requires [Wrangler](https://developers.cloudflare.com/workers/wrangler/) authent
 ## Contributing / AI agents
 
 - [AGENTS.md](AGENTS.md) — conventions for coding agents (also available as `AGENT.md`)
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — module boundaries, data flow, and API contract
 - `.cursor/rules/` — Cursor-specific rules for dependency pinning and project context
 - TSDoc comments on exported APIs in `src/`, `server/`, and `functions`
 

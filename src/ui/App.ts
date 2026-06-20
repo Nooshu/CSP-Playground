@@ -60,7 +60,8 @@ export function mountSecurityScorePanel(
 export function createApp(root: HTMLElement): void {
   const sections: DirectiveSectionHandle[] = [];
   let outputPanel: PolicyOutputPanel | null = null;
-  let securityScorePanel: ReturnType<typeof createSecurityScorePanel> | null = null;
+  let securityScorePanel: ReturnType<typeof createSecurityScorePanel> | null =
+    null;
 
   function collectState(): PolicyState {
     const state: PolicyState = {};
@@ -88,7 +89,8 @@ export function createApp(root: HTMLElement): void {
     root.querySelector("#generated-policy");
 
   if (hasSsgShell) {
-    const outputContainer = root.querySelector<HTMLElement>("#generated-policy");
+    const outputContainer =
+      root.querySelector<HTMLElement>("#generated-policy");
     outputPanel = createPolicyOutput({
       getState: collectState,
       onModeChange: handleChange,

@@ -41,6 +41,9 @@ jobs:
       - name: Verify pinned dependencies and lockfile integrity
         run: yarn verify:deps
 
+      - name: Lint and format check
+        run: yarn lint
+
       - name: Build
         run: yarn build
 

@@ -19,6 +19,9 @@
   "scripts": {
     "dev": "vite",
     "typecheck": "tsc --noEmit && tsc -p tsconfig.server.json --noEmit",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "format": "biome format --write .",
     "build": "yarn typecheck && vite build && node scripts/generate-dist-headers.mjs && node scripts/compress-dist-brotli.mjs",
     "preview": "vite preview",
     "preview:dist": "node scripts/preview-dist.mjs",
@@ -31,6 +34,7 @@
     "verify:deps": "node scripts/verify-deps-integrity.mjs"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.5.0",
     "@cloudflare/workers-types": "4.20260620.1",
     "@types/node": "25.9.4",
     "@vitest/coverage-istanbul": "4.1.9",

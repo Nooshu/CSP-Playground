@@ -32,9 +32,7 @@ describe("createFlagInfoIcon", () => {
     vi.spyOn(button, "matches").mockReturnValue(true);
 
     button.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true }));
-    await vi.waitFor(() =>
-      expect(tooltip.textContent).toBe("Allows scripts."),
-    );
+    await vi.waitFor(() => expect(tooltip.textContent).toBe("Allows scripts."));
     expect(button.getAttribute("aria-describedby")).toBeTruthy();
 
     button.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true }));

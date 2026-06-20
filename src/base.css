@@ -55,7 +55,8 @@
   --grid-max: 72rem;
   --grid-gutter: var(--space-s);
   --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --font-mono: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, monospace;
+  --font-mono:
+    ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, monospace;
   --max-width: var(--grid-max);
   --page-top-inset: var(--space-md);
   --score-panel-width: 16rem;

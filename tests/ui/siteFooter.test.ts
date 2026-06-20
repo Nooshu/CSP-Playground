@@ -7,8 +7,8 @@ import {
 import {
   createSiteFooter,
   ensureSiteFooter,
-  getSiteBuildInfo,
   getFooterEndYear,
+  getSiteBuildInfo,
   renderSiteFooterHtml,
   resolveGitCommitShort,
   updateSiteFooterYear,
@@ -30,9 +30,11 @@ describe("siteFooter", () => {
     expect(html).toContain("Built with");
     expect(html).toContain(">Cloudflare</a>");
     expect(html).toContain('href="https://www.cloudflare.com"');
-    expect(html).toContain('href="https://cursor.com/referral?code=XDKDHWAJX4RJ"');
     expect(html).toContain(
-      "title=\"Matt Hobbs's Cursor referral link — get 50% off your first month of Pro, Pro+, or Ultra. Opens in a new tab.\"",
+      'href="https://cursor.com/referral?code=XDKDHWAJX4RJ"',
+    );
+    expect(html).toContain(
+      'title="Matt Hobbs\'s Cursor referral link — get 50% off your first month of Pro, Pro+, or Ultra. Opens in a new tab."',
     );
     expect(html).toContain("/site-footer-year.mjs");
   });
@@ -58,7 +60,9 @@ describe("siteFooter", () => {
     document.body.innerHTML =
       '<footer class="site-footer"><p>© 2009 - <span class="site-footer-year"></span></p></footer>';
     updateSiteFooterYear();
-    expect(document.querySelector(".site-footer-year")?.textContent).toBe("2031");
+    expect(document.querySelector(".site-footer-year")?.textContent).toBe(
+      "2031",
+    );
 
     vi.useRealTimers();
   });

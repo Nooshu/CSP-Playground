@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
-import { createSecurityScorePanel } from "../../src/ui/SecurityScore";
 import type { PolicyState } from "../../src/csp/buildPolicy";
+import * as scorePolicyModule from "../../src/csp/scorePolicy";
+import { createSecurityScorePanel } from "../../src/ui/SecurityScore";
 
 describe("createSecurityScorePanel", () => {
   it("renders score details and recommendations", () => {
@@ -17,10 +18,12 @@ describe("createSecurityScorePanel", () => {
     document.body.appendChild(panel);
 
     panel.update();
-    expect(panel.querySelector(".security-score-value")?.textContent).toContain("%");
-    expect(panel.querySelectorAll(".security-score-factors li").length).toBeGreaterThan(
-      0,
+    expect(panel.querySelector(".security-score-value")?.textContent).toContain(
+      "%",
     );
+    expect(
+      panel.querySelectorAll(".security-score-factors li").length,
+    ).toBeGreaterThan(0);
     expect(
       panel.querySelectorAll(".security-score-recommendation-btn").length,
     ).toBeGreaterThan(0);
@@ -88,7 +91,9 @@ describe("createSecurityScorePanel", () => {
     document.body.appendChild(panel);
     panel.update();
     expect(
-      panel.querySelector(".factor-neutral, .factor-positive, .factor-negative"),
+      panel.querySelector(
+        ".factor-neutral, .factor-positive, .factor-negative",
+      ),
     ).not.toBeNull();
   });
 
@@ -100,11 +105,13 @@ describe("createSecurityScorePanel", () => {
     document.body.appendChild(panel);
 
     expect(panel.querySelector(".security-score-nav")).not.toBeNull();
-    expect(
-      panel.querySelector(".security-score-nav-btn")?.textContent,
-    ).toBe("View generated policy");
+    expect(panel.querySelector(".security-score-nav-btn")?.textContent).toBe(
+      "View generated policy",
+    );
     expect(panel.querySelector(".security-score-back-to-top")).not.toBeNull();
-    expect(panel.querySelector(".security-score-back-to-top-wrap")).not.toBeNull();
+    expect(
+      panel.querySelector(".security-score-back-to-top-wrap"),
+    ).not.toBeNull();
   });
 
   it("shows back to top after scrolling and scrolls to top on click", () => {
@@ -128,7 +135,10 @@ describe("createSecurityScorePanel", () => {
     window.dispatchEvent(new Event("scroll"));
     expect(backToTopWrap.classList.contains("is-visible")).toBe(false);
 
-    Object.defineProperty(window, "scrollY", { value: 400, configurable: true });
+    Object.defineProperty(window, "scrollY", {
+      value: 400,
+      configurable: true,
+    });
     window.dispatchEvent(new Event("scroll"));
     expect(backToTopWrap.classList.contains("is-visible")).toBe(true);
 
@@ -191,5 +201,74 @@ describe("createSecurityScorePanel", () => {
     ];
     expect(nextButtons.length).toBeGreaterThan(0);
     expect(nextButtons[0]?.textContent).not.toBe(initialLabel);
+  });
+
+  it("falls back to a poor grade when scorePolicy returns an unknown grade", () => {
+    vi.spyOn(scorePolicyModule, "scorePolicy").mockReturnValue({
+      score: 10,
+      grade: "Unknown" as "Poor",
+      summary: "Test",
+      factors: [{ label: "Neutral", points: 0 }],
+      recommendations: [],
+      potentialScore: 10,
+    });
+    const panel = createSecurityScorePanel({
+      getState: () => ({}),
+      getReportOnly: () => false,
+    });
+    document.body.appendChild(panel);
+    panel.update();
+    expect(panel.className).toContain("score-poor");
+  });
+
+  it("ignores clicks on the recommendations list background", () => {
+    const panel = createSecurityScorePanel({
+      getState: () => ({
+        "script-src": { enabled: true, values: ["'unsafe-inline'"] },
+      }),
+      getReportOnly: () => false,
+    });
+    document.body.appendChild(panel);
+    panel.update();
+    panel
+      .querySelector(".security-score-recommendations-list")
+      ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    expect(Element.prototype.scrollIntoView).not.toHaveBeenCalled();
+  });
+
+  it("scrolls to a recommendation target when a recommendation button is clicked", () => {
+    const section = document.createElement("article");
+    section.className = "directive-section";
+    section.dataset.directive = "script-src";
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.className = "enable-checkbox";
+    section.appendChild(checkbox);
+    document.body.appendChild(section);
+
+    vi.spyOn(scorePolicyModule, "scorePolicy").mockReturnValue({
+      score: 0,
+      grade: "Poor",
+      summary: "Test",
+      factors: [],
+      recommendations: [
+        {
+          id: "remove-unsafe-inline",
+          label: "Remove unsafe-inline",
+          targetId: "script-src",
+        },
+      ],
+      potentialScore: 50,
+    });
+    const panel = createSecurityScorePanel({
+      getState: () => ({}),
+      getReportOnly: () => false,
+    });
+    document.body.appendChild(panel);
+    panel.update();
+    panel
+      .querySelector(".security-score-recommendation-btn")
+      ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    expect(Element.prototype.scrollIntoView).toHaveBeenCalled();
   });
 });

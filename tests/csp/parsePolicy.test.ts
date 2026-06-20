@@ -19,7 +19,7 @@ describe("parsePolicyString", () => {
   });
 
   it("parses double-quoted source values and unclosed quotes", () => {
-    const parsed = parsePolicyString('default-src "cdn.example.com" \'self\'');
+    const parsed = parsePolicyString("default-src \"cdn.example.com\" 'self'");
     expect(parsed.directives["default-src"]).toEqual([
       '"cdn.example.com"',
       "'self'",
@@ -47,9 +47,9 @@ describe("parsePolicyString", () => {
 
   it("ignores segments without a name", () => {
     expect(parsePolicyString("   ").directives).toEqual({});
-    expect(parsePolicyString("  ; default-src 'self'").directives["default-src"]).toEqual([
-      "'self'",
-    ]);
+    expect(
+      parsePolicyString("  ; default-src 'self'").directives["default-src"],
+    ).toEqual(["'self'"]);
   });
 });
 

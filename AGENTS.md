@@ -21,6 +21,7 @@ Guidance for AI coding agents working in the CSP Playground repository.
 | URL lookup (shared) | `server/` |
 | Cloudflare Pages API | `functions/api/` |
 | Tests | `tests/` (Vitest + jsdom) |
+| Architecture | `docs/ARCHITECTURE.md` |
 | Cursor rules | `.cursor/rules/*.mdc` |
 | Pages config | `wrangler.toml` |
 
@@ -30,6 +31,8 @@ Guidance for AI coding agents working in the CSP Playground repository.
 yarn install          # Install dependencies
 yarn dev              # Dev server (http://localhost:5173)
 yarn typecheck        # Typecheck src/, server/, and functions/
+yarn lint             # Biome format + lint check
+yarn lint:fix         # Apply safe Biome fixes and formatting
 yarn build            # Typecheck + production build
 yarn test             # Run tests
 yarn test:coverage    # Tests with coverage thresholds
@@ -104,6 +107,7 @@ Use `yarn pages:dev` when changing Functions or shared server lookup code.
 ## Testing expectations
 
 - Run `yarn test` after logic changes.
+- Run `yarn lint` after formatting or style changes.
 - Run `yarn build` before finishing TypeScript or bundler changes.
 - Maintain existing coverage thresholds when touching tested code.
 

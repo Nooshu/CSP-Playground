@@ -112,17 +112,19 @@ export function createSourceListEditor(
   }
 
   if (STYLE_HASH_DIRECTIVES.has(directive.name)) {
-    void import("./StyleAttrHashHelper").then(({ createStyleAttrHashHelper }) => {
-      contentArea.appendChild(
-        createStyleAttrHashHelper({
-          idPrefix,
-          helpId,
-          addValue: addConfirmedValue,
-          getValues: () => values,
-          onChange,
-        }),
-      );
-    });
+    void import("./StyleAttrHashHelper").then(
+      ({ createStyleAttrHashHelper }) => {
+        contentArea.appendChild(
+          createStyleAttrHashHelper({
+            idPrefix,
+            helpId,
+            addValue: addConfirmedValue,
+            getValues: () => values,
+            onChange,
+          }),
+        );
+      },
+    );
   }
 
   container.appendChild(contentArea);
@@ -204,10 +206,7 @@ export function createSourceListEditor(
     });
   }
 
-  function confirmCustomInput(
-    input: HTMLInputElement,
-    row: HTMLElement,
-  ): void {
+  function confirmCustomInput(input: HTMLInputElement, row: HTMLElement): void {
     const value = input.value.trim();
     if (!value) return;
 

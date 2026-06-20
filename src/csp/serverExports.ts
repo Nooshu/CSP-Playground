@@ -147,7 +147,7 @@ export const WEB_SERVER_EXPORTS: WebServerExport[] = [
     format: (headerName, policy, options) => {
       const headerLine = `<add name="${headerName}" value="${escapeApacheValue(policy)}" />`;
       if (options?.htmlOnly) {
-        return `<location path=\"*.html\">\n  <system.webServer>\n    <httpProtocol>\n      <customHeaders>\n        ${headerLine}\n      </customHeaders>\n    </httpProtocol>\n  </system.webServer>\n</location>`;
+        return `<location path="*.html">\n  <system.webServer>\n    <httpProtocol>\n      <customHeaders>\n        ${headerLine}\n      </customHeaders>\n    </httpProtocol>\n  </system.webServer>\n</location>`;
       }
       return headerLine;
     },
@@ -244,6 +244,8 @@ export const onRequest: PagesFunction = async (context) => {
  * @param id - Server identifier from the policy output dropdown.
  * @returns Matching export definition, or `undefined` if not found.
  */
-export function getWebServerExport(id: WebServerId): WebServerExport | undefined {
+export function getWebServerExport(
+  id: WebServerId,
+): WebServerExport | undefined {
   return WEB_SERVER_EXPORTS.find((server) => server.id === id);
 }

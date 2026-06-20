@@ -3,10 +3,10 @@
  */
 
 import {
-  SITE_LICENSE_NAME,
-  SITE_VERSION,
   githubCommitUrl,
   githubLicenseUrl,
+  SITE_LICENSE_NAME,
+  SITE_VERSION,
   type SiteBuildInfo,
 } from "../siteBuildInfo";
 

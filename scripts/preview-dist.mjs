@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+
 /**
  * Local static preview server for the production `dist/` output.
  *
@@ -13,8 +14,8 @@
  * For Pages Functions (including `/api/*`), use `yarn pages:dev` instead.
  */
 
-import { createServer } from "node:http";
 import { existsSync, readFileSync, statSync } from "node:fs";
+import { createServer } from "node:http";
 import { join, normalize, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import {

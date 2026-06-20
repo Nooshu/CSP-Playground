@@ -12,16 +12,16 @@
  * @see {@link applyParsedPolicy}
  */
 
-import { lookupCspFromUrl, type CspLookupFailure } from "../api/lookupCsp";
+import { type CspLookupFailure, lookupCspFromUrl } from "../api/lookupCsp";
 import {
   ExtractCspError,
-  extractCspFromText,
   type ExtractCspSource,
+  extractCspFromText,
 } from "../csp/extractCspFromText";
 import { parsePolicyString } from "../csp/parsePolicy";
 import {
-  validatePolicyString,
   type PolicyValidationResult,
+  validatePolicyString,
 } from "../csp/validatePolicy";
 import { applyParsedPolicy } from "./applyPolicy";
 import type { DirectiveSectionHandle } from "./DirectiveSection";
@@ -281,7 +281,10 @@ export function createUrlImporter(options: UrlImporterOptions): HTMLElement {
   }
 
   /** Toggles disabled/loading state on import and validate controls. */
-  function setLoading(loading: boolean, mode: "import" | "validate" = "import"): void {
+  function setLoading(
+    loading: boolean,
+    mode: "import" | "validate" = "import",
+  ): void {
     submitBtn.disabled = loading;
     validateBtn.disabled = loading;
     urlInput.disabled = loading || importMode !== "url";
@@ -359,10 +362,7 @@ export function createUrlImporter(options: UrlImporterOptions): HTMLElement {
   }
 
   /** Applies parsed directives to the builder and syncs report-only mode. */
-  function applyPolicy(
-    policy: string,
-    reportOnly: boolean,
-  ): number {
+  function applyPolicy(policy: string, reportOnly: boolean): number {
     const parsed = parsePolicyString(policy);
     parsed.reportOnly = reportOnly;
 
@@ -455,9 +455,7 @@ export function createUrlImporter(options: UrlImporterOptions): HTMLElement {
     if (importMode === "url") {
       const failure = error as CspLookupFailure;
       if (failure?.error === "no_csp") {
-        handleNoCspFound(
-          "No Content-Security-Policy was found for that URL.",
-        );
+        handleNoCspFound("No Content-Security-Policy was found for that URL.");
         return;
       }
 

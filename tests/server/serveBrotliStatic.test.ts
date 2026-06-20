@@ -135,11 +135,12 @@ describe("serveBrotliStatic", () => {
 
   it("forwards etag headers and supports HEAD requests", async () => {
     const assets = {
-      fetch: vi.fn(async () =>
-        new Response("br-body", {
-          status: 200,
-          headers: { etag: '"abc123"' },
-        }),
+      fetch: vi.fn(
+        async () =>
+          new Response("br-body", {
+            status: 200,
+            headers: { etag: '"abc123"' },
+          }),
       ),
     } as unknown as Fetcher;
 
