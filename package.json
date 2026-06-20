@@ -18,7 +18,8 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build && node scripts/generate-dist-headers.mjs && node scripts/compress-dist-brotli.mjs",
+    "typecheck": "tsc --noEmit && tsc -p tsconfig.server.json --noEmit",
+    "build": "yarn typecheck && vite build && node scripts/generate-dist-headers.mjs && node scripts/compress-dist-brotli.mjs",
     "preview": "vite preview",
     "preview:dist": "node scripts/preview-dist.mjs",
     "preview:brotli": "yarn build && node scripts/preview-dist.mjs",

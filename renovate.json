@@ -12,6 +12,11 @@
   "rangeStrategy": "pin",
   "packageRules": [
     {
+      "description": "GitHub Actions are updated by Dependabot (see .github/dependabot.yml)",
+      "matchManagers": ["github-actions"],
+      "enabled": false
+    },
+    {
       "description": "Pin exact versions in package.json (Yarn v1 policy)",
       "matchManagers": ["npm"],
       "rangeStrategy": "pin"

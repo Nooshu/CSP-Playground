@@ -29,6 +29,7 @@ Guidance for AI coding agents working in the CSP Playground repository.
 ```bash
 yarn install          # Install dependencies
 yarn dev              # Dev server (http://localhost:5173)
+yarn typecheck        # Typecheck src/, server/, and functions/
 yarn build            # Typecheck + production build
 yarn test             # Run tests
 yarn test:coverage    # Tests with coverage thresholds

@@ -85,15 +85,15 @@ Import an existing CSP into the builder from a live URL or pasted text:
 | UI | TypeScript, vanilla DOM (no framework) |
 | Bundler | [Vite](https://vite.dev/) |
 | Package manager | [Yarn v1](https://classic.yarnpkg.com/) (`yarn.lock` is canonical) |
-| Tests | [Vitest](https://vitest.dev/) + jsdom, v8 coverage |
+| Tests | [Vitest](https://vitest.dev/) + jsdom, Istanbul coverage |
 | Deployment | Static `dist/` on [Cloudflare Pages](https://pages.cloudflare.com/) + Pages Functions |
 
 ## Getting started
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/) 18+ (`.nvmrc` pins Node 20 for local development)
-- [Yarn](https://yarnpkg.com/) 1.x
+- [Node.js](https://nodejs.org/) **22.16.0** (see `.nvmrc`; matches Cloudflare Pages v3)
+- [Yarn](https://yarnpkg.com/) **1.22.22** (classic; set `YARN_VERSION=1.22.22` on Cloudflare Pages)
 
 ### Install
 
@@ -126,7 +126,13 @@ yarn preview
 ```bash
 yarn test              # Run once
 yarn test:watch        # Watch mode
-yarn test:coverage     # Coverage with thresholds (100% lines/statements/functions, 95% branches)
+yarn test:coverage     # Coverage with thresholds (100% lines/functions, 99% statements, 93% branches)
+```
+
+### Typecheck
+
+```bash
+yarn typecheck         # Client (src/) + server/functions shared code
 ```
 
 ### Dependency integrity
@@ -196,7 +202,18 @@ Requires [Wrangler](https://developers.cloudflare.com/workers/wrangler/) authent
 
 - [AGENTS.md](AGENTS.md) — conventions for coding agents (also available as `AGENT.md`)
 - `.cursor/rules/` — Cursor-specific rules for dependency pinning and project context
-- TSDoc comments on exported APIs in `src/`, `server/`, and `functions/`
+- TSDoc comments on exported APIs in `src/`, `server/`, and `functions`
+
+### Dependency update bots
+
+Two bots run side by side with non-overlapping scopes:
+
+| Bot | Scope |
+|-----|--------|
+| [Renovate](renovate.json) | npm / Yarn packages (`package.json`, `yarn.lock`) |
+| [Dependabot](.github/dependabot.yml) | GitHub Actions pins in `.github/workflows/` |
+
+Both label PRs `dependencies` and run on the same daily schedule (06:00 Europe/London). Either bot may open a security advisory PR for npm; merge one and close any duplicate.
 
 ## License
 
