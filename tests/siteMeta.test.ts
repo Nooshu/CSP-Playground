@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
+  META_DESCRIPTION_MAX_LENGTH,
+  OG_DESCRIPTION_MAX_LENGTH,
   OG_IMAGE_PATH,
   OG_IMAGE_TYPE,
   renderSiteMetaHtml,
@@ -9,9 +11,20 @@ import {
 } from "../src/siteMeta";
 
 describe("siteMeta", () => {
+  it("keeps meta and Open Graph descriptions within recommended lengths", () => {
+    for (const page of Object.values(SITE_PAGE_META)) {
+      expect(page.description.length).toBeLessThanOrEqual(
+        META_DESCRIPTION_MAX_LENGTH,
+      );
+      expect(page.ogDescription.length).toBeLessThanOrEqual(
+        OG_DESCRIPTION_MAX_LENGTH,
+      );
+    }
+  });
+
   it("renders SEO, Open Graph, and Twitter tags for the home page", () => {
     const html = renderSiteMetaHtml("home");
-    const { title, description } = SITE_PAGE_META.home;
+    const { title, description, ogDescription } = SITE_PAGE_META.home;
 
     expect(html).toContain(`<title>${title}</title>`);
     expect(html).toContain(`name="description" content="${description}"`);
@@ -19,6 +32,9 @@ describe("siteMeta", () => {
     expect(html).toContain('property="og:type" content="website"');
     expect(html).toContain(`property="og:title" content="${title}"`);
     expect(html).toContain(
+      `property="og:description" content="${ogDescription}"`,
+    );
+    expect(html).not.toContain(
       `property="og:description" content="${description}"`,
     );
     expect(html).toContain(`property="og:url" content="${SITE_ORIGIN}/"`);
@@ -43,7 +59,7 @@ describe("siteMeta", () => {
 
   it("renders page-specific metadata for the why-CSP guide", () => {
     const html = renderSiteMetaHtml("whyCsp");
-    const { title, description } = SITE_PAGE_META.whyCsp;
+    const { title, description, ogDescription } = SITE_PAGE_META.whyCsp;
 
     expect(html).toContain(`<title>${title}</title>`);
     expect(html).toContain(`name="description" content="${description}"`);
@@ -52,7 +68,7 @@ describe("siteMeta", () => {
     );
     expect(html).toContain(`property="og:title" content="${title}"`);
     expect(html).toContain(
-      `property="og:description" content="${description}"`,
+      `property="og:description" content="${ogDescription}"`,
     );
     expect(html).toContain(
       `property="og:url" content="${SITE_ORIGIN}/why-csp.html"`,

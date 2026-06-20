@@ -23,12 +23,19 @@ export const SITE_NAME = "CSP Playground";
 /** Page keys supported by {@link renderSiteMetaHtml}. */
 export type SiteMetaPage = "home" | "whyCsp";
 
+/** Recommended max lengths for search and social preview snippets. */
+export const META_DESCRIPTION_MAX_LENGTH = 160;
+export const OG_DESCRIPTION_MAX_LENGTH = 125;
+
 /** Per-page SEO fields and canonical path. */
 export const SITE_PAGE_META: Record<
   SiteMetaPage,
   {
     title: string;
+    /** Meta description and JSON-LD (≤ {@link META_DESCRIPTION_MAX_LENGTH} chars). */
     description: string;
+    /** Open Graph and Twitter description (≤ {@link OG_DESCRIPTION_MAX_LENGTH} chars). */
+    ogDescription: string;
     path: string;
     imageAlt: string;
     schemaType: "WebApplication" | "Article";
@@ -37,7 +44,9 @@ export const SITE_PAGE_META: Record<
   home: {
     title: "Content Security Policy Header Generator | CSP Playground",
     description:
-      "Build and validate Content Security Policy headers in your browser. Import policies from any URL, score your CSP, and copy server snippets for Apache, Nginx, Caddy, and more.",
+      "Build and validate Content Security Policy headers in your browser. Import policies, score your CSP, and copy server snippets for Apache, Nginx, and Caddy.",
+    ogDescription:
+      "Build CSP headers in your browser. Import policies, score security, and copy snippets for Apache, Nginx, Caddy, and more.",
     path: "/",
     imageAlt: "Content Security Policy header generator — CSP Playground",
     schemaType: "WebApplication",
@@ -46,6 +55,8 @@ export const SITE_PAGE_META: Record<
     title: "Why Use Content Security Policy (CSP)? | CSP Playground",
     description:
       "Learn why Content Security Policy matters for XSS protection, what risks you face without a CSP, and how to adopt a policy safely with report-only mode.",
+    ogDescription:
+      "Why CSP matters for XSS protection, risks without a policy, and how to adopt one safely with report-only mode.",
     path: "/why-csp.html",
     imageAlt:
       "Why use Content Security Policy — security guide from CSP Playground",
@@ -113,13 +124,15 @@ function renderJsonLd(page: SiteMetaPage, pageUrl: string): string {
  * @param page - Which public page is being rendered.
  */
 export function renderSiteMetaHtml(page: SiteMetaPage): string {
-  const { title, description, path, imageAlt } = SITE_PAGE_META[page];
+  const { title, description, ogDescription, path, imageAlt } =
+    SITE_PAGE_META[page];
   const pageUrl = absoluteUrl(path);
   const imageUrl = absoluteUrl(OG_IMAGE_PATH);
 
   const attrs = {
     title: escapeHtmlAttribute(title),
     description: escapeHtmlAttribute(description),
+    ogDescription: escapeHtmlAttribute(ogDescription),
     pageUrl: escapeHtmlAttribute(pageUrl),
     imageUrl: escapeHtmlAttribute(imageUrl),
     imageAlt: escapeHtmlAttribute(imageAlt),
@@ -132,7 +145,7 @@ export function renderSiteMetaHtml(page: SiteMetaPage): string {
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="${attrs.siteName}" />
     <meta property="og:title" content="${attrs.title}" />
-    <meta property="og:description" content="${attrs.description}" />
+    <meta property="og:description" content="${attrs.ogDescription}" />
     <meta property="og:url" content="${attrs.pageUrl}" />
     <meta property="og:locale" content="en_GB" />
     <meta property="og:image" content="${attrs.imageUrl}" />
@@ -143,7 +156,7 @@ export function renderSiteMetaHtml(page: SiteMetaPage): string {
     <meta property="og:image:alt" content="${attrs.imageAlt}" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="${attrs.title}" />
-    <meta name="twitter:description" content="${attrs.description}" />
+    <meta name="twitter:description" content="${attrs.ogDescription}" />
     <meta name="twitter:image" content="${attrs.imageUrl}" />
     <meta name="twitter:image:alt" content="${attrs.imageAlt}" />
     ${renderJsonLd(page, pageUrl)}`;
