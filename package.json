@@ -30,7 +30,7 @@
     "verify:deps": "node scripts/verify-deps-integrity.mjs"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "4.20260619.1",
+    "@cloudflare/workers-types": "4.20260620.1",
     "@types/node": "25.9.4",
     "@vitest/coverage-istanbul": "4.1.9",
     "jsdom": "29.1.1",
