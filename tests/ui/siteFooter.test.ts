@@ -5,8 +5,12 @@ import {
   githubLicenseUrl,
 } from "../../src/siteBuildInfo";
 import {
+  createSiteFooter,
+  ensureSiteFooter,
+  getSiteBuildInfo,
   getFooterEndYear,
   renderSiteFooterHtml,
+  resolveGitCommitShort,
   updateSiteFooterYear,
 } from "../../src/ui/siteFooter";
 
@@ -54,5 +58,37 @@ describe("siteFooter", () => {
     expect(document.querySelector(".site-footer-year")?.textContent).toBe("2031");
 
     vi.useRealTimers();
+  });
+
+  it("uses build-time commit metadata when available", () => {
+    expect(getSiteBuildInfo()).toEqual({
+      version: "1.0",
+      gitCommitShort: "test1234",
+    });
+  });
+
+  it("falls back to dev commit metadata when build define is absent", () => {
+    expect(resolveGitCommitShort(undefined)).toBe("dev");
+  });
+
+  it("uses default build metadata when rendering static footer html", () => {
+    expect(renderSiteFooterHtml()).toContain("test1234");
+  });
+
+  it("updates the year without duplicating an existing footer", () => {
+    document.body.innerHTML =
+      '<footer class="site-footer"><span class="site-footer-year">2000</span></footer>';
+    ensureSiteFooter();
+    expect(document.querySelectorAll(".site-footer")).toHaveLength(1);
+    expect(document.querySelector(".site-footer-year")?.textContent).toBe(
+      String(getFooterEndYear()),
+    );
+  });
+
+  it("creates the footer when none is present", () => {
+    document.body.innerHTML = "";
+    ensureSiteFooter();
+    expect(document.querySelector(".site-footer")).not.toBeNull();
+    expect(createSiteFooter(TEST_BUILD_INFO).className).toBe("site-footer");
   });
 });

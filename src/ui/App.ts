@@ -28,7 +28,13 @@ import { createPolicyUpdateSnapshot } from "./policyUpdate";
 import { createSecurityScorePanel } from "./SecurityScore";
 import { createUrlImporter } from "./UrlImporter";
 
-function mountSecurityScorePanel(
+/**
+ * Inserts the security score panel after the main layout, or appends to root.
+ *
+ * @param panel - Security score aside element.
+ * @param root - Application root container.
+ */
+export function mountSecurityScorePanel(
   panel: HTMLElement,
   root: HTMLElement,
 ): void {

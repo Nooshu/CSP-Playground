@@ -239,15 +239,6 @@ export function validatePolicyString(policy: string): PolicyValidationResult {
   }
 
   for (const segment of segments) {
-    if (!segment.name) {
-      issues.push({
-        severity: "error",
-        message: "Directive segment has no name.",
-        suggestion: "Each segment must start with a directive name.",
-      });
-      continue;
-    }
-
     directiveCounts.set(
       segment.name,
       (directiveCounts.get(segment.name) ?? 0) + 1,

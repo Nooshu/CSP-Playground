@@ -39,4 +39,13 @@ describe("showToast", () => {
     expect(toasts[0]?.textContent).toBe("Second message");
     expect(toasts[0]?.classList.contains("toast--error")).toBe(true);
   });
+
+  it("uses the success variant by default and removes the toast after exit", () => {
+    showToast("Saved");
+    const toast = document.querySelector(".toast.toast--success");
+    expect(toast).not.toBeNull();
+
+    vi.advanceTimersByTime(2800);
+    expect(document.querySelector(".toast")).toBeNull();
+  });
 });

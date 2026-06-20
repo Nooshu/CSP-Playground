@@ -23,17 +23,22 @@ const DEV_BUILD_INFO: SiteBuildInfo = {
 };
 
 /**
+ * Returns the short Git commit hash used in footer metadata.
+ *
+ * @param commitShort - Build-injected commit from Vite `define`, or `undefined` in dev.
+ */
+export function resolveGitCommitShort(commitShort: string | undefined): string {
+  return commitShort ?? DEV_BUILD_INFO.gitCommitShort;
+}
+
+/**
  * Returns build metadata for footer rendering.
  */
 export function getSiteBuildInfo(): SiteBuildInfo {
-  if (typeof __GIT_COMMIT_SHORT__ !== "undefined") {
-    return {
-      version: SITE_VERSION,
-      gitCommitShort: __GIT_COMMIT_SHORT__,
-    };
-  }
-
-  return DEV_BUILD_INFO;
+  return {
+    version: SITE_VERSION,
+    gitCommitShort: resolveGitCommitShort(__GIT_COMMIT_SHORT__),
+  };
 }
 
 /**
@@ -97,9 +102,7 @@ export function createSiteFooter(
   text.innerHTML = footerTextHtml();
 
   const yearSpan = text.querySelector(".site-footer-year");
-  if (yearSpan) {
-    yearSpan.textContent = String(getFooterEndYear());
-  }
+  yearSpan!.textContent = String(getFooterEndYear());
 
   const meta = document.createElement("p");
   meta.className = "site-footer-meta";

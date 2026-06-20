@@ -74,4 +74,30 @@ describe("scrollToRecommendationTarget", () => {
     scrollToGeneratedPolicy();
     expect(Element.prototype.scrollIntoView).not.toHaveBeenCalled();
   });
+
+  it("highlights nested targets inside enabled directive sections", () => {
+    vi.useFakeTimers();
+
+    const section = document.createElement("article");
+    section.className = "directive-section";
+    section.dataset.directive = "style-src";
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.className = "enable-checkbox";
+    checkbox.checked = true;
+
+    const child = document.createElement("input");
+    child.className = "source-input";
+    child.id = "style-src-custom";
+
+    section.append(checkbox, child);
+    document.body.appendChild(section);
+
+    scrollToRecommendationTarget("style-src-custom");
+
+    expect(section.classList.contains("recommendation-highlight")).toBe(true);
+    vi.advanceTimersByTime(1600);
+    vi.useRealTimers();
+  });
 });

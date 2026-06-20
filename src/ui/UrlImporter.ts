@@ -258,6 +258,7 @@ export function createUrlImporter(options: UrlImporterOptions): HTMLElement {
   );
   section.append(heading, description, form);
 
+  /** Switches between URL fetch and paste modes, updating labels and focus targets. */
   function setImportMode(mode: ImportMode): void {
     importMode = mode;
     const isUrl = mode === "url";
@@ -270,6 +271,7 @@ export function createUrlImporter(options: UrlImporterOptions): HTMLElement {
     setStatus("", "neutral");
   }
 
+  /** Writes status copy and tone to the live region used by assistive tech. */
   function setStatus(
     message: string,
     tone: "neutral" | "success" | "error" = "neutral",
@@ -278,6 +280,7 @@ export function createUrlImporter(options: UrlImporterOptions): HTMLElement {
     status.dataset.tone = tone;
   }
 
+  /** Toggles disabled/loading state on import and validate controls. */
   function setLoading(loading: boolean, mode: "import" | "validate" = "import"): void {
     submitBtn.disabled = loading;
     validateBtn.disabled = loading;
@@ -291,6 +294,7 @@ export function createUrlImporter(options: UrlImporterOptions): HTMLElement {
       loading && mode === "validate" ? "Validating…" : "Validate CSP";
   }
 
+  /** Resets the validation panel before a new import or validate attempt. */
   function clearValidationPanel(): void {
     validationPanel.hidden = true;
     validationSummary.textContent = "";
@@ -354,6 +358,7 @@ export function createUrlImporter(options: UrlImporterOptions): HTMLElement {
     copyCorrectedBtn.disabled = !result.correctedPolicy;
   }
 
+  /** Applies parsed directives to the builder and syncs report-only mode. */
   function applyPolicy(
     policy: string,
     reportOnly: boolean,
@@ -404,6 +409,7 @@ export function createUrlImporter(options: UrlImporterOptions): HTMLElement {
     }
   }
 
+  /** Maps lookup/paste source codes to user-facing labels in success messages. */
   function sourceLabel(source: string): string {
     if (source.startsWith("meta")) {
       return "HTML meta tag";
@@ -442,6 +448,7 @@ export function createUrlImporter(options: UrlImporterOptions): HTMLElement {
     status.append(paragraph, link);
   }
 
+  /** Routes lookup and extraction failures to inline status or no-CSP guidance. */
   function handleImportFailure(error: unknown): void {
     clearValidationPanel();
 

@@ -21,6 +21,23 @@ describe("serverExports", () => {
     expect(getWebServerExport("missing" as "nginx")).toBeUndefined();
   });
 
+  it("formats html-only exports for Apache, Nginx, Caddy, Lighttpd, and IIS", () => {
+    const options = { htmlOnly: true };
+
+    expect(getWebServerExport("apache")!.format("Content-Security-Policy", policy, options))
+      .toContain("<FilesMatch");
+    expect(getWebServerExport("nginx")!.format("Content-Security-Policy", policy, options))
+      .toContain("add_header Content-Security-Policy");
+    expect(getWebServerExport("nginx")!.format("Content-Security-Policy", policy, options))
+      .toContain(".html$");
+    expect(getWebServerExport("caddy")!.format("Content-Security-Policy", policy, options))
+      .toContain("@html");
+    expect(getWebServerExport("litespeed")!.format("Content-Security-Policy", policy, options))
+      .toContain("<FilesMatch");
+    expect(getWebServerExport("iis")!.format("Content-Security-Policy", policy, options))
+      .toContain("<location path=");
+  });
+
   it("formats Cloudflare HTML-only export with Pages middleware", () => {
     const cloudflare = getWebServerExport("cloudflare");
     expect(cloudflare).toBeDefined();

@@ -58,6 +58,30 @@ describe("extractCspFromText", () => {
     });
   });
 
+  it("extracts CSP when header name and value are on separate lines", () => {
+    expect(
+      extractCspFromText(
+        "Content-Security-Policy:\ndefault-src 'self'",
+      ),
+    ).toEqual({
+      policy: "default-src 'self'",
+      reportOnly: false,
+      source: "header-enforce",
+    });
+  });
+
+  it("extracts report-only CSP from collapsed multiline header text", () => {
+    expect(
+      extractCspFromText(
+        "Content-Security-Policy-Report-Only:\ndefault-src 'none'",
+      ),
+    ).toEqual({
+      policy: "default-src 'none'",
+      reportOnly: true,
+      source: "header-report-only",
+    });
+  });
+
   it("extracts CSP from indented response header blocks", () => {
     const text = [
       "  Access-Control-Allow-Origin: https://nooshu.com",

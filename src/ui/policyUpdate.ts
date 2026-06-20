@@ -1,5 +1,10 @@
 /**
  * Batched policy state and serialized string for coordinated UI updates.
+ *
+ * @remarks
+ * The output panel and security score both need the same policy string on every
+ * form change. Building the string once avoids duplicate work and keeps previews
+ * in sync with scoring input.
  */
 
 import { buildPolicyString, type PolicyState } from "../csp/buildPolicy";

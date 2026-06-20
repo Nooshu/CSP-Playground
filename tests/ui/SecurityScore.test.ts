@@ -156,4 +156,40 @@ describe("createSecurityScorePanel", () => {
     expect(Element.prototype.scrollIntoView).toHaveBeenCalled();
     expect(policy.classList.contains("recommendation-highlight")).toBe(true);
   });
+
+  it("removes stale recommendation buttons when recommendations change", () => {
+    let state: Record<string, { enabled: boolean; values: string[] }> = {
+      "script-src": {
+        enabled: true,
+        values: ["'unsafe-inline'"],
+      },
+    };
+
+    const panel = createSecurityScorePanel({
+      getState: () => state,
+      getReportOnly: () => false,
+    });
+    document.body.appendChild(panel);
+    panel.update();
+
+    const initialButtons = [
+      ...panel.querySelectorAll(".security-score-recommendation-btn"),
+    ];
+    expect(initialButtons.length).toBeGreaterThan(0);
+    const initialLabel = initialButtons[0]?.textContent;
+
+    state = {
+      "script-src": {
+        enabled: true,
+        values: ["'unsafe-eval'"],
+      },
+    };
+    panel.update();
+
+    const nextButtons = [
+      ...panel.querySelectorAll(".security-score-recommendation-btn"),
+    ];
+    expect(nextButtons.length).toBeGreaterThan(0);
+    expect(nextButtons[0]?.textContent).not.toBe(initialLabel);
+  });
 });

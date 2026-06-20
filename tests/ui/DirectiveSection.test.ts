@@ -153,4 +153,28 @@ describe("createDirectiveSection", () => {
       section.element.querySelector(".deprecated-badge")?.textContent,
     ).toBe("Deprecated");
   });
+
+  it("handles boolean directives and source-single reset paths", () => {
+    const onChange = vi.fn();
+    const booleanDirective = DIRECTIVES.find(
+      (directive) => directive.type === "boolean",
+    )!;
+    const section = createDirectiveSection({
+      directive: booleanDirective,
+      onChange,
+    });
+    section.setState({ enabled: true, values: [] });
+    expect(section.getState()).toEqual({ enabled: true, values: [] });
+    section.reset();
+    expect(section.getState()).toEqual({ enabled: false, values: [] });
+
+    const single = DIRECTIVES.find((directive) => directive.type === "source-single")!;
+    const singleSection = createDirectiveSection({
+      directive: single,
+      onChange,
+    });
+    singleSection.setState({ enabled: true, values: ["endpoint"] });
+    singleSection.reset();
+    expect(singleSection.getState()).toEqual({ enabled: false, values: [] });
+  });
 });

@@ -180,4 +180,24 @@ describe("scorePolicy", () => {
     const result = scorePolicy({});
     expect(result.potentialScore).toBeLessThanOrEqual(100);
   });
+
+  it("scores upgrade-insecure-requests as a boolean directive", () => {
+    const result = scorePolicy(
+      state({
+        "upgrade-insecure-requests": { enabled: true, values: ["ignored"] },
+        "object-src": { enabled: true, values: ["'none'"] },
+      }),
+    );
+    expect(result.score).toBeGreaterThan(0);
+  });
+
+  it("scores boolean directives and accepts a policy override", () => {
+    const result = scorePolicy(
+      state({
+        "default-src": { enabled: true, values: ["'self'"] },
+      }),
+      { policy: "default-src 'self'; object-src 'none'" },
+    );
+    expect(result.score).toBeGreaterThan(0);
+  });
 });

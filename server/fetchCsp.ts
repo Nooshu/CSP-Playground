@@ -64,9 +64,6 @@ function isPrivateIpv4(hostname: string): boolean {
   if (!match) return false;
 
   const octets = match.slice(1, 5).map(Number);
-  // Reject impossible octets (treated as unsafe).
-  if (octets.some((octet) => octet > 255)) return true;
-
   const [a, b] = octets;
   if (a === 10) return true;
   if (a === 127) return true;

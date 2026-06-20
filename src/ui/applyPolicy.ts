@@ -21,6 +21,7 @@ import type { DirectiveSectionHandle } from "./DirectiveSection";
  * @remarks
  * Directives absent from `parsed.directives` remain disabled after reset.
  * Report-only mode is handled separately by the URL importer on the output panel.
+ * Sections without a `data-directive` attribute are skipped silently.
  */
 export function applyParsedPolicy(
   sections: DirectiveSectionHandle[],

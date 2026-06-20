@@ -126,6 +126,31 @@ describe("createPolicyOutput", () => {
     );
   });
 
+  it("disables html-only export for servers without scoped HTML support", async () => {
+    const panel = createPolicyOutput({ getState: createState });
+    document.body.appendChild(panel);
+    panel.update();
+
+    const htmlOnlyCheckbox = panel.querySelector(
+      'input[type="checkbox"]',
+    ) as HTMLInputElement;
+    htmlOnlyCheckbox.checked = true;
+    htmlOnlyCheckbox.dispatchEvent(new Event("change", { bubbles: true }));
+
+    const serverSelect = panel.querySelector(
+      "#server-export-select",
+    ) as HTMLSelectElement;
+    await vi.waitFor(() =>
+      expect(serverSelect.options.length).toBeGreaterThan(1),
+    );
+
+    serverSelect.value = "traefik";
+    serverSelect.dispatchEvent(new Event("change", { bubbles: true }));
+
+    expect(htmlOnlyCheckbox.disabled).toBe(true);
+    expect(htmlOnlyCheckbox.checked).toBe(false);
+  });
+
   it("can progressively enhance an existing container element", () => {
     const container = document.createElement("aside");
     container.id = "generated-policy";

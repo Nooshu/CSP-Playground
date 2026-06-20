@@ -17,6 +17,8 @@ import { createNonceHelper } from "../src/ui/NonceHelper";
 import { createApp } from "../src/ui/App";
 import { createStyleAttrHashHelper } from "../src/ui/StyleAttrHashHelper";
 import * as lookupApi from "../src/api/lookupCsp";
+import * as extractCspModule from "../src/csp/extractCspFromText";
+import { ExtractCspError } from "../src/csp/extractCspFromText";
 
 describe("coverage gaps", () => {
   it("treats public IPv4 addresses as allowed", () => {

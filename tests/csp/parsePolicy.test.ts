@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   extractMetaCsp,
   parsePolicyString,
+  parseSourceValues,
 } from "../../src/csp/parsePolicy";
 
 describe("parsePolicyString", () => {
@@ -17,6 +18,24 @@ describe("parsePolicyString", () => {
     expect(parsed.reportOnly).toBe(false);
   });
 
+  it("parses double-quoted source values and unclosed quotes", () => {
+    const parsed = parsePolicyString('default-src "cdn.example.com" \'self\'');
+    expect(parsed.directives["default-src"]).toEqual([
+      '"cdn.example.com"',
+      "'self'",
+    ]);
+    expect(parseSourceValues('"open-only')).toEqual(['"open-only"']);
+  });
+
+  it("tokenizes mixed quoting styles and whitespace", () => {
+    expect(parseSourceValues("'self' \"cdn.example\" https://a.test")).toEqual([
+      "'self'",
+      '"cdn.example"',
+      "https://a.test",
+    ]);
+    expect(parseSourceValues("   ")).toEqual([]);
+  });
+
   it("parses boolean directives and empty segments", () => {
     const parsed = parsePolicyString(
       "upgrade-insecure-requests; block-all-mixed-content; ; sandbox",
@@ -28,6 +47,9 @@ describe("parsePolicyString", () => {
 
   it("ignores segments without a name", () => {
     expect(parsePolicyString("   ").directives).toEqual({});
+    expect(parsePolicyString("  ; default-src 'self'").directives["default-src"]).toEqual([
+      "'self'",
+    ]);
   });
 });
 
@@ -63,11 +85,43 @@ describe("extractMetaCsp", () => {
     });
   });
 
+  it("reads reversed report-only meta tags", () => {
+    const html = `
+      <meta content="default-src none" http-equiv="Content-Security-Policy-Report-Only">
+    `;
+    expect(extractMetaCsp(html)).toEqual({
+      policy: "default-src none",
+      reportOnly: true,
+    });
+  });
+
   it("skips empty content and returns null when absent", () => {
     const html = `<meta http-equiv="Content-Security-Policy" content="">`;
     expect(extractMetaCsp(html)).toEqual({
       policy: null,
       reportOnly: false,
+    });
+  });
+
+  it("reads enforce policy from reversed-order meta tags only", () => {
+    const html = `
+      <meta content="default-src self" http-equiv="Content-Security-Policy">
+    `;
+    expect(extractMetaCsp(html)).toEqual({
+      policy: "default-src self",
+      reportOnly: false,
+    });
+  });
+
+  it("ignores unrelated meta tags and empty reversed content", () => {
+    const html = `
+      <meta http-equiv="Refresh" content="0">
+      <meta content="" http-equiv="Content-Security-Policy">
+      <meta content="default-src none" http-equiv="Content-Security-Policy-Report-Only">
+    `;
+    expect(extractMetaCsp(html)).toEqual({
+      policy: "default-src none",
+      reportOnly: true,
     });
   });
 });

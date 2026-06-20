@@ -122,6 +122,34 @@ describe("validatePolicyString", () => {
     ).toBe(true);
   });
 
+  it("flags policies with no parseable directives", () => {
+    const result = validatePolicyString(" ; ");
+    expect(result.hasErrors).toBe(true);
+    expect(
+      result.issues.some((issue) =>
+        issue.message.includes("Policy contains no valid directives"),
+      ),
+    ).toBe(true);
+  });
+
+  it("flags stray semicolons in corrected policies", () => {
+    const stray = validatePolicyString("default-src 'self';;");
+    expect(
+      stray.issues.some((issue) =>
+        issue.message.includes("Empty directive segment"),
+      ),
+    ).toBe(true);
+  });
+
+  it("flags unclosed double quotes in source lists", () => {
+    const result = validatePolicyString('default-src "self');
+    expect(
+      result.issues.some((issue) =>
+        issue.message.includes("Unclosed quote in default-src"),
+      ),
+    ).toBe(true);
+  });
+
   it("flags invalid sandbox flags", () => {
     const result = validatePolicyString("sandbox allow-invalid");
     expect(result.hasErrors).toBe(true);

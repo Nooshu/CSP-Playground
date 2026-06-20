@@ -107,12 +107,46 @@ describe("lookupCspForUrl", () => {
   });
 
   it("reports timeouts as fetch failures", async () => {
-    const abort = Object.assign(new Error("aborted"), { name: "AbortError" });
-    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(abort));
-
-    await expect(lookupCspForUrl("https://example.com")).rejects.toThrow(
-      /timed out/i,
+    vi.useFakeTimers();
+    vi.stubGlobal(
+      "fetch",
+      vi.fn((_url, init?: RequestInit) =>
+        new Promise((_resolve, reject) => {
+          init?.signal?.addEventListener("abort", () => {
+            const abort = Object.assign(new Error("aborted"), {
+              name: "AbortError",
+            });
+            reject(abort);
+          });
+        }),
+      ),
     );
+
+    const lookup = lookupCspForUrl("https://example.com");
+    const assertion = expect(lookup).rejects.toMatchObject({
+      code: "fetch_failed",
+      message: /timed out/,
+    });
+    await vi.advanceTimersByTimeAsync(12_001);
+    await assertion;
+    vi.useRealTimers();
+  });
+
+  it("falls back to the normalized URL when responses omit a final URL", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        mockResponse({
+          url: "",
+          headers: {
+            "content-security-policy": "default-src 'self'",
+          },
+        }),
+      ),
+    );
+
+    const result = await lookupCspForUrl("https://example.com/path");
+    expect(result.url).toBe("https://example.com/path");
   });
 
   it("returns report-only CSP from HEAD response", async () => {
@@ -187,6 +221,23 @@ describe("lookupCspForUrl", () => {
   });
 
   it("throws when no CSP is found or fetch fails", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockResolvedValueOnce(mockResponse({ status: 200 }))
+        .mockResolvedValueOnce(
+          mockResponse({
+            status: 200,
+            url: "",
+            text: `<meta http-equiv="Content-Security-Policy" content="default-src 'self'">`,
+          }),
+        ),
+    );
+    const metaResult = await lookupCspForUrl("https://example.com/page");
+    expect(metaResult.source).toBe("meta-enforce");
+    expect(metaResult.url).toBe("https://example.com/page");
+
     vi.stubGlobal(
       "fetch",
       vi

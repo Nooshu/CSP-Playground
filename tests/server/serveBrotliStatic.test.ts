@@ -25,6 +25,9 @@ describe("serveBrotliStatic", () => {
     expect(getStaticAssetContentType("/favicon.ico")).toBe(
       "image/vnd.microsoft.icon",
     );
+    expect(getStaticAssetContentType("/unknown/asset.dat")).toBe(
+      "application/octet-stream",
+    );
     expect(isBrotliCompressibleAsset("/index.html")).toBe(true);
     expect(isBrotliCompressibleAsset("/favicon-32x32.png")).toBe(false);
     expect(getStaticAssetCacheControl("/assets/main-abc12345.js")).toBe(
@@ -32,6 +35,9 @@ describe("serveBrotliStatic", () => {
     );
     expect(getStaticAssetCacheControl("/index.html")).toContain(
       "must-revalidate",
+    );
+    expect(getStaticAssetCacheControl("/robots.txt")).toBe(
+      "public, max-age=86400, no-transform",
     );
   });
 
@@ -77,6 +83,10 @@ describe("serveBrotliStatic", () => {
       ),
     ).resolves.toBeNull();
 
+    await expect(
+      tryServeBrotliAsset(new Request("https://example.com/", {}), assets),
+    ).resolves.toBeNull();
+
     expect(assets.fetch).not.toHaveBeenCalled();
   });
 
@@ -94,5 +104,55 @@ describe("serveBrotliStatic", () => {
 
     expect(response).toBeNull();
     expect(assets.fetch).not.toHaveBeenCalled();
+  });
+
+  it("falls through for GET API routes", async () => {
+    const assets = { fetch: vi.fn() } as unknown as Fetcher;
+
+    await expect(
+      tryServeBrotliAsset(
+        new Request("https://example.com/api/csp-lookup", { method: "GET" }),
+        assets,
+      ),
+    ).resolves.toBeNull();
+    expect(assets.fetch).not.toHaveBeenCalled();
+  });
+
+  it("falls through when the brotli sidecar fetch fails", async () => {
+    const assets = {
+      fetch: vi.fn(async () => new Response("missing", { status: 404 })),
+    } as unknown as Fetcher;
+
+    const response = await tryServeBrotliAsset(
+      new Request("https://example.com/", {
+        headers: { "Accept-Encoding": "gzip, br" },
+      }),
+      assets,
+    );
+
+    expect(response).toBeNull();
+  });
+
+  it("forwards etag headers and supports HEAD requests", async () => {
+    const assets = {
+      fetch: vi.fn(async () =>
+        new Response("br-body", {
+          status: 200,
+          headers: { etag: '"abc123"' },
+        }),
+      ),
+    } as unknown as Fetcher;
+
+    const headResponse = await tryServeBrotliAsset(
+      new Request("https://example.com/", {
+        method: "HEAD",
+        headers: { "Accept-Encoding": "br" },
+      }),
+      assets,
+    );
+
+    expect(headResponse?.status).toBe(200);
+    expect(headResponse?.headers.get("etag")).toBe('"abc123"');
+    expect(await headResponse?.text()).toBe("");
   });
 });

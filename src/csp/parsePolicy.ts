@@ -29,7 +29,7 @@ export function parseSourceValues(valuePart: string): string[] {
   let index = 0;
 
   while (index < valuePart.length) {
-    // Skip whitespace between tokens.
+    // Skip whitespace between tokens before reading the next source expression.
     while (index < valuePart.length && /\s/.test(valuePart[index] ?? "")) {
       index += 1;
     }
@@ -116,6 +116,7 @@ export function extractMetaCsp(html: string): {
     const content = match[2]?.trim();
     if (!content) continue;
 
+    // Standard attribute order: http-equiv before content.
     if (equiv === "content-security-policy") {
       enforcePolicy = content;
     } else if (equiv === "content-security-policy-report-only") {
@@ -131,6 +132,7 @@ export function extractMetaCsp(html: string): {
     const equiv = match[2]?.trim().toLowerCase();
     if (!content) continue;
 
+    // Reversed attribute order: content before http-equiv.
     if (equiv === "content-security-policy") {
       enforcePolicy = content;
     } else if (equiv === "content-security-policy-report-only") {
@@ -139,6 +141,7 @@ export function extractMetaCsp(html: string): {
   }
 
   if (enforcePolicy) {
+    // Enforce policies always win over report-only meta tags.
     return { policy: enforcePolicy, reportOnly: false };
   }
 

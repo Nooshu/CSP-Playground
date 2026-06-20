@@ -41,10 +41,14 @@ const ENFORCE_HEADER_PATTERN =
 const REPORT_ONLY_HEADER_PATTERN =
   /^\s*content-security-policy-report-only\s*:\s*(.+)$/i;
 
+/**
+ * Normalizes line endings and outer whitespace before tokenizing source values.
+ */
 function normalizeInput(input: string): string {
   return input.replace(/\r\n/g, "\n").trim();
 }
 
+/** Collects all CSP header values matching `pattern` across a multi-line paste. */
 function collectHeaderValues(
   text: string,
   pattern: RegExp,
@@ -61,10 +65,19 @@ function collectHeaderValues(
   return values;
 }
 
+/**
+ * Joins duplicate CSP header values the way browsers combine repeated headers.
+ */
 function joinPolicies(values: string[]): string {
   return values.join("; ");
 }
 
+/**
+ * Detects whether pasted text looks like HTTP headers rather than a bare policy.
+ *
+ * @remarks
+ * Used to distinguish "headers without CSP" (actionable error) from raw policy text.
+ */
 function looksLikeHttpHeaders(text: string): boolean {
   for (const line of text.split("\n")) {
     const trimmed = line.trim();
@@ -76,6 +89,9 @@ function looksLikeHttpHeaders(text: string): boolean {
   return false;
 }
 
+/**
+ * Parses a single-line enforce or report-only CSP header value.
+ */
 function extractFromSingleHeaderLine(text: string): ExtractCspResult | null {
   const reportOnlyMatch = text.match(REPORT_ONLY_HEADER_PATTERN);
   if (reportOnlyMatch?.[1]?.trim()) {
@@ -146,12 +162,6 @@ export function extractCspFromText(input: string): ExtractCspResult {
   }
 
   const rawPolicy = singleLine.trim();
-  if (!rawPolicy) {
-    throw new ExtractCspError(
-      "no_csp",
-      "No Content-Security-Policy was found in the pasted text.",
-    );
-  }
 
   return {
     policy: rawPolicy,
