@@ -130,6 +130,17 @@ yarn test:watch        # Watch mode
 yarn test:coverage     # Coverage with thresholds (100% lines/functions, 99% statements, 93% branches)
 ```
 
+### E2E smoke tests
+
+Playwright runs against the production build served by `vite preview` (includes the CSP lookup middleware):
+
+```bash
+yarn build             # Required before first e2e run
+yarn test:e2e          # Headless Chromium smoke suite
+yarn test:e2e:ui       # Interactive Playwright UI
+yarn playwright install chromium  # One-time browser install locally
+```
+
 ### Typecheck
 
 ```bash

@@ -36,6 +36,7 @@ yarn lint:fix         # Apply safe Biome fixes and formatting
 yarn build            # Typecheck + production build
 yarn test             # Run tests
 yarn test:coverage    # Tests with coverage thresholds
+yarn test:e2e         # Playwright smoke tests (requires yarn build first)
 yarn verify:deps      # Pin + integrity check (run after dependency updates)
 ```
 
@@ -107,6 +108,7 @@ Use `yarn pages:dev` when changing Functions or shared server lookup code.
 ## Testing expectations
 
 - Run `yarn test` after logic changes.
+- Run `yarn test:e2e` after UI or build output changes (`yarn build` first).
 - Run `yarn lint` after formatting or style changes.
 - Run `yarn build` before finishing TypeScript or bundler changes.
 - Maintain existing coverage thresholds when touching tested code.

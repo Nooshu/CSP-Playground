@@ -118,6 +118,7 @@ Lookup order: `HEAD` headers → `GET` headers → HTML `<meta http-equiv="Conte
 ## Testing strategy
 
 - **Vitest + jsdom** for unit and DOM tests under `tests/`, mirroring `src/` and `server/` layout.
+- **Playwright** for browser smoke tests in `e2e/` against `vite preview` + `dist/`.
 - High coverage thresholds in `vitest.config.ts`; branch coverage below 100% reflects defensive DOM paths rather than missing tests.
 - **`yarn typecheck`** — `src/` plus `server/` / `functions/` via separate tsconfigs.
 - **`yarn lint`** — Biome check (format + lint).
