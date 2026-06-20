@@ -26,6 +26,10 @@ import {
 /** Whether the helper targets script or stylesheet/style inline nonces. */
 export type NonceHelperVariant = "script" | "style";
 
+/** Shared production guidance shown in script and style nonce helpers. */
+export const NONCE_PRODUCTION_NOTE =
+  "Example only. In production, generate a new nonce on every HTTP response on the server and inject the same value into both your CSP header and your HTML. Never reuse a fixed nonce from this tool.";
+
 interface NonceVariantConfig {
   summary: string;
   intro: string;
@@ -46,7 +50,7 @@ const NONCE_VARIANTS: Record<NonceHelperVariant, NonceVariantConfig> = {
   script: {
     summary: "Generate a script nonce",
     intro:
-      "Create a cryptographically random nonce, add it to this directive, and copy the HTML snippet for your page.",
+      "Generate an example cryptographically random nonce, add it to this directive, and copy the matching HTML snippet.",
     modeLegend: "Script type",
     externalLabel: " External script URL",
     inlineLabel: " Inline script",
@@ -62,7 +66,7 @@ const NONCE_VARIANTS: Record<NonceHelperVariant, NonceVariantConfig> = {
   style: {
     summary: "Generate a style nonce",
     intro:
-      "Create a nonce for an external stylesheet or inline <style> block, add it to this directive, and copy the HTML snippet.",
+      "Generate an example nonce for an external stylesheet or inline <style> block, add it to this directive, and copy the matching HTML snippet.",
     modeLegend: "Style type",
     externalLabel: " External stylesheet URL",
     inlineLabel: " Inline <style> block",
@@ -116,6 +120,11 @@ export function createNonceHelper(options: NonceHelperOptions): HTMLElement {
   const intro = document.createElement("p");
   intro.className = "nonce-helper-intro";
   intro.textContent = config.intro;
+
+  const productionNote = document.createElement("aside");
+  productionNote.className = "nonce-helper-notice";
+  productionNote.setAttribute("aria-label", "Production nonce guidance");
+  productionNote.textContent = NONCE_PRODUCTION_NOTE;
 
   const modeFieldset = document.createElement("fieldset");
   modeFieldset.className = "nonce-mode-fieldset";
@@ -221,6 +230,7 @@ export function createNonceHelper(options: NonceHelperOptions): HTMLElement {
   details.append(
     summary,
     intro,
+    productionNote,
     modeFieldset,
     externalPanel,
     inlinePanel,
@@ -289,7 +299,7 @@ export function createNonceHelper(options: NonceHelperOptions): HTMLElement {
       snippet.textContent = htmlSnippet;
       result.hidden = false;
       status.textContent =
-        "Nonce generated and added to this directive. Copy the HTML snippet into your page.";
+        "Example nonce generated and added to this directive. Copy the HTML snippet to try the pattern locally.";
     } catch (error) {
       status.textContent =
         error instanceof Error ? error.message : "Could not generate a nonce.";

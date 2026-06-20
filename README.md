@@ -49,9 +49,9 @@ Import an existing CSP into the builder from a live URL or pasted text:
 ### Nonce and hash helpers
 
 - **Script/style nonce helper** (on `script-src`, `script-src-elem`, `style-src`, `style-src-elem`):
-  - Generates a cryptographically random nonce
+  - Generates **example** cryptographically random nonces and matching HTML snippets for inline or external scripts/stylesheets
   - Adds `'nonce-…'` to the directive
-  - Copies ready-to-paste HTML snippets for inline or external scripts/stylesheets
+  - **Production note:** in production, generate a **new nonce on every HTTP response** on the server and inject the same value into both your CSP header and your HTML — never reuse a fixed nonce copied from this tool
 - **Style attribute hash helper** (on `style-src-attr`):
   - SHA-256 hashes the exact `style="…"` attribute value via Web Crypto
   - Adds `'sha256-…'` and `'unsafe-hashes'` when needed

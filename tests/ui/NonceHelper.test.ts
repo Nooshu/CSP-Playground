@@ -2,6 +2,25 @@ import { describe, expect, it, vi } from "vitest";
 import { createNonceHelper } from "../../src/ui/NonceHelper";
 
 describe("createNonceHelper", () => {
+  it("shows production guidance for example nonces", () => {
+    const helper = createNonceHelper({
+      idPrefix: "script-src",
+      helpId: "script-src-help",
+      variant: "script",
+      addValue: vi.fn(),
+      getValues: () => [],
+      onChange: vi.fn(),
+    });
+    document.body.appendChild(helper);
+
+    expect(helper.querySelector(".nonce-helper-notice")?.textContent).toContain(
+      "Example only",
+    );
+    expect(helper.querySelector(".nonce-helper-notice")?.textContent).toContain(
+      "every HTTP response",
+    );
+  });
+
   it("generates script nonces for external URLs", async () => {
     const values: string[] = [];
     const onChange = vi.fn();
