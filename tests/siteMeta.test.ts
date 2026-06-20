@@ -48,7 +48,7 @@ describe("siteMeta", () => {
       `property="og:image:type" content="${OG_IMAGE_TYPE}"`,
     );
     expect(html).toContain('property="og:image:width" content="1200"');
-    expect(html).toContain('property="og:image:height" content="464"');
+    expect(html).toContain('property="og:image:height" content="630"');
     expect(html).toContain('name="twitter:card" content="summary_large_image"');
     expect(html).toContain(`name="twitter:title" content="${title}"`);
     expect(html).toContain(

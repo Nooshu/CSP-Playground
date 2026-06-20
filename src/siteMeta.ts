@@ -5,14 +5,14 @@
 /** Canonical site origin for absolute URLs and social previews. */
 export const SITE_ORIGIN = "https://csp-playground.dev";
 
-/** Path to the social preview image in `public/` (1200 × 464 px). */
+/** Path to the social preview image in `public/` (1200 × 630 px). */
 export const OG_IMAGE_PATH = "/og-image.jpg";
 
 /** Social preview image width in pixels. */
 export const OG_IMAGE_WIDTH = 1200;
 
 /** Social preview image height in pixels. */
-export const OG_IMAGE_HEIGHT = 464;
+export const OG_IMAGE_HEIGHT = 630;
 
 /** MIME type of the social preview image. */
 export const OG_IMAGE_TYPE = "image/jpeg";
