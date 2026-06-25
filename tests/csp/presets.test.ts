@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { buildPolicyString } from "../../src/csp/buildPolicy";
-import { CSP_PRESETS } from "../../src/csp/presets";
 import { isPolicyStateEmpty } from "../../src/csp/policyState";
+import { CSP_PRESETS, getCspPreset } from "../../src/csp/presets";
 
 describe("CSP_PRESETS", () => {
   it("defines three presets from beginner to advanced", () => {
@@ -28,6 +28,13 @@ describe("CSP_PRESETS", () => {
     expect(advanced?.state["script-src"]?.values).not.toContain(
       "'unsafe-inline'",
     );
+  });
+});
+
+describe("getCspPreset", () => {
+  it("returns a preset by id", () => {
+    expect(getCspPreset("intermediate")?.title).toBe("Intermediate");
+    expect(getCspPreset("missing" as "beginner")).toBeUndefined();
   });
 });
 

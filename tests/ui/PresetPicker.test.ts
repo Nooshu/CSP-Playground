@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { CSP_PRESETS } from "../../src/csp/presets";
-import { createPresetPicker } from "../../src/ui/PresetPicker";
 import type { DirectiveSectionHandle } from "../../src/ui/DirectiveSection";
+import { createPresetPicker } from "../../src/ui/PresetPicker";
 
 function createMockSection(directiveName: string): DirectiveSectionHandle {
   let state = { enabled: false, values: [] as string[] };
@@ -68,9 +68,7 @@ describe("createPresetPicker", () => {
       .querySelector(".preset-card-apply")
       ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
 
-    expect(defaultSection.getState()).toEqual(
-      beginner.state["default-src"],
-    );
+    expect(defaultSection.getState()).toEqual(beginner.state["default-src"]);
     expect(onApplied).toHaveBeenCalledTimes(1);
     expect(document.querySelector(".toast")?.textContent).toContain(
       "Beginner preset",

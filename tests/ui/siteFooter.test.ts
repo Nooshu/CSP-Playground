@@ -31,7 +31,9 @@ describe("siteFooter", () => {
     expect(html).toContain(">Cloudflare</a>");
     expect(html).toContain('href="https://www.cloudflare.com"');
     expect(html).toContain('href="https://spacebarspeeds.com/"');
-    expect(html).toContain('aria-label="Claire Hobbs (opens in new tab)">❤️</a>');
+    expect(html).toContain(
+      'aria-label="Claire Hobbs (opens in new tab)">❤️</a>',
+    );
     expect(html).toContain(
       'href="https://cursor.com/referral?code=XDKDHWAJX4RJ"',
     );

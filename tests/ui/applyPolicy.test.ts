@@ -98,4 +98,25 @@ describe("applyPolicyState", () => {
       values: ["'self'", "'unsafe-inline'"],
     });
   });
+
+  it("skips sections without directive names when applying state", () => {
+    const section = createMockSection("default-src");
+    delete section.section.element.dataset.directive;
+
+    expect(
+      applyPolicyState([section.section], {
+        "default-src": { enabled: true, values: ["'self'"] },
+      }),
+    ).toBe(0);
+  });
+
+  it("skips disabled directives when applying state", () => {
+    const section = createMockSection("default-src");
+
+    expect(
+      applyPolicyState([section.section], {
+        "default-src": { enabled: false, values: ["'self'"] },
+      }),
+    ).toBe(0);
+  });
 });

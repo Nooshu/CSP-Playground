@@ -11,8 +11,8 @@
  */
 
 import type { PolicyState } from "../csp/buildPolicy";
-import { CSP_PRESETS, type CspPreset } from "../csp/presets";
 import { isPolicyStateEmpty } from "../csp/policyState";
+import { CSP_PRESETS, type CspPreset } from "../csp/presets";
 import { applyPolicyState } from "./applyPolicy";
 import type { DirectiveSectionHandle } from "./DirectiveSection";
 import { createModal } from "./modal";

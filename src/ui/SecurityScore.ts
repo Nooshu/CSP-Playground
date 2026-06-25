@@ -187,7 +187,10 @@ export function createSecurityScorePanel(
         recommendationItems.set(recommendation.id, item);
       }
 
-      const button = item.querySelector("button")!;
+      const button = item.querySelector("button");
+      if (!(button instanceof HTMLButtonElement)) {
+        continue;
+      }
       if (button.textContent !== text) button.textContent = text;
       if (button.getAttribute("aria-label") !== ariaLabel) {
         button.setAttribute("aria-label", ariaLabel);

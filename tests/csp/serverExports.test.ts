@@ -92,7 +92,10 @@ describe("serverExports", () => {
     const firebase = getWebServerExport("firebase");
     expect(firebase?.name).toBe("Firebase Hosting");
 
-    const output = firebase!.format("Content-Security-Policy-Report-Only", policy);
+    const output = firebase!.format(
+      "Content-Security-Policy-Report-Only",
+      policy,
+    );
     expect(output).toContain('"hosting"');
     expect(output).toContain('"source": "**"');
     expect(output).toContain('"key": "Content-Security-Policy-Report-Only"');
@@ -101,7 +104,13 @@ describe("serverExports", () => {
   });
 
   it("documents servers that cannot scope HTML-only exports", () => {
-    const unsupported = ["iis", "netlify", "vercel", "traefik", "envoy"] as const;
+    const unsupported = [
+      "iis",
+      "netlify",
+      "vercel",
+      "traefik",
+      "envoy",
+    ] as const;
 
     for (const id of unsupported) {
       const server = getWebServerExport(id);

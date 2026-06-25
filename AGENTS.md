@@ -16,7 +16,7 @@ Guidance for AI coding agents working in the CSP Playground repository.
 | Area | Location |
 |------|----------|
 | CSP logic | `src/csp/` |
-| UI components | `src/ui/` |
+| UI components | `src/ui/` (`PresetPicker`, `modal`, server export panel) |
 | Client API | `src/api/` |
 | URL lookup (shared) | `server/` |
 | Cloudflare Pages API | `functions/api/` |
@@ -30,6 +30,7 @@ Guidance for AI coding agents working in the CSP Playground repository.
 ```bash
 yarn install          # Install dependencies
 yarn dev              # Dev server (http://localhost:5173)
+yarn start            # Alias for yarn dev
 yarn typecheck        # Typecheck src/, server/, and functions/
 yarn lint             # Biome format + lint check
 yarn lint:fix         # Apply safe Biome fixes and formatting
@@ -109,9 +110,10 @@ Use `yarn pages:dev` when changing Functions or shared server lookup code.
 
 - Run `yarn test` after logic changes.
 - Run `yarn test:e2e` after UI or build output changes (`yarn build` first).
-- Run `yarn lint` after formatting or style changes.
+- Run `yarn lint` after formatting or style changes; fix all errors and warnings before finishing.
 - Run `yarn build` before finishing TypeScript or bundler changes.
 - Maintain existing coverage thresholds when touching tested code.
+- Before marking work complete, follow `.cursor/rules/finish-quality-gate.mdc` (tests, lint, build, and `AGENTS.md` updates when required).
 
 ## Git conventions
 

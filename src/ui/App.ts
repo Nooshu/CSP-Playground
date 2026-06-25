@@ -24,8 +24,8 @@ import {
   type DirectiveSectionHandle,
 } from "./DirectiveSection";
 import { createPolicyOutput, type PolicyOutputPanel } from "./PolicyOutput";
-import { createPolicyUpdateSnapshot } from "./policyUpdate";
 import { createPresetPicker } from "./PresetPicker";
+import { createPolicyUpdateSnapshot } from "./policyUpdate";
 import { createSecurityScorePanel } from "./SecurityScore";
 import { createUrlImporter } from "./UrlImporter";
 
@@ -137,8 +137,9 @@ export function createApp(root: HTMLElement): void {
       container: urlImporterContainer ?? undefined,
     });
 
-    const presetPickerContainer =
-      root.querySelector<HTMLElement>("#preset-picker-root");
+    const presetPickerContainer = root.querySelector<HTMLElement>(
+      "#preset-picker-root",
+    );
     createPresetPicker({
       sections,
       getState: collectState,

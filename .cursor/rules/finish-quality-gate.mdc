@@ -1,0 +1,59 @@
+---
+description: Before finishing code work — fix all test/lint issues and update AGENTS.md when needed
+alwaysApply: true
+---
+
+# Finish quality gate
+
+Before marking code work complete, run verification and fix **every** failure and warning. Do not leave the branch in a broken or warning state.
+
+Read [AGENTS.md](../../AGENTS.md) for full project conventions; update it when your changes affect what agents need to know.
+
+## Required before finishing
+
+1. **Tests** — all must pass with no errors:
+
+   ```bash
+   yarn test
+   yarn test:coverage   # when touching covered src/, server/, or functions/ code
+   yarn test:e2e        # when touching UI or build output (run yarn build first)
+   ```
+
+2. **Lint** — zero errors **and** zero warnings:
+
+   ```bash
+   yarn lint
+   ```
+
+   Fix issues with `yarn lint:fix` when safe; resolve any remaining warnings manually.
+
+3. **Build** — must succeed when TypeScript, bundler, or deploy paths change:
+
+   ```bash
+   yarn build
+   ```
+
+4. **Dependencies** — after any `package.json` change, run once at the end:
+
+   ```bash
+   yarn verify:deps
+   ```
+
+   See `.cursor/rules/dependency-pinning.mdc`.
+
+## Fix failures; do not defer
+
+- Failing tests, type errors, coverage threshold failures, and lint warnings are **blockers** — fix them in the same session unless the user explicitly defers.
+- Do not silence warnings with ignores or suppressions unless the user asks and the project already uses that pattern.
+
+## Update AGENTS.md when required
+
+Update [AGENTS.md](../../AGENTS.md) (and linked docs such as `README.md`, `docs/ARCHITECTURE.md`, or `llms.txt` when user-facing or agent-facing) if your changes affect:
+
+- Commands, scripts, or toolchain pins (Node, Yarn, Vite, test runners)
+- Key paths, module boundaries, or architecture
+- Testing expectations or coverage policy
+- Dependency or deployment workflow
+- New features agents should know about (APIs, env vars, Pages settings)
+
+Skip doc updates for trivial, behaviour-preserving refactors that do not change how agents work in this repo.

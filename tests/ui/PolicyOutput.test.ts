@@ -182,9 +182,9 @@ describe("createPolicyOutput", () => {
     serverSelect.dispatchEvent(new Event("change", { bubbles: true }));
 
     const note = panel.querySelector("#server-export-note");
-    expect(note?.querySelector(".server-export-note-heading")?.textContent).toBe(
-      "Cloudflare Pages setup",
-    );
+    expect(
+      note?.querySelector(".server-export-note-heading")?.textContent,
+    ).toBe("Cloudflare Pages setup");
     expect(note?.textContent).toContain("functions/_middleware.ts");
     expect(note?.textContent).toContain("_headers");
   });
@@ -248,9 +248,7 @@ describe("createPolicyOutput", () => {
     expect(htmlOnlyCheckbox.disabled).toBe(true);
     expect(htmlOnlyCheckbox.checked).toBe(false);
     expect(htmlOnlyCheckbox.title).toContain("splats");
-    expect(
-      panel.querySelector(".html-only-label--unsupported"),
-    ).not.toBeNull();
+    expect(panel.querySelector(".html-only-label--unsupported")).not.toBeNull();
     expect(serverSelect.classList.contains("server-select--no-html-only")).toBe(
       true,
     );
@@ -317,6 +315,29 @@ describe("createPolicyOutput", () => {
     ) as HTMLInputElement;
     enforceRadio.dispatchEvent(new Event("change", { bubbles: true }));
     expect(panel.getReportOnly()).toBe(false);
+  });
+
+  it("clears server export help when the selected server id is unknown", async () => {
+    const panel = createPolicyOutput({
+      getState: () => ({
+        "default-src": { enabled: true, values: ["'self'"] },
+      }),
+    });
+    document.body.appendChild(panel);
+    panel.update();
+
+    const serverSelect = panel.querySelector(
+      "#server-export-select",
+    ) as HTMLSelectElement;
+    await vi.waitFor(() =>
+      expect(serverSelect.options.length).toBeGreaterThan(1),
+    );
+
+    serverSelect.value = "not-a-real-server";
+    serverSelect.dispatchEvent(new Event("change", { bubbles: true }));
+
+    expect(panel.querySelector("#server-export-help")?.textContent).toBe("");
+    expect(panel.querySelector("#server-export-note")?.hidden).toBe(true);
   });
 
   it("handles server export copy when the selected server id is invalid", async () => {

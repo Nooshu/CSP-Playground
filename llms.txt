@@ -1,0 +1,73 @@
+# CSP Playground
+
+> Browser-based Content Security Policy (CSP) header builder. Edit directives in a form, import from URLs or pasted headers, score policies heuristically, and copy server-specific export snippets. Policy editing runs in the browser; URL import uses a small lookup API (Vite middleware locally, Cloudflare Pages Functions in production).
+
+Live site: https://csp-playground.dev
+Repository: https://github.com/Nooshu/CSP-Playground
+
+## What this project is
+
+CSP Playground helps developers author correct Content Security Policy headers without memorizing syntax. It maps standard directives to accessible controls, explains sandbox flags, generates example nonces and style-attribute hashes, and exports ready-made config for common web servers.
+
+## Key features
+
+- Form editor for all standard CSP directives (fetch, document, navigation, reporting, Trusted Types, sandbox)
+- Beginner, Intermediate, and Advanced presets (with confirmation before overwriting existing work)
+- Import from URL (response headers or HTML meta tags) or paste headers/policy text
+- Live security score with actionable recommendations
+- Server export snippets: Apache, Nginx, Caddy, LiteSpeed, IIS, Cloudflare Pages, Netlify, Firebase Hosting, Vercel, Traefik, Envoy
+- HTML-only CSP option where the platform supports it; per-server setup notes (e.g. Cloudflare `_headers` vs `functions/_middleware.ts`)
+- Enforce vs Content-Security-Policy-Report-Only toggle
+
+## Tech stack
+
+- TypeScript, vanilla DOM (no React), Vite
+- Yarn v1 classic (`yarn.lock` is canonical; pin exact dependency versions)
+- Vitest + jsdom tests; Playwright e2e smoke tests
+- Biome for lint/format
+- Deployed as static `dist/` on Cloudflare Pages with one Pages Function (`POST /api/csp-lookup`)
+
+## Project layout
+
+- `src/csp/` — parse, build, validate, score policies; presets; server exports (pure logic)
+- `src/ui/` — form components, PolicyOutput, PresetPicker, accessible modal (`modal.ts`), helpers
+- `src/api/` — client fetch wrapper for CSP lookup
+- `server/` — shared lookup handler and fetch logic (Web APIs only)
+- `functions/` — Cloudflare Pages Function adapters
+- `tests/` — Vitest unit and DOM tests
+- `docs/ARCHITECTURE.md` — module boundaries and data flow
+
+## Commands
+
+```bash
+yarn install
+yarn dev          # or yarn start — http://localhost:5173
+yarn build
+yarn test
+yarn test:coverage
+yarn lint
+yarn verify:deps  # run once after dependency updates
+```
+
+Node 22.16.0 (`.nvmrc`). Cloudflare Pages builds require `YARN_VERSION=1.22.22`.
+
+## Documentation for AI agents
+
+- [AGENTS.md](AGENTS.md): conventions, commands, dependency policy, Pages v3 compatibility
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): architecture, API contract, policy lifecycle
+- [README.md](README.md): user-facing features and getting started
+- `.cursor/rules/`: Cursor-specific rules (dependency pinning, Cloudflare Pages v3)
+
+Use TSDoc for exported APIs in `src/`, `server/`, and `functions/`.
+
+## Contributing constraints
+
+- Yarn only for dependencies; do not use `npm install` for lockfile changes
+- Pin direct dependencies to exact versions; run `yarn verify:deps` after updates
+- Minimize diffs; match existing patterns
+- Run `yarn test` after logic changes; `yarn build` after TypeScript changes
+- Do not commit unless explicitly requested
+
+## License
+
+MIT — see [LICENSE](LICENSE)

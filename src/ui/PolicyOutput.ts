@@ -310,9 +310,7 @@ export function createPolicyOutput(options: PolicyOutputOptions): HTMLElement {
       opt.textContent = supportsHtmlOnly
         ? server.name
         : `${server.name} (no HTML-only)`;
-      opt.className = supportsHtmlOnly
-        ? ""
-        : "server-option--no-html-only";
+      opt.className = supportsHtmlOnly ? "" : "server-option--no-html-only";
       if (!supportsHtmlOnly && server.htmlOnlyUnsupportedReason) {
         opt.title = server.htmlOnlyUnsupportedReason;
       }
@@ -322,7 +320,9 @@ export function createPolicyOutput(options: PolicyOutputOptions): HTMLElement {
     serverSelect.value = selectedServer;
   }
 
-  function syncHtmlOnlyControl(server: (typeof WEB_SERVER_EXPORTS)[number] | undefined): void {
+  function syncHtmlOnlyControl(
+    server: (typeof WEB_SERVER_EXPORTS)[number] | undefined,
+  ): void {
     const supportsHtmlOnly = server?.supportsHtmlOnly === true;
 
     htmlOnlyCheckbox.disabled = !supportsHtmlOnly;
@@ -423,10 +423,7 @@ export function createPolicyOutput(options: PolicyOutputOptions): HTMLElement {
       if (exportNote) {
         describedBy.push("server-export-note");
       }
-      htmlOnlyCheckbox.setAttribute(
-        "aria-describedby",
-        describedBy.join(" "),
-      );
+      htmlOnlyCheckbox.setAttribute("aria-describedby", describedBy.join(" "));
     } else {
       serverHelp.textContent = "";
       serverExportNote.hidden = true;

@@ -105,7 +105,9 @@ export function createSiteFooter(
   text.innerHTML = footerTextHtml();
 
   const yearSpan = text.querySelector(".site-footer-year");
-  yearSpan!.textContent = String(getFooterEndYear());
+  if (yearSpan) {
+    yearSpan.textContent = String(getFooterEndYear());
+  }
 
   const meta = document.createElement("p");
   meta.className = "site-footer-meta";

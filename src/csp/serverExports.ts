@@ -178,7 +178,7 @@ export const WEB_SERVER_EXPORTS: WebServerExport[] = [
       "_headers in public/ or build output for site-wide rules (path patterns only)",
     supportsHtmlOnly: true,
     setupNote:
-      "Cloudflare Pages can export site-wide CSP in _headers (below). HTML-only CSP cannot use _headers — it requires Pages Functions middleware. Check \"Only apply CSP response header to HTML files\" to export functions/_middleware.ts.",
+      'Cloudflare Pages can export site-wide CSP in _headers (below). HTML-only CSP cannot use _headers — it requires Pages Functions middleware. Check "Only apply CSP response header to HTML files" to export functions/_middleware.ts.',
     htmlOnlySetupNote:
       "Deploy the middleware export below as functions/_middleware.ts and enable Pages Functions. Do not add the same CSP to public/_headers — middleware sets it on HTML responses by Content-Type.",
     format: (headerName, policy, options) => {
@@ -227,7 +227,8 @@ export const onRequest: PagesFunction = async (context) => {
   {
     id: "firebase",
     name: "Firebase Hosting",
-    description: "hosting.headers array in firebase.json (glob source patterns)",
+    description:
+      "hosting.headers array in firebase.json (glob source patterns)",
     supportsHtmlOnly: true,
     format: (headerName, policy, options) => {
       if (options?.htmlOnly) {

@@ -17,6 +17,12 @@ If a site has no CSP yet, the importer links to [why-csp.html](why-csp.html)—a
 
 ## Features
 
+### Policy presets
+
+- **Beginner**, **Intermediate**, and **Advanced** starter policies via **Choose a preset**
+- Applies immediately when the form is empty; otherwise asks for confirmation before replacing your work
+- Each preset enables a sensible subset of directives with documented keywords and sources
+
 ### Policy editor
 
 - Form-based editor for **all standard CSP directives**, grouped by category:
@@ -62,7 +68,9 @@ Import an existing CSP into the builder from a live URL or pasted text:
 - Live preview of the **policy value** and full **HTTP header line**
 - Toggle **enforce** vs **Content-Security-Policy-Report-Only** for safe rollout
 - One-click copy for policy value, header, or web-server snippet
-- Export snippets for **Apache**, **Nginx**, **Caddy**, **LiteSpeed**, **Microsoft IIS**, **Traefik**, and **Envoy**
+- Export snippets for **Apache**, **Nginx**, **Caddy**, **LiteSpeed**, **Microsoft IIS**, **Cloudflare Pages**, **Netlify**, **Firebase Hosting**, **Vercel**, **Traefik**, and **Envoy**
+- **HTML-only CSP** option for servers that support scoping headers to HTML responses (Apache, Nginx, Caddy, LiteSpeed, Cloudflare Pages middleware, Firebase Hosting); unsupported servers show a disabled checkbox with an explanation
+- Per-server setup notes (e.g. Cloudflare Pages `_headers` vs `functions/_middleware.ts` for HTML-only)
 - Deployment disclaimer with link to MDN’s safe CSP implementation guide
 
 ### Security score
@@ -77,6 +85,7 @@ Import an existing CSP into the builder from a live URL or pasted text:
 
 - Semantic HTML, labels, focus styles, and `aria-live` regions for dynamic updates
 - Keyboard-accessible controls and tooltips
+- Preset and confirmation flows use a native `<dialog>` modal with focus trap, `inert` on the main app, and focus restoration on close
 
 ## Tech stack
 
@@ -106,6 +115,8 @@ yarn install
 
 ```bash
 yarn dev
+# or
+yarn start
 ```
 
 Open [http://localhost:5173](http://localhost:5173). URL import works via a Vite middleware shim—you do not need Wrangler for day-to-day UI work.
@@ -167,21 +178,22 @@ See [AGENTS.md](AGENTS.md) for the full dependency policy.
 
 ## Usage
 
-1. Optionally use **Import existing policy** at the top—fetch from a URL, or paste response headers / a `Content-Security-Policy` header line—and click **Import CSP**.
-2. Enable a directive (e.g. `default-src`) using its checkbox.
-3. Add keywords from the dropdown or enter custom sources (e.g. `https://cdn.example.com`).
-4. Use nonce or style-hash helpers where inline content needs to be allowed safely.
-5. Review the **security score** panel and apply recommendations if helpful.
-6. Review the generated policy in the output panel.
-7. Copy the policy, full header, or web server configuration snippet.
+1. Optionally click **Choose a preset** for a beginner, intermediate, or advanced starter policy.
+2. Optionally use **Import existing policy** at the top—fetch from a URL, or paste response headers / a `Content-Security-Policy` header line—and click **Import CSP**.
+3. Enable a directive (e.g. `default-src`) using its checkbox.
+4. Add keywords from the dropdown or enter custom sources (e.g. `https://cdn.example.com`).
+5. Use nonce or style-hash helpers where inline content needs to be allowed safely.
+6. Review the **security score** panel and apply recommendations if helpful.
+7. Review the generated policy in the output panel.
+8. Copy the policy, full header, or web server configuration snippet.
 
 Toggle **Content-Security-Policy-Report-Only** to generate a report-only header for testing before enforcement.
 
 ## Project layout
 
 ```
-src/csp/          Policy parsing, building, scoring, keywords, hashes, server exports
-src/ui/           Form components, output panel, security score, helpers
+src/csp/          Policy parsing, building, scoring, keywords, hashes, presets, server exports
+src/ui/           Form components, output panel, security score, preset picker, modal, helpers
 src/api/          Client fetch wrapper for CSP lookup
 server/           Shared lookup logic + Vite dev middleware
 functions/api/    Cloudflare Pages Function (production API)
@@ -223,6 +235,7 @@ Requires [Wrangler](https://developers.cloudflare.com/workers/wrangler/) authent
 
 - [AGENTS.md](AGENTS.md) — conventions for coding agents (also available as `AGENT.md`)
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — module boundaries, data flow, and API contract
+- [llms.txt](llms.txt) — concise project summary for LLM crawlers and agents
 - `.cursor/rules/` — Cursor-specific rules for dependency pinning and project context
 - TSDoc comments on exported APIs in `src/`, `server/`, and `functions`
 
