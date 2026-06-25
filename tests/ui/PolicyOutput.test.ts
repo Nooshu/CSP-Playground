@@ -70,6 +70,11 @@ describe("createPolicyOutput", () => {
     serverSelect.value = "nginx";
     serverSelect.dispatchEvent(new Event("change", { bubbles: true }));
     await vi.waitFor(() =>
+      expect(panel.querySelector("#server-export-help")?.textContent).toBe(
+        "add_header in server or location block",
+      ),
+    );
+    await vi.waitFor(() =>
       expect(
         panel.querySelector("#server-export-preview")?.textContent,
       ).toContain("add_header"),
@@ -134,6 +139,85 @@ describe("createPolicyOutput", () => {
     );
   });
 
+  it("updates server help text when the selected export changes", async () => {
+    const panel = createPolicyOutput({ getState: () => ({}) });
+    document.body.appendChild(panel);
+    panel.update();
+
+    const serverSelect = panel.querySelector(
+      "#server-export-select",
+    ) as HTMLSelectElement;
+    await vi.waitFor(() =>
+      expect(serverSelect.options.length).toBeGreaterThan(1),
+    );
+
+    expect(panel.querySelector("#server-export-help")?.textContent).toBe(
+      "Header directive in .htaccess or VirtualHost config",
+    );
+
+    serverSelect.value = "firebase";
+    serverSelect.dispatchEvent(new Event("change", { bubbles: true }));
+
+    expect(panel.querySelector("#server-export-help")?.textContent).toBe(
+      "hosting.headers array in firebase.json (glob source patterns)",
+    );
+    expect(
+      panel.querySelector("#server-export-preview")?.textContent,
+    ).toContain("(no server config to display)");
+  });
+
+  it("shows Cloudflare setup guidance as soon as Cloudflare Pages is selected", async () => {
+    const panel = createPolicyOutput({ getState: createState });
+    document.body.appendChild(panel);
+    panel.update();
+
+    const serverSelect = panel.querySelector(
+      "#server-export-select",
+    ) as HTMLSelectElement;
+    await vi.waitFor(() =>
+      expect(serverSelect.options.length).toBeGreaterThan(1),
+    );
+
+    serverSelect.value = "cloudflare";
+    serverSelect.dispatchEvent(new Event("change", { bubbles: true }));
+
+    const note = panel.querySelector("#server-export-note");
+    expect(note?.querySelector(".server-export-note-heading")?.textContent).toBe(
+      "Cloudflare Pages setup",
+    );
+    expect(note?.textContent).toContain("functions/_middleware.ts");
+    expect(note?.textContent).toContain("_headers");
+  });
+
+  it("shows Cloudflare HTML-only deployment guidance when middleware export is selected", async () => {
+    const panel = createPolicyOutput({ getState: createState });
+    document.body.appendChild(panel);
+    panel.update();
+
+    const serverSelect = panel.querySelector(
+      "#server-export-select",
+    ) as HTMLSelectElement;
+    await vi.waitFor(() =>
+      expect(serverSelect.options.length).toBeGreaterThan(1),
+    );
+
+    serverSelect.value = "cloudflare";
+    serverSelect.dispatchEvent(new Event("change", { bubbles: true }));
+
+    const htmlOnlyCheckbox = panel.querySelector(
+      'input[type="checkbox"]',
+    ) as HTMLInputElement;
+    htmlOnlyCheckbox.checked = true;
+    htmlOnlyCheckbox.dispatchEvent(new Event("change", { bubbles: true }));
+
+    const note = panel.querySelector("#server-export-note");
+    expect(note?.textContent).toContain("Deploy the middleware export below");
+    expect(note?.textContent).toContain("public/_headers");
+    expect(
+      panel.querySelector("#server-export-preview")?.textContent,
+    ).toContain("requires Pages Functions");
+  });
+
   it("disables html-only export for servers without scoped HTML support", async () => {
     const panel = createPolicyOutput({ getState: createState });
     document.body.appendChild(panel);
@@ -152,11 +236,24 @@ describe("createPolicyOutput", () => {
       expect(serverSelect.options.length).toBeGreaterThan(1),
     );
 
-    serverSelect.value = "traefik";
+    const netlifyOption = [...serverSelect.options].find(
+      (option) => option.value === "netlify",
+    );
+    expect(netlifyOption?.textContent).toContain("(no HTML-only)");
+    expect(netlifyOption?.title).toContain("splats");
+
+    serverSelect.value = "netlify";
     serverSelect.dispatchEvent(new Event("change", { bubbles: true }));
 
     expect(htmlOnlyCheckbox.disabled).toBe(true);
     expect(htmlOnlyCheckbox.checked).toBe(false);
+    expect(htmlOnlyCheckbox.title).toContain("splats");
+    expect(
+      panel.querySelector(".html-only-label--unsupported"),
+    ).not.toBeNull();
+    expect(serverSelect.classList.contains("server-select--no-html-only")).toBe(
+      true,
+    );
   });
 
   it("can progressively enhance an existing container element", () => {

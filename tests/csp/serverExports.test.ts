@@ -21,7 +21,7 @@ describe("serverExports", () => {
     expect(getWebServerExport("missing" as "nginx")).toBeUndefined();
   });
 
-  it("formats html-only exports for Apache, Nginx, Caddy, Lighttpd, and IIS", () => {
+  it("formats html-only exports for Apache, Nginx, Caddy, and LiteSpeed", () => {
     const options = { htmlOnly: true };
 
     expect(
@@ -59,36 +59,69 @@ describe("serverExports", () => {
         options,
       ),
     ).toContain("<FilesMatch");
-    expect(
-      getWebServerExport("iis")!.format(
-        "Content-Security-Policy",
-        policy,
-        options,
-      ),
-    ).toContain("<location path=");
   });
 
   it("formats Cloudflare HTML-only export with Pages middleware", () => {
     const cloudflare = getWebServerExport("cloudflare");
     expect(cloudflare).toBeDefined();
+    expect(cloudflare?.setupNote).toContain("_headers");
+    expect(cloudflare?.htmlOnlySetupNote).toContain("functions/_middleware.ts");
 
     const output = cloudflare!.format("Content-Security-Policy", policy, {
       htmlOnly: true,
     });
     expect(output).toContain("functions/_middleware.ts");
+    expect(output).toContain("requires Pages Functions");
     expect(output).toContain('contentType.includes("text/html")');
     expect(output).not.toContain("/*.html");
+    expect(output).not.toMatch(/^\/\*\n\s+Content-Security-Policy:/m);
   });
 
-  it("formats Netlify and Vercel HTML-only exports", () => {
-    const netlify = getWebServerExport("netlify");
-    const vercel = getWebServerExport("vercel");
+  it("formats Firebase HTML-only export for extension-less document routes", () => {
+    const firebase = getWebServerExport("firebase");
+    const output = firebase!.format("Content-Security-Policy", policy, {
+      htmlOnly: true,
+    });
 
-    expect(
-      netlify?.format("Content-Security-Policy", policy, { htmlOnly: true }),
-    ).toContain("/*.html");
-    expect(
-      vercel?.format("Content-Security-Policy", policy, { htmlOnly: true }),
-    ).toContain('"/(.*)\\.html"');
+    expect(output).toContain('"source": "/**/!(*.*)"');
+    expect(output).toContain("cleanUrls");
+    expect(output).not.toContain('"source": "**/*.html"');
+  });
+
+  it("formats Firebase site-wide export inside hosting.headers", () => {
+    const firebase = getWebServerExport("firebase");
+    expect(firebase?.name).toBe("Firebase Hosting");
+
+    const output = firebase!.format("Content-Security-Policy-Report-Only", policy);
+    expect(output).toContain('"hosting"');
+    expect(output).toContain('"source": "**"');
+    expect(output).toContain('"key": "Content-Security-Policy-Report-Only"');
+    expect(output).toContain('"value":');
+    expect(output).not.toContain("vercel.json");
+  });
+
+  it("documents servers that cannot scope HTML-only exports", () => {
+    const unsupported = ["iis", "netlify", "vercel", "traefik", "envoy"] as const;
+
+    for (const id of unsupported) {
+      const server = getWebServerExport(id);
+      expect(server?.supportsHtmlOnly).toBeUndefined();
+      expect(server?.htmlOnlyUnsupportedReason?.length).toBeGreaterThan(0);
+    }
+  });
+
+  it("marks only traditional servers, Cloudflare, and Firebase as HTML-only capable", () => {
+    const supported = WEB_SERVER_EXPORTS.filter(
+      (server) => server.supportsHtmlOnly === true,
+    ).map((server) => server.id);
+
+    expect(supported).toEqual([
+      "apache",
+      "nginx",
+      "caddy",
+      "litespeed",
+      "cloudflare",
+      "firebase",
+    ]);
   });
 });

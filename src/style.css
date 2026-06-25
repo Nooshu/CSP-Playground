@@ -513,6 +513,42 @@ select {
   color: var(--color-text);
 }
 
+.server-export-note {
+  margin: 0 0 var(--space-md);
+}
+
+.server-export-note[hidden] {
+  display: none;
+}
+
+.server-export-note-heading {
+  margin: 0 0 var(--space-xs);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-deprecated);
+}
+
+.server-export-note-text {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--color-deprecated);
+}
+
+.server-select--no-html-only {
+  border-color: var(--color-deprecated);
+  background: var(--color-deprecated-bg);
+}
+
+.html-only-label--unsupported {
+  color: var(--color-text-muted);
+  cursor: help;
+}
+
+.html-only-label--unsupported input:disabled {
+  cursor: help;
+}
+
 .keyword-select {
   width: 100%;
   min-width: 0;

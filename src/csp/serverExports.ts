@@ -15,6 +15,7 @@ export type WebServerId =
   | "iis"
   | "cloudflare"
   | "netlify"
+  | "firebase"
   | "vercel"
   | "traefik"
   | "envoy";
@@ -34,6 +35,27 @@ export interface WebServerExport {
    * globally and cannot trivially restrict by file extension.
    */
   supportsHtmlOnly?: boolean;
+  /**
+   * Tooltip text when {@link supportsHtmlOnly} is false.
+   *
+   * @remarks
+   * Shown on the HTML-only checkbox `title` attribute so users understand why
+   * the control is disabled for this export format.
+   */
+  htmlOnlyUnsupportedReason?: string;
+  /**
+   * Extra guidance when HTML-only export needs platform setup beyond a single
+   * config file (for example Cloudflare Pages Functions middleware).
+   */
+  htmlOnlySetupNote?: string;
+  /**
+   * Platform-specific guidance shown whenever this export is selected.
+   *
+   * @remarks
+   * Use for setup that applies beyond a single config snippet, such as when a
+   * host needs middleware in addition to `_headers`.
+   */
+  setupNote?: string;
   /** Produces a config fragment for the given header name and policy value. */
   format: (
     headerName: string,
@@ -143,26 +165,31 @@ export const WEB_SERVER_EXPORTS: WebServerExport[] = [
     id: "iis",
     name: "Microsoft IIS",
     description: "customHeaders in web.config",
-    supportsHtmlOnly: true,
-    format: (headerName, policy, options) => {
-      const headerLine = `<add name="${headerName}" value="${escapeApacheValue(policy)}" />`;
-      if (options?.htmlOnly) {
-        return `<location path="*.html">\n  <system.webServer>\n    <httpProtocol>\n      <customHeaders>\n        ${headerLine}\n      </customHeaders>\n    </httpProtocol>\n  </system.webServer>\n</location>`;
-      }
-      return headerLine;
+    htmlOnlyUnsupportedReason:
+      "IIS location paths are virtual directories, not file-extension wildcards. Use URL Rewrite to scope headers to .html URLs or HTML responses.",
+    format: (headerName, policy) => {
+      return `<add name="${headerName}" value="${escapeApacheValue(policy)}" />`;
     },
   },
   {
     id: "cloudflare",
     name: "Cloudflare Pages",
     description:
-      "_headers in public/ or build output; HTML-only via Pages Functions middleware",
+      "_headers in public/ or build output for site-wide rules (path patterns only)",
     supportsHtmlOnly: true,
+    setupNote:
+      "Cloudflare Pages can export site-wide CSP in _headers (below). HTML-only CSP cannot use _headers — it requires Pages Functions middleware. Check \"Only apply CSP response header to HTML files\" to export functions/_middleware.ts.",
+    htmlOnlySetupNote:
+      "Deploy the middleware export below as functions/_middleware.ts and enable Pages Functions. Do not add the same CSP to public/_headers — middleware sets it on HTML responses by Content-Type.",
     format: (headerName, policy, options) => {
       if (options?.htmlOnly) {
-        return `// functions/_middleware.ts
-// Pages _headers matches directory paths only (not file extensions).
-// Use middleware to add CSP only to HTML responses.
+        return `// Cloudflare Pages: HTML-only CSP requires Pages Functions — not _headers.
+// 1. Save as functions/_middleware.ts (create the functions/ folder if needed).
+// 2. Optional: npm i -D @cloudflare/workers-types for local TypeScript types.
+// 3. Do not add the same CSP to public/_headers; middleware sets it on HTML responses only.
+// 4. _headers rules do not apply to responses from Pages Functions — use middleware for SSR too.
+//
+// Docs: https://developers.cloudflare.com/pages/functions/middleware/
 import type { PagesFunction } from "@cloudflare/workers-types";
 
 const CSP_HEADER = "${headerName}";
@@ -192,25 +219,65 @@ export const onRequest: PagesFunction = async (context) => {
     id: "netlify",
     name: "Netlify",
     description: "_headers in the publish directory (for example public/)",
+    htmlOnlyUnsupportedReason:
+      "Netlify _headers splats match greedily to the end of the path, so /*.html is treated as /*. HTML is also commonly served at extension-less URLs, which splats cannot target.",
+    format: (headerName, policy) =>
+      formatHeadersFileBlock("/*", headerName, policy),
+  },
+  {
+    id: "firebase",
+    name: "Firebase Hosting",
+    description: "hosting.headers array in firebase.json (glob source patterns)",
     supportsHtmlOnly: true,
     format: (headerName, policy, options) => {
       if (options?.htmlOnly) {
-        return formatHeadersFileBlock("/*.html", headerName, policy);
+        return `// Matches extension-less paths (typical HTML document routes).
+// **/*.html only applies when the URL contains ".html"; it misses "/" and cleanUrls routes.
+{
+  "hosting": {
+    "headers": [
+      {
+        "source": "/**/!(*.*)",
+        "headers": [
+          {
+            "key": "${headerName}",
+            "value": "${escapeJsonString(policy)}"
+          }
+        ]
       }
-      return formatHeadersFileBlock("/*", headerName, policy);
+    ]
+  }
+}`;
+      }
+
+      const source = "**";
+      return `{
+  "hosting": {
+    "headers": [
+      {
+        "source": "${source}",
+        "headers": [
+          {
+            "key": "${headerName}",
+            "value": "${escapeJsonString(policy)}"
+          }
+        ]
+      }
+    ]
+  }
+}`;
     },
   },
   {
     id: "vercel",
     name: "Vercel",
     description: "headers array in vercel.json",
-    supportsHtmlOnly: true,
-    format: (headerName, policy, options) => {
-      const source = options?.htmlOnly ? "/(.*)\\.html" : "/(.*)";
-      return `{
+    htmlOnlyUnsupportedReason:
+      "Vercel header rules match the request pathname. With cleanUrls, HTML pages are served without a .html suffix, so /(.*)\\.html does not match document routes.",
+    format: (headerName, policy) => `{
   "headers": [
     {
-      "source": "${source}",
+      "source": "/(.*)",
       "headers": [
         {
           "key": "${headerName}",
@@ -219,13 +286,14 @@ export const onRequest: PagesFunction = async (context) => {
       ]
     }
   ]
-}`;
-    },
+}`,
   },
   {
     id: "traefik",
     name: "Traefik",
     description: "customResponseHeaders in dynamic or static config",
+    htmlOnlyUnsupportedReason:
+      "Traefik middleware applies custom response headers to every response on the matched route. This export snippet cannot limit CSP to HTML files only.",
     format: (headerName, policy) =>
       `[http.middlewares]\n  [http.middlewares.csp-headers.headers.customResponseHeaders]\n    ${headerName} = "${escapeNginxValue(policy)}"`,
   },
@@ -233,6 +301,8 @@ export const onRequest: PagesFunction = async (context) => {
     id: "envoy",
     name: "Envoy",
     description: "response_headers_to_add in HTTP connection manager",
+    htmlOnlyUnsupportedReason:
+      "Envoy response_headers_to_add applies to every response from the connection manager. This export snippet cannot filter by file type or Content-Type.",
     format: (headerName, policy) =>
       `response_headers_to_add:\n- header:\n    key: "${headerName}"\n    value: "${escapeNginxValue(policy)}"`,
   },

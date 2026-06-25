@@ -219,6 +219,20 @@ export function createPolicyOutput(options: PolicyOutputOptions): HTMLElement {
   serverHelp.id = "server-export-help";
   serverHelp.className = "server-help";
 
+  const serverExportNote = document.createElement("aside");
+  serverExportNote.id = "server-export-note";
+  serverExportNote.className = "policy-warning server-export-note";
+  serverExportNote.hidden = true;
+  serverExportNote.setAttribute("aria-label", "Server export setup note");
+
+  const serverExportNoteHeading = document.createElement("p");
+  serverExportNoteHeading.className = "server-export-note-heading";
+
+  const serverExportNoteText = document.createElement("p");
+  serverExportNoteText.className = "server-export-note-text";
+
+  serverExportNote.append(serverExportNoteHeading, serverExportNoteText);
+
   const htmlOnlyLabel = document.createElement("label");
   htmlOnlyLabel.className = "mode-label";
 
@@ -252,6 +266,7 @@ export function createPolicyOutput(options: PolicyOutputOptions): HTMLElement {
     serverExportWarning,
     serverSelect,
     serverHelp,
+    serverExportNote,
     htmlOnlyLabel,
     serverPreview,
   );
@@ -291,15 +306,51 @@ export function createPolicyOutput(options: PolicyOutputOptions): HTMLElement {
     for (const server of WEB_SERVER_EXPORTS) {
       const opt = document.createElement("option");
       opt.value = server.id;
-      opt.textContent = server.name;
+      const supportsHtmlOnly = server.supportsHtmlOnly === true;
+      opt.textContent = supportsHtmlOnly
+        ? server.name
+        : `${server.name} (no HTML-only)`;
+      opt.className = supportsHtmlOnly
+        ? ""
+        : "server-option--no-html-only";
+      if (!supportsHtmlOnly && server.htmlOnlyUnsupportedReason) {
+        opt.title = server.htmlOnlyUnsupportedReason;
+      }
       serverSelect.appendChild(opt);
     }
 
     serverSelect.value = selectedServer;
   }
 
+  function syncHtmlOnlyControl(server: (typeof WEB_SERVER_EXPORTS)[number] | undefined): void {
+    const supportsHtmlOnly = server?.supportsHtmlOnly === true;
+
+    htmlOnlyCheckbox.disabled = !supportsHtmlOnly;
+    htmlOnlyLabel.classList.toggle(
+      "html-only-label--unsupported",
+      !supportsHtmlOnly,
+    );
+    serverSelect.classList.toggle(
+      "server-select--no-html-only",
+      !supportsHtmlOnly,
+    );
+
+    if (supportsHtmlOnly) {
+      htmlOnlyCheckbox.removeAttribute("title");
+      htmlOnlyLabel.removeAttribute("title");
+      return;
+    }
+
+    const reason =
+      server?.htmlOnlyUnsupportedReason ??
+      "This export format cannot scope the CSP header to HTML files only.";
+    htmlOnlyCheckbox.title = reason;
+    htmlOnlyLabel.title = reason;
+    htmlOnly = false;
+    htmlOnlyCheckbox.checked = false;
+  }
+
   populateServerSelect();
-  serverHelp.textContent = WEB_SERVER_EXPORTS[0]?.description ?? "";
 
   function announce(message: string): void {
     liveRegion.textContent = "";
@@ -345,17 +396,46 @@ export function createPolicyOutput(options: PolicyOutputOptions): HTMLElement {
     return server.format(getHeaderName(), policy, { htmlOnly });
   }
 
+  function getServerExportNote(
+    server: (typeof WEB_SERVER_EXPORTS)[number],
+  ): string {
+    if (htmlOnly && server.htmlOnlySetupNote) {
+      return server.htmlOnlySetupNote;
+    }
+    return server.setupNote ?? "";
+  }
+
   function updateServerPreview(policy: string, headerName: string): void {
     const server = WEB_SERVER_EXPORTS.find(
       (item) => item.id === selectedServer,
     );
-    if (server && policy) {
+    syncHtmlOnlyControl(server);
+
+    if (server) {
       serverHelp.textContent = server.description;
-      htmlOnlyCheckbox.disabled = !server.supportsHtmlOnly;
-      if (!server.supportsHtmlOnly) {
-        htmlOnly = false;
-        htmlOnlyCheckbox.checked = false;
+      const exportNote = getServerExportNote(server);
+      serverExportNote.hidden = !exportNote;
+      serverExportNoteHeading.textContent = exportNote
+        ? `${server.name} setup`
+        : "";
+      serverExportNoteText.textContent = exportNote;
+      const describedBy = ["server-export-help"];
+      if (exportNote) {
+        describedBy.push("server-export-note");
       }
+      htmlOnlyCheckbox.setAttribute(
+        "aria-describedby",
+        describedBy.join(" "),
+      );
+    } else {
+      serverHelp.textContent = "";
+      serverExportNote.hidden = true;
+      serverExportNoteHeading.textContent = "";
+      serverExportNoteText.textContent = "";
+      htmlOnlyCheckbox.setAttribute("aria-describedby", "server-export-help");
+    }
+
+    if (server && policy) {
       serverPreview.textContent = server.format(headerName, policy, {
         htmlOnly,
       });
