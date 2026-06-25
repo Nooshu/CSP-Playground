@@ -47,6 +47,7 @@ export function renderIndexAppHtml(
     `<header class="app-header">`,
     `<h1>${escapeHtml(SITE_NAME)}</h1>`,
     `<p class="app-subtitle">Build a Content Security Policy header by enabling directives and adding source values. Copy the result for your server configuration.</p>`,
+    `<div id="preset-picker-root" class="preset-picker"></div>`,
     `</header>`,
   ].join("");
 

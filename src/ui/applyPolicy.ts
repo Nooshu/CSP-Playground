@@ -8,6 +8,7 @@
  * @see {@link parsePolicyString}
  */
 
+import type { PolicyState } from "../csp/buildPolicy";
 import type { ParsedPolicy } from "../csp/parsePolicy";
 import type { DirectiveSectionHandle } from "./DirectiveSection";
 
@@ -41,6 +42,40 @@ export function applyParsedPolicy(
     if (values === undefined) continue;
 
     section.setState({ enabled: true, values });
+    appliedCount += 1;
+  }
+
+  return appliedCount;
+}
+
+/**
+ * Pre-fills directive sections from a {@link PolicyState} object.
+ *
+ * @param sections - All builder directive handles to reset and update.
+ * @param state - Directive map produced by presets or other builder state.
+ * @returns Count of directives that received preset values.
+ *
+ * @remarks
+ * Directives absent from `state` or marked disabled remain off after reset.
+ */
+export function applyPolicyState(
+  sections: DirectiveSectionHandle[],
+  state: PolicyState,
+): number {
+  for (const section of sections) {
+    section.reset();
+  }
+
+  let appliedCount = 0;
+
+  for (const section of sections) {
+    const directiveName = section.element.dataset.directive;
+    if (!directiveName) continue;
+
+    const directiveState = state[directiveName];
+    if (!directiveState?.enabled) continue;
+
+    section.setState(directiveState);
     appliedCount += 1;
   }
 

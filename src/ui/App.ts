@@ -25,6 +25,7 @@ import {
 } from "./DirectiveSection";
 import { createPolicyOutput, type PolicyOutputPanel } from "./PolicyOutput";
 import { createPolicyUpdateSnapshot } from "./policyUpdate";
+import { createPresetPicker } from "./PresetPicker";
 import { createSecurityScorePanel } from "./SecurityScore";
 import { createUrlImporter } from "./UrlImporter";
 
@@ -136,6 +137,15 @@ export function createApp(root: HTMLElement): void {
       container: urlImporterContainer ?? undefined,
     });
 
+    const presetPickerContainer =
+      root.querySelector<HTMLElement>("#preset-picker-root");
+    createPresetPicker({
+      sections,
+      getState: collectState,
+      onApplied: handleChange,
+      container: presetPickerContainer ?? undefined,
+    });
+
     handleChange();
     return;
   }
@@ -165,6 +175,14 @@ export function createApp(root: HTMLElement): void {
     "Build a Content Security Policy header by enabling directives and adding source values. Copy the result for your server configuration.";
 
   header.append(title, subtitle);
+
+  const presetPicker = createPresetPicker({
+    sections,
+    getState: collectState,
+    onApplied: handleChange,
+  });
+  header.appendChild(presetPicker);
+
   root.appendChild(header);
 
   const layout = document.createElement("div");

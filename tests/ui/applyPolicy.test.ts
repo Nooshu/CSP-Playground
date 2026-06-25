@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { applyParsedPolicy } from "../../src/ui/applyPolicy";
+import type { PolicyState } from "../../src/csp/buildPolicy";
+import { applyParsedPolicy, applyPolicyState } from "../../src/ui/applyPolicy";
 import type { DirectiveSectionHandle } from "../../src/ui/DirectiveSection";
 
 function createMockSection(directiveName: string): {
@@ -69,5 +70,32 @@ describe("applyParsedPolicy", () => {
         directives: { "default-src": ["'self'"] },
       }),
     ).toBe(0);
+  });
+});
+
+describe("applyPolicyState", () => {
+  it("resets sections and applies matching directive state", () => {
+    const defaultSection = createMockSection("default-src");
+    const scriptSection = createMockSection("script-src");
+
+    const state: PolicyState = {
+      "default-src": { enabled: true, values: ["'self'"] },
+      "script-src": { enabled: true, values: ["'self'", "'unsafe-inline'"] },
+    };
+
+    const applied = applyPolicyState(
+      [defaultSection.section, scriptSection.section],
+      state,
+    );
+
+    expect(applied).toBe(2);
+    expect(defaultSection.lastState).toEqual({
+      enabled: true,
+      values: ["'self'"],
+    });
+    expect(scriptSection.lastState).toEqual({
+      enabled: true,
+      values: ["'self'", "'unsafe-inline'"],
+    });
   });
 });

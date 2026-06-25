@@ -25,6 +25,127 @@
   max-width: 42rem;
 }
 
+.preset-picker {
+  margin-top: var(--space-md);
+}
+
+.preset-picker-trigger {
+  width: fit-content;
+}
+
+.preset-picker-intro,
+.preset-picker-confirm-summary {
+  margin: 0 0 var(--space-md);
+}
+
+.preset-picker-warning {
+  margin: 0 0 var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  color: var(--color-deprecated);
+  background: var(--color-deprecated-bg);
+  border-radius: var(--radius);
+}
+
+.preset-picker-confirm-detail {
+  margin: 0 0 var(--space-md);
+  color: var(--color-text-muted);
+}
+
+.preset-picker-list {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.preset-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-bg);
+}
+
+.preset-card-title {
+  margin: 0;
+  font-size: var(--step-1);
+}
+
+.preset-card-summary {
+  margin: 0;
+  font-weight: 500;
+}
+
+.preset-card-description {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.9375rem;
+}
+
+.preset-card-apply {
+  align-self: flex-start;
+  margin-top: var(--space-xs);
+}
+
+.preset-picker-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+body.modal-open {
+  overflow: hidden;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-md);
+  background: rgb(17 24 39 / 45%);
+}
+
+.modal-backdrop[hidden] {
+  display: none;
+}
+
+.modal-dialog {
+  display: flex;
+  flex-direction: column;
+  width: min(100%, 40rem);
+  max-height: min(90vh, 48rem);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-md) var(--space-sm);
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.modal-title {
+  margin: 0;
+  font-size: var(--step-1);
+}
+
+.modal-close-btn {
+  flex-shrink: 0;
+}
+
+.modal-body {
+  padding: var(--space-md);
+  overflow: auto;
+}
+
 .app-layout {
   display: flex;
   flex-direction: column;

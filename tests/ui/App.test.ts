@@ -20,6 +20,7 @@ describe("createApp", () => {
     expect(root.querySelector(".policy-output")).not.toBeNull();
     expect(root.querySelector("#generated-policy")).not.toBeNull();
     expect(root.querySelector(".url-importer")).not.toBeNull();
+    expect(root.querySelector(".preset-picker-trigger")).not.toBeNull();
   });
 
   it("enhances SSG markup even without the url importer id", () => {
