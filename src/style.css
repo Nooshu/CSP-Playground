@@ -98,8 +98,6 @@ body.modal-open {
 }
 
 .modal-dialog {
-  display: flex;
-  flex-direction: column;
   width: min(100%, 40rem);
   max-height: min(90vh, 48rem);
   margin: auto;
@@ -108,6 +106,15 @@ body.modal-open {
   border-radius: var(--radius);
   background: var(--color-surface);
   box-shadow: var(--shadow);
+}
+
+.modal-dialog:not([open]) {
+  display: none;
+}
+
+.modal-dialog[open] {
+  display: flex;
+  flex-direction: column;
 }
 
 .modal-dialog::backdrop {

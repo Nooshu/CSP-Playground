@@ -7,6 +7,14 @@ describe("createModal", () => {
     document.body.classList.remove("modal-open");
   });
 
+  it("stays closed in the DOM until opened", () => {
+    const modal = createModal();
+
+    expect(modal.element.open).toBe(false);
+    expect(modal.element.hasAttribute("open")).toBe(false);
+    expect(modal.element.querySelector(".modal-body")?.textContent).toBe("");
+  });
+
   it("opens a labelled dialog and closes via the close button", () => {
     const onClose = vi.fn();
     const modal = createModal();
