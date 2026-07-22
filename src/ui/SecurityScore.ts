@@ -188,18 +188,17 @@ export function createSecurityScorePanel(
       }
 
       const button = item.querySelector("button");
-      if (!(button instanceof HTMLButtonElement)) {
-        continue;
-      }
-      if (button.textContent !== text) button.textContent = text;
-      if (button.getAttribute("aria-label") !== ariaLabel) {
-        button.setAttribute("aria-label", ariaLabel);
-      }
-      if (button.dataset.targetId !== recommendation.targetId) {
-        button.dataset.targetId = recommendation.targetId;
-      }
+      if (button instanceof HTMLButtonElement) {
+        if (button.textContent !== text) button.textContent = text;
+        if (button.getAttribute("aria-label") !== ariaLabel) {
+          button.setAttribute("aria-label", ariaLabel);
+        }
+        if (button.dataset.targetId !== recommendation.targetId) {
+          button.dataset.targetId = recommendation.targetId;
+        }
 
-      recommendationList.appendChild(item);
+        recommendationList.appendChild(item);
+      }
     }
   }
 
