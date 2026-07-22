@@ -63,6 +63,8 @@ Summary:
 
 4. **Transitive dependencies** — every resolved tarball in `yarn.lock` must have an `integrity` hash. The verify script fails if any are missing.
 
+5. **Vite resolution** — `package.json` → `resolutions.vite` pins a single Vite version for the tree (including Vitest). Without it, Yarn can nest an older Vite under Vitest that pulls an incompatible `rolldown`, and tests fail at startup (`viteWasmFallbackPlugin` missing). Keep the resolution in sync when bumping `vite`.
+
 All dependency work must also follow `.cursor/rules/cloudflare-pages-v3.mdc` for Pages v3 compatibility.
 
 ## Cloudflare Pages v3 compatibility (required)
