@@ -9,7 +9,7 @@ Guidance for AI coding agents working in the CSP Playground repository.
 - **Stack:** Vite, TypeScript, vanilla DOM (no React), Yarn
 - **Purpose:** Browser-based Content Security Policy header builder with URL import, security scoring, and server export snippets
 - **Package manager:** **Yarn v1 (classic)** — use `yarn.lock` as the single source of truth. Do not use `npm install` for dependency changes.
-- **Production builds:** [Cloudflare Pages v3 build image](https://developers.cloudflare.com/pages/configuration/build-image/) — Node **22.16.0**, Yarn **1.22.22** (via env var; see below).
+- **Production builds:** [Cloudflare Pages v3 build image](https://developers.cloudflare.com/pages/configuration/build-image/) — Node **22.22.2**, Yarn **1.22.22** (via env var; see below).
 
 ## Key paths
 
@@ -75,12 +75,14 @@ Deploys use the **Pages v3 build image** (Ubuntu 22.04, x86_64). Toolchain and p
 
 | Tool | v3 default | This project | How to pin |
 |------|------------|--------------|------------|
-| Node.js | 22.16.0 | 22.16.0 | `.nvmrc` — **exact semver only** |
+| Node.js | 22.16.0 | 22.22.2 | `.nvmrc` — **exact semver only** |
 | Yarn | 4.9.1 | 1.22.22 (classic) | `YARN_VERSION=1.22.22` in Pages build env vars |
 
 **Critical:** v3 does **not** detect Yarn 1 from `yarn.lock`. Without `YARN_VERSION=1.22.22` in the Cloudflare Pages dashboard (production **and** preview), the build uses Yarn 4 and fails against this lockfile.
 
-v3 also does **not** read `package.json` → `engines` for Node or package managers. Use `.nvmrc` for the Pages build Node version; `engines.node` (`>=22.16.0`) is for local tooling only. Do not use Node codenames in `.nvmrc` (e.g. `lts/hydrogen`).
+v3 also does **not** read `package.json` → `engines` for Node or package managers. Use `.nvmrc` for the Pages build Node version; `engines.node` (`>=22.22.2`) is for local tooling only. Do not use Node codenames in `.nvmrc` (e.g. `lts/hydrogen`).
+
+Node is pinned above the v3 default because `jsdom` 30+ requires Node `^22.22.2` (or newer supported majors).
 
 ### Package compatibility rules
 
@@ -106,7 +108,7 @@ Use `yarn pages:dev` when changing Functions or shared server lookup code.
 
 - **Build command:** `yarn build`
 - **Build output directory:** `dist`
-- **Build environment variables:** `YARN_VERSION=1.22.22` (required); `NODE_VERSION=22.16.0` (optional if `.nvmrc` is committed)
+- **Build environment variables:** `YARN_VERSION=1.22.22` (required); `NODE_VERSION=22.22.2` (optional if `.nvmrc` is committed)
 
 ## Testing expectations
 

@@ -102,7 +102,7 @@ Import an existing CSP into the builder from a live URL or pasted text:
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/) **22.16.0** (see `.nvmrc`; matches Cloudflare Pages v3)
+- [Node.js](https://nodejs.org/) **22.22.2** (see `.nvmrc`; Cloudflare Pages v3 compatible)
 - [Yarn](https://yarnpkg.com/) **1.22.22** (classic; set `YARN_VERSION=1.22.22` on Cloudflare Pages)
 
 ### Install

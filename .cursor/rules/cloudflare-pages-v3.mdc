@@ -12,9 +12,11 @@ Production deploys use the [Cloudflare Pages v3 build image](https://developers.
 
 | Tool | v3 default | This project | Pin method |
 |------|------------|--------------|------------|
-| Node.js | 22.16.0 | 22.16.0 | `.nvmrc` with **exact semver** |
+| Node.js | 22.16.0 | 22.22.2 | `.nvmrc` with **exact semver** |
 | Yarn | 4.9.1 | 1.22.22 (classic) | `YARN_VERSION=1.22.22` Pages build env var |
 | npm | 10.9.2 | (not used for installs) | — |
+
+Node is pinned above the v3 default because `jsdom` 30+ requires `^22.22.2 || ^24.15.0 || >=26.0.0`. Pages accepts any Node version via `.nvmrc`.
 
 ## v3 limitations agents must respect
 
@@ -29,7 +31,7 @@ The v3 build system does **not**:
 
 ## Required pins
 
-1. **`.nvmrc`** — exact Node semver matching v3 (currently `22.16.0`). No major-only (`20`) or codename aliases.
+1. **`.nvmrc`** — exact Node semver (currently `22.22.2`). No major-only (`20`) or codename aliases.
 2. **`YARN_VERSION`** — must be set to `1.22.22` in Cloudflare Pages **production and preview** build environment variables. Without this, v3 uses Yarn 4 and `yarn install` fails against the Yarn v1 lockfile.
 3. **`packageManager`** in `package.json` — keep `"yarn@1.22.22"` as documentation; it does not replace the dashboard `YARN_VERSION` on Pages.
 
@@ -46,7 +48,7 @@ The v3 build system does **not**:
 Run **once** when all updates are complete:
 
 ```bash
-# Match .nvmrc (22.16.0)
+# Match .nvmrc (22.22.2)
 yarn install
 yarn verify:deps
 yarn build
@@ -62,4 +64,4 @@ For function changes, also run `yarn pages:dev` when possible.
 | Build command | `yarn build` |
 | Build output directory | `dist` |
 | `YARN_VERSION` | `1.22.22` |
-| `NODE_VERSION` | `22.16.0` (optional if `.nvmrc` is committed) |
+| `NODE_VERSION` | `22.22.2` (optional if `.nvmrc` is committed) |
