@@ -89,6 +89,8 @@ Canonical directive metadata (names, categories, control types) is **`src/csp/di
 
 `vite.config.ts` injects site meta, footer, and SSG app HTML via `transformIndexHtml` plugins. Git commit short hash is baked in at build time (`__GIT_COMMIT_SHORT__`).
 
+`functions/_middleware.ts` serves pre-compressed `.br` sidecars via `ASSETS.fetch`. Cloudflare Pages may return `index.html` with a 200 for a missing sidecar; middleware must ignore `text/html` responses for non-HTML assets so `/assets/*.js` is never served as HTML (`SyntaxError: expected expression, got '<'`).
+
 ## `/api/csp-lookup` contract
 
 **Request:** `POST` with JSON body `{ "url": "https://example.com" }` (max 4 KiB body).

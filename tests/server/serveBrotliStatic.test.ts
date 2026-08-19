@@ -3,6 +3,7 @@ import {
   getStaticAssetCacheControl,
   getStaticAssetContentType,
   isBrotliCompressibleAsset,
+  isPagesHtmlFallback,
   resolveStaticAssetPath,
   tryServeBrotliAsset,
 } from "../../server/serveBrotliStatic";
@@ -116,6 +117,49 @@ describe("serveBrotliStatic", () => {
       ),
     ).resolves.toBeNull();
     expect(assets.fetch).not.toHaveBeenCalled();
+  });
+
+  it("detects Pages HTML fallback on non-HTML sidecar fetches", () => {
+    expect(
+      isPagesHtmlFallback(
+        "/assets/main-abc12345.js",
+        new Response("<!doctype html>", {
+          status: 200,
+          headers: { "content-type": "text/html; charset=utf-8" },
+        }),
+      ),
+    ).toBe(true);
+    expect(
+      isPagesHtmlFallback(
+        "/index.html",
+        new Response("br-html", {
+          status: 200,
+          headers: { "content-type": "text/html; charset=UTF-8" },
+        }),
+      ),
+    ).toBe(false);
+  });
+
+  it("falls through when Pages returns HTML for a missing JS sidecar", async () => {
+    const assets = {
+      fetch: vi.fn(
+        async () =>
+          new Response("<!doctype html>", {
+            status: 200,
+            headers: { "content-type": "text/html; charset=utf-8" },
+          }),
+      ),
+    } as unknown as Fetcher;
+
+    const response = await tryServeBrotliAsset(
+      new Request("https://example.com/assets/main-abc12345.js", {
+        headers: { "Accept-Encoding": "gzip, br" },
+      }),
+      assets,
+    );
+
+    expect(response).toBeNull();
+    expect(assets.fetch).toHaveBeenCalled();
   });
 
   it("falls through when the brotli sidecar fetch fails", async () => {

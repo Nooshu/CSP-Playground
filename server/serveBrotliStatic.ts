@@ -24,6 +24,10 @@ const FINGERPRINTED_ASSET_PATTERN =
  * Keep in sync with `scripts/compress-dist-brotli.mjs` and
  * `scripts/lib/brotli-static.mjs`. Do not request `.br` sidecars for other
  * types — Pages may return an unrelated asset (for example `index.html.br`).
+ * Treat `text/html` sidecar responses as a miss unless the original asset is
+ * HTML; otherwise missing `/assets/*.js.br` files are served as `index.html`
+ * with `Content-Type: text/javascript` and browsers throw
+ * `SyntaxError: expected expression, got '<'`.
  */
 const BROTLI_COMPRESSIBLE_EXTENSIONS = new Set([
   ".css",
@@ -111,6 +115,24 @@ export function getStaticAssetCacheControl(assetPath: string): string {
 }
 
 /**
+ * Whether an `ASSETS.fetch` result is Pages' HTML fallback rather than a `.br` sidecar.
+ *
+ * @param assetPath - Original (uncompressed) asset path.
+ * @param response - Response from fetching `${assetPath}.br`.
+ */
+export function isPagesHtmlFallback(
+  assetPath: string,
+  response: Response,
+): boolean {
+  if (assetPath.endsWith(".html")) {
+    return false;
+  }
+
+  const contentType = response.headers.get("content-type") ?? "";
+  return /text\/html/i.test(contentType);
+}
+
+/**
  * Attempts to serve a pre-compressed `.br` asset when the client accepts Brotli.
  *
  * @param request - Incoming HTTP request.
@@ -145,7 +167,7 @@ export async function tryServeBrotliAsset(
     { method: "GET" },
   );
 
-  if (!brResponse.ok) {
+  if (!brResponse.ok || isPagesHtmlFallback(assetPath, brResponse)) {
     return null;
   }
 
