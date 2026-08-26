@@ -38,7 +38,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.10",
-    "@cloudflare/workers-types": "5.20260823.1",
+    "@cloudflare/workers-types": "5.20260826.1",
     "@playwright/test": "1.62.1",
     "@types/node": "25.9.5",
     "@vitest/coverage-istanbul": "4.1.11",
@@ -46,7 +46,7 @@
     "typescript": "7.0.2",
     "vite": "8.2.2",
     "vitest": "4.1.11",
-    "wrangler": "4.125.0"
+    "wrangler": "4.126.0"
   },
   "resolutions": {
     "vite": "8.2.2"
