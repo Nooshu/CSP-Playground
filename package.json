@@ -37,8 +37,8 @@
     "verify:deps": "node scripts/verify-deps-integrity.mjs"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.11",
-    "@cloudflare/workers-types": "5.20260831.1",
+    "@biomejs/biome": "2.5.12",
+    "@cloudflare/workers-types": "5.20260904.1",
     "@playwright/test": "1.62.1",
     "@types/node": "25.9.5",
     "@vitest/coverage-istanbul": "4.1.11",
@@ -46,7 +46,7 @@
     "typescript": "7.0.2",
     "vite": "8.2.2",
     "vitest": "4.1.11",
-    "wrangler": "4.127.1"
+    "wrangler": "4.129.0"
   },
   "resolutions": {
     "vite": "8.2.2"
