@@ -41,11 +41,11 @@
     "@cloudflare/workers-types": "5.20260904.1",
     "@playwright/test": "1.62.1",
     "@types/node": "25.9.5",
-    "@vitest/coverage-istanbul": "4.1.11",
+    "@vitest/coverage-istanbul": "5.0.0",
     "jsdom": "30.0.1",
     "typescript": "7.0.2",
     "vite": "8.2.2",
-    "vitest": "4.1.11",
+    "vitest": "5.0.0",
     "wrangler": "4.129.0"
   },
   "resolutions": {
