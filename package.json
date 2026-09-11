@@ -49,6 +49,6 @@
     "wrangler": "4.130.0"
   },
   "resolutions": {
-    "vite": "8.2.2"
+    "vite": "8.3.0"
   }
 }
