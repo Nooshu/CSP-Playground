@@ -7,6 +7,8 @@
  * does not re-compress the response.
  *
  * Keep in sync with `scripts/lib/brotli-static.mjs` (local preview server).
+ * Fingerprinted `/assets/*` files are excluded from Functions via `_routes.json`
+ * and are not Brotli-negotiated here (Cloudflare edge compression covers them).
  */
 
 /** Long-lived cache for Vite fingerprinted files under `/assets/`. */
@@ -149,6 +151,13 @@ export async function tryServeBrotliAsset(
 
   const url = new URL(request.url);
   if (url.pathname.startsWith("/api/")) {
+    return null;
+  }
+
+  // Fingerprinted Vite assets are excluded from Functions via `_routes.json`.
+  // Never negotiate `.br` for them here — a soft-404 HTML body would be cached
+  // under `/assets/*` immutable headers and break module loads.
+  if (url.pathname.startsWith("/assets/")) {
     return null;
   }
 

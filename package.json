@@ -23,7 +23,7 @@
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "format": "biome format --write .",
-    "build": "yarn typecheck && vite build && node scripts/generate-dist-headers.mjs && node scripts/compress-dist-brotli.mjs",
+    "build": "yarn typecheck && vite build && node scripts/generate-dist-headers.mjs && node scripts/generate-dist-routes.mjs && node scripts/compress-dist-brotli.mjs",
     "preview": "vite preview",
     "preview:dist": "node scripts/preview-dist.mjs",
     "preview:brotli": "yarn build && node scripts/preview-dist.mjs",

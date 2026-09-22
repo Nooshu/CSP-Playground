@@ -140,7 +140,22 @@ describe("serveBrotliStatic", () => {
     ).toBe(false);
   });
 
-  it("falls through when Pages returns HTML for a missing JS sidecar", async () => {
+  it("falls through for /assets/ paths without fetching sidecars", async () => {
+    const assets = { fetch: vi.fn() } as unknown as Fetcher;
+
+    await expect(
+      tryServeBrotliAsset(
+        new Request("https://example.com/assets/main-abc12345.js", {
+          headers: { "Accept-Encoding": "gzip, br" },
+        }),
+        assets,
+      ),
+    ).resolves.toBeNull();
+
+    expect(assets.fetch).not.toHaveBeenCalled();
+  });
+
+  it("falls through when Pages returns HTML for a missing non-asset sidecar", async () => {
     const assets = {
       fetch: vi.fn(
         async () =>
@@ -152,7 +167,7 @@ describe("serveBrotliStatic", () => {
     } as unknown as Fetcher;
 
     const response = await tryServeBrotliAsset(
-      new Request("https://example.com/assets/main-abc12345.js", {
+      new Request("https://example.com/site-footer-year.mjs", {
         headers: { "Accept-Encoding": "gzip, br" },
       }),
       assets,

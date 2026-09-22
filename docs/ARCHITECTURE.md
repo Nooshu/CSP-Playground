@@ -84,12 +84,12 @@ Canonical directive metadata (names, categories, control types) is **`src/csp/di
 | Phase | What runs |
 |-------|-----------|
 | `yarn dev` | Vite + `cspLookupPlugin` (dev middleware for `/api/csp-lookup`) |
-| `yarn build` | Typecheck → Vite bundle → `_headers` → Brotli sidecars |
+| `yarn build` | Typecheck → Vite bundle → `_headers` → `_routes.json` → Brotli sidecars |
 | Production | Static `dist/` + Pages Functions on the edge |
 
 `vite.config.ts` injects site meta, footer, and SSG app HTML via `transformIndexHtml` plugins. Git commit short hash is baked in at build time (`__GIT_COMMIT_SHORT__`).
 
-`functions/_middleware.ts` serves pre-compressed `.br` sidecars via `ASSETS.fetch`. Cloudflare Pages may return `index.html` with a 200 for a missing sidecar; middleware must ignore `text/html` responses for non-HTML assets so `/assets/*.js` is never served as HTML (`SyntaxError: expected expression, got '<'`).
+`functions/_middleware.ts` serves pre-compressed `.br` sidecars via `ASSETS.fetch` for HTML (and other non-asset paths). Build output includes `_routes.json` so `/assets/*` and other static files bypass Functions entirely — otherwise a soft-404 `index.html` can be cached under an `/assets/*.js` URL with immutable `_headers`, and browsers refuse the module (`disallowed MIME type ("text/html")`). Middleware also ignores `/assets/` and any non-HTML `text/html` sidecar response.
 
 ## `/api/csp-lookup` contract
 

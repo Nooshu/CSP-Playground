@@ -90,6 +90,7 @@ Node is pinned above the v3 default because `jsdom` 30+ requires Node `^22.22.2`
 - New dependencies must install on **Linux x86_64 + Node 22** (the v3 build container).
 - Keep test-only packages (`vitest`, `jsdom`, coverage, `wrangler`) in `devDependencies`. Pages runs `yarn build` only.
 - **Pages Functions** (`functions/`) use the Workers runtime — shared `server/` code must use Web APIs, not Node built-ins, unless `nodejs_compat` is enabled and verified.
+- **Static assets vs Functions** — `yarn build` writes `dist/_routes.json` so `/assets/*` and other static files are excluded from Functions. Do not remove those excludes; they prevent soft-404 HTML from being cached as JS/CSS.
 
 ### Verify deploy-related changes
 

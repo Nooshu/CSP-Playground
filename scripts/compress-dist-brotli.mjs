@@ -11,7 +11,7 @@
  */
 
 import { readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
-import { basename, extname, join } from "node:path";
+import { basename, extname, join, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { brotliCompressSync, constants } from "node:zlib";
 
@@ -54,7 +54,20 @@ const SKIP_EXTENSIONS = new Set([
  * @param {string} filePath
  */
 function compressFile(filePath) {
-  if (basename(filePath) === "_headers") {
+  if (
+    basename(filePath) === "_headers" ||
+    basename(filePath) === "_routes.json"
+  ) {
+    return;
+  }
+
+  // Skip Vite fingerprinted assets — Pages serves `/assets/*` as static files
+  // (see `_routes.json`); Cloudflare's edge compression covers JS/CSS.
+  const relativePath = filePath.slice(distDir.length).replace(/^[/\\]/, "");
+  if (
+    relativePath.startsWith(`assets${sep}`) ||
+    relativePath.startsWith("assets/")
+  ) {
     return;
   }
 
